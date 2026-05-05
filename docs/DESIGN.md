@@ -268,8 +268,150 @@ export function WidgetHealthDot({ status }: { status: Health }) {
 
 ---
 
-## 12. 디자인 변경 이력
+## 12. Phase 1 Design Patches (`/plan-design-review` 결과)
+
+7-pass 압축 리뷰로 도출된 추가 결정·자동 fix 모음. DESIGN.md §1~§11과 함께 SSOT.
+
+### 12.1 위젯 카드 내부 시선 위계 (Pass 1)
+
+```
+1순위: 핵심 데이터 값      (text-3xl font-mono font-bold) — "-3.2°C" / "5km 내 3곳" / "0건"
+2순위: 위젯 제목 + 아이콘  (text-lg font-semibold, 좌상단)
+3순위: 보조 데이터          (text-xs font-mono text-zinc-400)
+4순위: HealthDot           (우상단, 무음 정상 상태)
+5순위: 액션 버튼            (refresh, expand)
+```
+
+**원칙:** 사용자가 카드 봤을 때 0.5초 안에 1순위 값 인지. Mono + 큰 폰트가 anchor.
+
+### 12.2 추가 인터랙션 상태 (Pass 2)
+
+**RefreshBtn 5상태:**
+
+| State | Tailwind |
+|-------|----------|
+| idle | `text-zinc-500` |
+| hover | `text-zinc-300 bg-white/5` |
+| active (pressed) | `scale-95 transition` |
+| spinning (fetch 중) | `animate-spin text-emerald-400` |
+| disabled (debounce) | `text-zinc-700 cursor-not-allowed` |
+
+**Partial / Edge 상태:**
+
+| 상황 | UI 표현 |
+|------|--------|
+| SOS 위치 권한 거부 | 기본 좌표(서울 시청) 사용 + 카드 상단 amber `<Banner>` "위치 켜면 더 정확" + amber HealthDot |
+| 위젯 0개 첫 진입 | `<EmptyDashboard>` Hero — Aurora 위 큰 카피 "어떤 데이터를 받아볼까요?" + "+ 첫 위젯 추가" emerald CTA |
+| 새로고침 빠른 연타 | debounce 500ms, 두 번째 클릭부터 disabled |
+
+### 12.3 User Journey & Time-Horizon Design (Pass 3)
+
+**5초 / 5분 / 5년 horizon (Norman):**
+
+| Horizon | 사용자 인지 | 디자인이 지지 |
+|---------|------------|------------|
+| 5초 (visceral) | "이거 좀 다르네, 진짜 같다" | Aurora gradient + Mono 큰 숫자 + Cmd+K 힌트 |
+| 5분 (behavioral) | "어 빠르네 + 변화 보이네" | First Run Magic 1초 + Diff 색표시 + health dot |
+| 5년 (reflective) | "내 일상에 박힘" | 일관된 디자인, 변화 없는 안정감, 6개월 후도 동일 톤 |
+
+**6단계 User Journey:**
+
+```
+STEP | USER DOES                        | FEELS    | DESIGN SUPPORTS
+─────|──────────────────────────────────|──────────|────────────────────────────
+  1  | 첫 진입 (빈 dashboard)            | 호기심    | Aurora + Hero 빈 상태 + 큰 CTA
+  2  | 카탈로그 둘러봄                   | 기대     | 카드 hover에 데이터 미리보기
+  3  | 첫 위젯 추가                      | 만족     | First Run Magic 1초 → Mono 큰 숫자 fade-in
+  4  | 매일 새로고침 1회                  | 안심     | health dot 녹색, refresh 가벼운 spin
+  5  | PWA 설치 (3번째 방문 trigger)      | 깊은 관계 | iOS install 가이드 또는 Chrome A2HS
+  6  | 6개월 후                          | 일상      | 일관된 디자인, "왜 안 봤지" 후회 없음
+```
+
+### 12.4 AI Slop 차별화 (Pass 4) — Generic Card Grid 회피
+
+**위젯 그리드는 일반 SaaS dashboard와 다음 4가지가 다름:**
+
+1. **Aurora bg** — 카드 *사이의 공기*가 다름. 일반 SaaS는 white/gray flat.
+2. **Mono 데이터** — 큰 숫자가 카드의 anchor. 일반 SaaS는 본문체 + 작은 그래프.
+3. **Live HealthDot** — 카드가 "살아있다"는 신호. 일반 SaaS는 정적.
+4. **Diff 색표시** — 새로고침 시 변화가 보임. 일반 SaaS는 silent refresh.
+
+이 4가지 중 어느 하나라도 빠지면 위젯 그리드는 generic SaaS로 회귀. Phase 1 구현 시 **모두 포함 필수.**
+
+**Aurora 가드레일:** §7의 Aurora bg는 emerald-500/10 + cyan-500/10 blur-3xl, 반드시 *2개만, 10% opacity 이하*. 더 추가하면 "decorative blob slop"으로 추락.
+
+**Emoji 가드레일:** ✨/✅ 등 emoji는 *빈 상태에서만, 카드당 1회 한정*. 헤더·버튼·본문에 emoji 금지.
+
+### 12.5 위젯-토큰 매핑 (Pass 5)
+
+| 요소 | DESIGN.md 토큰 |
+|------|--------------|
+| 위젯 카드 bg | `bg-zinc-900/60 backdrop-blur` |
+| 카드 border | `border border-white/5` |
+| 카드 shadow | `shadow-md shadow-black/30 hover:shadow-xl hover:shadow-black/40` |
+| 카드 radius | `rounded-xl` |
+| 핵심 데이터 (값) | `text-3xl font-mono font-bold text-zinc-100` |
+| 위젯 제목 | `text-lg font-semibold text-zinc-100` |
+| 보조 데이터 | `text-xs font-mono text-zinc-400` |
+| HealthDot 정상 | `bg-emerald-400 shadow-[0_0_8px] shadow-emerald-400/50 motion-safe:animate-pulse` |
+| HealthDot 경고 | `bg-amber-400 shadow-[0_0_8px] shadow-amber-400/50` |
+| HealthDot 에러 | `bg-rose-400 shadow-[0_0_8px] shadow-rose-400/50` |
+| Diff 새 항목 | `text-emerald-400 bg-emerald-950/30 px-1.5 rounded` |
+| Diff 사라짐 | `line-through text-zinc-500` |
+
+### 12.6 위젯별 모바일 변환 (<768px) (Pass 6)
+
+| 위젯 | 모바일 변환 |
+|------|-----------|
+| 날씨 | 시간대별 mini graph: `overflow-x-auto snap-x` 가로 스크롤. 메인 온도는 그대로 큰 mono. |
+| SOS 병원/약국 | 병원 리스트: 1열 stacked. 거리 right-align mono. 전화 버튼 full-width emerald. |
+| 위해식품 리콜 | 키워드 필터 `sticky top-16` (헤더 아래). 항목 카드 1열. |
+
+### 12.7 헤더 로고 스펙 (결정 1)
+
+```tsx
+// src/app/(dashboard)/layout.tsx 헤더
+<a href="/" aria-label="DataWeave 홈" className="flex items-center gap-1.5">
+  <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 shadow-[0_0_6px] shadow-emerald-400/60" />
+  <span className="text-base font-semibold tracking-tight text-zinc-100">
+    DataWeave
+  </span>
+</a>
+```
+
+**원칙:** Wordmark 단일. Inter Bold + tracking-tight. 좌측에 emerald dot (3x3px 정도, 살짝 glow). 디자인 비용 0, 식별 명확. Linear/Vercel 톤.
+
+### 12.8 PWA Install Prompt 트리거 (결정 2)
+
+**조건 (AND):**
+- 사용자 visit count ≥ 3 (localStorage `dataweave.visits`)
+- 활성 위젯 인스턴스 ≥ 1
+- 이전 dismiss 후 7일 경과 (`dataweave.pwa.dismissedAt`)
+- `beforeinstallprompt` event 사용 가능 (Chrome/Edge)
+
+**iOS:** `beforeinstallprompt` 미지원 → 같은 조건 만족 시 "iOS 안내" banner: "공유 → 홈 화면에 추가"
+
+**Banner UI:**
+```tsx
+<aside className="fixed bottom-4 left-4 right-4 md:left-auto md:right-4 md:w-96
+                  rounded-xl bg-zinc-900/95 border border-emerald-500/20
+                  p-4 shadow-2xl backdrop-blur">
+  <p className="text-sm text-zinc-100">DataWeave를 홈 화면에 추가할까요?</p>
+  <p className="text-xs text-zinc-400 mt-1">한 번 클릭으로 앱처럼 열립니다.</p>
+  <div className="flex gap-2 mt-3">
+    <Button size="sm" variant="default">설치</Button>
+    <Button size="sm" variant="ghost">나중에</Button>
+  </div>
+</aside>
+```
+
+**Dismiss 규칙:** 클릭 시 `dismissedAt = now`, 7일 후 재표시. "나중에"는 부드럽게.
+
+---
+
+## 13. 디자인 변경 이력
 
 | 날짜 | 변경 |
 |------|------|
 | 2026-05-04 | 최초 작성. Emerald + Cyan 액센트 + Aurora bg + JetBrains Mono 데이터 |
+| 2026-05-05 | §12 Phase 1 Design Patches 추가 — `/plan-design-review` 7-pass: 카드 IA, 인터랙션 상태, User Journey 5초/5분/5년, Slop 차별화 4가지, 위젯-토큰 매핑, 모바일 변환, 로고 wordmark, PWA install prompt 트리거 |

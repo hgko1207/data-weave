@@ -149,8 +149,60 @@
 
 ---
 
+## TODO 8 — Watcher Platform 활성화 (캠핑장 위젯 + 알림 인프라 일괄)
+
+**What.** Phase 1 단순화 결정으로 deferred된 알림 인프라 전체를 활성화: Web Push (VAPID + Service Worker push handler) + Supabase pg_cron (or GitHub Actions) + `snapshots`/`notifications`/`push_subs`/`cron_runs` 4개 테이블 + 알림 dispatcher + 캠핑장 빈자리 위젯 추가.
+
+**Why.** Phase 1 결정 시 사용자가 "조회만, 무료"를 명시 → 알림 인프라 deferred. 그러나 Watcher Platform 비전(차터 §1)의 코어 가치는 알림형 위젯에 있음. 캠핑장 줍줍은 알림 없이는 의미 0. Phase 2 전환 trigger condition 충족 시 즉시 활성화.
+
+**Pros.**
+- Watcher Platform 비전 완성. 캠핑장·리콜 등 알림 가치가 강한 use case 활성화.
+- 위젯 인터페이스가 Phase 1에 `alerting?` reserved로 박혀 있어 evolution 비용 작음.
+- 인프라 한 번 만들면 새 알림형 위젯 추가는 거의 무료.
+
+**Cons.**
+- Vercel Hobby cron 1/day 한도 → Supabase pg_cron 또는 GitHub Actions로 우회 필요 (둘 다 무료지만 학습 곡선).
+- iOS Web Push는 iOS 16.4+ + PWA install 필수 — setup checklist 명시.
+- Schema drift admin alert는 Web Push self-notify가 첫 폴링 chicken-egg 위험 (Outside Voice #2) → 시스템 시작 시 dummy push test로 구독 검증 필요.
+
+**Context (`/plan-eng-review` Outside Voice 발견 사항):**
+- Cron tier: Vercel Hobby = 1 cron/day로 deploy 시점 fail. **Supabase pg_cron 권장** (Free tier 포함, pg_net으로 Edge Function 호출 → 위젯 폴링).
+- Cron 자체 모니터링 (cron_runs 테이블 + dashboard 진입 시 "최신 cron > 90분 전" 배너 — Outside Voice #3).
+- pollIntervalSec 하한 zod refinement (Outside Voice #4).
+- iOS Web Push는 setup checklist 첫 단계로 PWA install 안내 (Outside Voice #6).
+- Step 분할: (8a) DB 마이그레이션 + cron skeleton, (8b) VAPID + SW + subscribe API, (8c) runner + baseline 보호 + dispatcher (Outside Voice #7).
+
+**Effort.** 사람 L (1~2주) → CC ~6시간
+
+**Priority.** P1 (Trigger condition 충족 즉시)
+
+**Depends on / blocks.** Phase 1 위젯 3개 안정 운영 60일 후 또는 명시적 알림 use case 등장. TODO 5 (스마트홈 트리거)는 본 인프라 의존.
+
+---
+
+## TODO 9 — Phase 2 Trigger Condition 정기 점검
+
+**What.** PLAN.md §12 Phase 2 trigger condition 4가지를 분기마다 점검 (사용량/명시적 결정/사용자 확장/데이터 확장). 한 가지라도 충족되면 TODO 8 진행 결정.
+
+**Why.** SCOPE EXPANSION 모드 비판 (Outside Voice #8) — 사이드 프로젝트가 Phase 2 안 가면 Phase 1의 plugin abstraction이 over-engineered. Trigger 명시로 의식적 의사결정.
+
+**Pros.** Phase 1 abstraction 비용을 의식적으로 정당화. 안 쓰는 추상화 누적 방지.
+
+**Cons.** 분기 점검 자체가 가벼운 운영 부담.
+
+**Context.** PLAN.md §12에 4가지 trigger condition 명시. 분기마다 본인이 dashboard 진입 빈도, 새 데이터 소스 등장, 외부 요청 등을 자가 점검. 충족 없으면 다음 분기까지 Phase 1 유지 — 부끄러워할 일 아님 (인프라 단순함이 가치).
+
+**Effort.** 사람 XS (30분/분기) → CC N/A
+
+**Priority.** P1 운영 일정
+
+**Depends on / blocks.** Phase 1 출시 후 자동 시작.
+
+---
+
 ## 변경 이력
 
 | 날짜 | 변경 |
 |------|------|
-| 2026-05-04 | 최초 작성. 7개 항목 (자연어 위젯, 다중 사용자, 갤러리, 체육시설, 스마트홈, 착한가격업소, health 페이지) |
+| 2026-05-04 | 최초 작성 — 7개 항목 (자연어 위젯, 다중 사용자, 갤러리, 체육시설, 스마트홈, 착한가격업소, health 페이지) — `/plan-ceo-review` SCOPE EXPANSION |
+| 2026-05-04 | TODO 8 (Watcher Platform 인프라), TODO 9 (Phase 2 trigger 점검) 추가 — `/plan-eng-review` Phase 1 축소 결정 + Outside Voice 반영 |
