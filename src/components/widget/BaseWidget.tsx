@@ -1,6 +1,5 @@
 "use client";
 
-import type { LucideIcon } from "lucide-react";
 import { WidgetErrorBoundary } from "@/components/error-boundary";
 import { WidgetHeader } from "./WidgetHeader";
 import { WidgetBody } from "./WidgetBody";
@@ -10,7 +9,7 @@ import { WidgetRefresh } from "./WidgetRefresh";
 import type { WidgetStatus } from "@/widgets/_types";
 
 type Props = {
-  icon: LucideIcon;
+  icon: React.ReactNode;
   title: string;
   status: WidgetStatus;
   errorMessage?: string;
