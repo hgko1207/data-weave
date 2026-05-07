@@ -61,7 +61,7 @@ async function fetchEgen(
   abort: AbortSignal,
 ) {
   const params = new URLSearchParams({
-    serviceKey,
+    serviceKey: normalizeServiceKey(serviceKey),
     Q0: q.Q0,
     Q1: q.Q1,
     pageNo: "1",
@@ -142,4 +142,8 @@ function hoursToday(item: EgenItem, now: Date): string | null {
 function formatHHMM(s: string): string {
   if (s.length !== 4) return s;
   return `${s.slice(0, 2)}:${s.slice(2)}`;
+}
+
+function normalizeServiceKey(k: string): string {
+  return k.includes("%") ? decodeURIComponent(k) : k;
 }

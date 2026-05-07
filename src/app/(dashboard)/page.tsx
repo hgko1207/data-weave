@@ -35,6 +35,16 @@ const DEMO_INSTANCES: WidgetInstance[] = [
     } satisfies WidgetConfig,
     active: true,
   },
+  {
+    id: "demo-food-recall",
+    type: "food-recall",
+    config: {
+      v: 1,
+      allergyKeywords: [],
+      windowHours: 72,
+    } satisfies WidgetConfig,
+    active: true,
+  },
 ];
 
 type Loaded = {
