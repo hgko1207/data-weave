@@ -22,6 +22,19 @@ const DEMO_INSTANCES: WidgetInstance[] = [
     } satisfies WidgetConfig,
     active: true,
   },
+  {
+    id: "demo-pharmacy",
+    type: "pharmacy",
+    config: {
+      v: 1,
+      sido: "대전광역시",
+      sigungu: "유성구",
+      lat: 36.3504,
+      lng: 127.3845,
+      radiusKm: 5,
+    } satisfies WidgetConfig,
+    active: true,
+  },
 ];
 
 type Loaded = {
