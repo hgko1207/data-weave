@@ -17,7 +17,7 @@ const ER_BASE = "https://apis.data.go.kr/B552657/ErmctInfoInqireService/getEgytL
 
 export async function fetchPharmacy(ctx: WidgetContext): Promise<SosData> {
   const cfg = pharmacyConfigSchema.parse(ctx.config);
-  const key = process.env.EMERGENCY_API_KEY;
+  const key = process.env.EMERGENCY_API_KEY ?? process.env.DATA_GO_KR_KEY;
 
   if (!key) {
     logger.info("pharmacy.fetch fallback to mock", { reason: "no EMERGENCY_API_KEY" });
