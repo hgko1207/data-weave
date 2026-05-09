@@ -9,20 +9,23 @@ import {
 import { mockRecalls } from "./mock";
 import { logger } from "@/lib/logger";
 
-const MFDS_BASE =
-  "https://apis.data.go.kr/1471000/RClnFdProductInfoService01/getRClnFdProductInfoService01";
+// 식품안전나라 OpenAPI (foodsafetykorea.go.kr)
+// I0490 = 식품의 회수 및 판매중지 정보 (data.go.kr 15074318)
+// 별도 시스템이라 data.go.kr 키와 호환 안 됨 — FOODSAFETY_API_KEY 사용.
+const FOODSAFETY_BASE = "https://openapi.foodsafetykorea.go.kr/api";
+const FOODSAFETY_SERVICE_ID = "I0490";
 
 export async function fetchFoodRecall(ctx: WidgetContext): Promise<FoodRecallData> {
   const cfg = foodRecallConfigSchema.parse(ctx.config);
-  const key = process.env.MFDS_API_KEY || process.env.DATA_GO_KR_KEY;
+  const key = process.env.FOODSAFETY_API_KEY || process.env.MFDS_API_KEY;
 
   if (!key) {
-    logger.info("food-recall.fetch fallback to mock", { reason: "no MFDS_API_KEY" });
+    logger.info("food-recall.fetch fallback to mock", { reason: "no FOODSAFETY_API_KEY" });
     return assemble(mockRecalls, cfg, "mock");
   }
 
   try {
-    const items = await fetchFromMfds(key, ctx.abort);
+    const items = await fetchFromFoodSafety(key, ctx.abort);
     return assemble(items, cfg, "live");
   } catch (err) {
     logger.warn("food-recall.fetch live failed, using mock", {
@@ -32,16 +35,10 @@ export async function fetchFoodRecall(ctx: WidgetContext): Promise<FoodRecallDat
   }
 }
 
-async function fetchFromMfds(serviceKey: string, abort: AbortSignal): Promise<RecallItem[]> {
-  const params = new URLSearchParams({
-    serviceKey: normalizeServiceKey(serviceKey),
-    pageNo: "1",
-    numOfRows: "100",
-    type: "json",
-  });
-  const res = await fetch(`${MFDS_BASE}?${params.toString()}`, {
-    signal: abort,
-  });
+async function fetchFromFoodSafety(serviceKey: string, abort: AbortSignal): Promise<RecallItem[]> {
+  // path: /api/{KEY}/{SERVICE_ID}/json/{startIdx}/{endIdx}
+  const url = `${FOODSAFETY_BASE}/${encodeURIComponent(serviceKey)}/${FOODSAFETY_SERVICE_ID}/json/1/100`;
+  const res = await fetch(url, { signal: abort });
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   const json = (await res.json()) as unknown;
   return extractRecalls(json);
@@ -115,10 +112,6 @@ function normalizeDate(raw: string): string {
     return `${yyyy}-${mm}-${dd}T00:00:00+09:00`;
   }
   return raw;
-}
-
-function normalizeServiceKey(k: string): string {
-  return k.includes("%") ? decodeURIComponent(k) : k;
 }
 
 function assemble(
