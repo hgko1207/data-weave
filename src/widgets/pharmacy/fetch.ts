@@ -1,6 +1,7 @@
 import { fetchWidget } from "../_fetch-wrapper";
 import type { WidgetContext } from "../_types";
 import {
+  egenItemSchema,
   egenResponseSchema,
   pharmacyConfigSchema,
   sosDataSchema,
@@ -17,7 +18,7 @@ const ER_BASE = "https://apis.data.go.kr/B552657/ErmctInfoInqireService/getEgytL
 
 export async function fetchPharmacy(ctx: WidgetContext): Promise<SosData> {
   const cfg = pharmacyConfigSchema.parse(ctx.config);
-  const key = process.env.EMERGENCY_API_KEY ?? process.env.DATA_GO_KR_KEY;
+  const key = process.env.EMERGENCY_API_KEY || process.env.DATA_GO_KR_KEY;
 
   if (!key) {
     logger.info("pharmacy.fetch fallback to mock", { reason: "no EMERGENCY_API_KEY" });
@@ -83,10 +84,7 @@ function normalizeItems(
   cfg: PharmacyConfig,
   now: Date,
 ): Facility[] {
-  const itemsField = resp.response.body?.items;
-  if (!itemsField || typeof itemsField === "string") return [];
-  const raw = itemsField.item;
-  const arr: EgenItem[] = Array.isArray(raw) ? raw : [raw];
+  const arr = extractEgenItems(resp.response.body?.items);
   return arr.flatMap((it) => {
     const name = it.dutyName?.trim();
     if (!name) return [];
@@ -146,4 +144,23 @@ function formatHHMM(s: string): string {
 
 function normalizeServiceKey(k: string): string {
   return k.includes("%") ? decodeURIComponent(k) : k;
+}
+
+function extractEgenItems(raw: unknown): EgenItem[] {
+  if (raw == null || raw === "") return [];
+  // Common shapes: { item: T | T[] } | T[] | T
+  const candidates: unknown[] =
+    typeof raw === "object" && raw !== null && "item" in (raw as Record<string, unknown>)
+      ? toArray((raw as Record<string, unknown>).item)
+      : toArray(raw);
+
+  return candidates.flatMap((c) => {
+    const parsed = egenItemSchema.safeParse(c);
+    return parsed.success ? [parsed.data] : [];
+  });
+}
+
+function toArray(v: unknown): unknown[] {
+  if (v == null) return [];
+  return Array.isArray(v) ? v : [v];
 }

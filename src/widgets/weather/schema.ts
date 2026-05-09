@@ -73,12 +73,12 @@ export const airkoreaResponseSchema = z.object({
       .object({
         items: z.array(
           z.object({
-            stationName: z.string(),
-            pm10Value: z.string().optional(),
-            pm10Grade: z.string().optional(),
-            pm25Value: z.string().optional(),
-            pm25Grade: z.string().optional(),
-            dataTime: z.string().optional(),
+            stationName: z.string().nullable().optional(),
+            pm10Value: z.string().nullable().optional(),
+            pm10Grade: z.string().nullable().optional(),
+            pm25Value: z.string().nullable().optional(),
+            pm25Grade: z.string().nullable().optional(),
+            dataTime: z.string().nullable().optional(),
           }),
         ),
       })

@@ -37,8 +37,8 @@ const GRADE_MAP: Record<string, "좋음" | "보통" | "나쁨" | "매우 나쁨"
 export async function fetchWeather(ctx: WidgetContext): Promise<WeatherData> {
   const cfg = weatherConfigSchema.parse(ctx.config);
   const sharedKey = process.env.DATA_GO_KR_KEY;
-  const kmaKey = process.env.KMA_API_KEY ?? sharedKey;
-  const airKey = process.env.AIRKOREA_API_KEY ?? sharedKey;
+  const kmaKey = process.env.KMA_API_KEY || sharedKey;
+  const airKey = process.env.AIRKOREA_API_KEY || sharedKey;
 
   if (!kmaKey || !airKey) {
     logger.info("weather.fetch fallback to mock", {

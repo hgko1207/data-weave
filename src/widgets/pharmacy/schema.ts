@@ -72,14 +72,7 @@ export const egenResponseSchema = z.object({
     }),
     body: z
       .object({
-        items: z
-          .union([
-            z.literal(""),
-            z.object({
-              item: z.union([itemBase, z.array(itemBase)]),
-            }),
-          ])
-          .optional(),
+        items: z.unknown().optional(),
         totalCount: z.union([z.string(), z.number()]).optional(),
       })
       .optional(),
@@ -87,3 +80,4 @@ export const egenResponseSchema = z.object({
 });
 
 export type EgenItem = z.infer<typeof itemBase>;
+export const egenItemSchema = itemBase;

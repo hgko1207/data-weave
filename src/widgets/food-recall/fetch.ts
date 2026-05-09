@@ -14,7 +14,7 @@ const MFDS_BASE =
 
 export async function fetchFoodRecall(ctx: WidgetContext): Promise<FoodRecallData> {
   const cfg = foodRecallConfigSchema.parse(ctx.config);
-  const key = process.env.MFDS_API_KEY ?? process.env.DATA_GO_KR_KEY;
+  const key = process.env.MFDS_API_KEY || process.env.DATA_GO_KR_KEY;
 
   if (!key) {
     logger.info("food-recall.fetch fallback to mock", { reason: "no MFDS_API_KEY" });
