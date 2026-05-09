@@ -17,6 +17,7 @@ const FOODSAFETY_SERVICE_ID = "I0490";
 
 export async function fetchFoodRecall(ctx: WidgetContext): Promise<FoodRecallData> {
   const cfg = foodRecallConfigSchema.parse(ctx.config);
+  // 식품안전나라는 data.go.kr와 완전 별도 인증. DATA_GO_KR_KEY 폴백 안 함.
   const key = process.env.FOODSAFETY_API_KEY || process.env.MFDS_API_KEY;
 
   if (!key) {
