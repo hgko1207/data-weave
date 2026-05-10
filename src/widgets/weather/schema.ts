@@ -31,7 +31,7 @@ export const weatherDataSchema = z
     pm10Grade: z.enum(["좋음", "보통", "나쁨", "매우 나쁨", "정보 없음"]),
     pm25Value: z.number().nullable(),
     pm25Grade: z.enum(["좋음", "보통", "나쁨", "매우 나쁨", "정보 없음"]),
-    hourly: z.array(hourlyPointSchema).max(12),
+    hourly: z.array(hourlyPointSchema).max(24),
     source: z.enum(["live", "mock"]),
   })
   .strict();

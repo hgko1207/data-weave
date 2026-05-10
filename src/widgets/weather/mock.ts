@@ -3,13 +3,13 @@ import type { WeatherData } from "./schema";
 export function buildMockWeather(region: string): WeatherData {
   const now = new Date();
   const observedAt = now.toISOString();
-  const hourly = Array.from({ length: 6 }, (_, i) => {
+  const hourly = Array.from({ length: 24 }, (_, i) => {
     const t = new Date(now.getTime() + i * 60 * 60 * 1000);
     const hh = String(t.getHours()).padStart(2, "0");
     return {
       time: `${hh}:00`,
-      temp: -3.2 + i * 0.4,
-      pop: i === 0 ? 20 : i < 3 ? 30 : 10,
+      temp: -3.2 + Math.sin(i / 3) * 4,
+      pop: i % 7 < 2 ? 30 : 10,
     };
   });
 

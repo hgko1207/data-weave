@@ -46,20 +46,7 @@ export function WeatherRender({ data }: { data: WeatherData }) {
       </div>
 
       {data.hourly.length > 0 ? (
-        <div className="overflow-x-auto snap-x">
-          <ul className="flex gap-3 pb-1">
-            {data.hourly.map((h) => (
-              <li
-                key={h.time}
-                className="snap-start flex flex-col items-center gap-1 rounded-lg border border-white/5 bg-white/5 px-3 py-2 min-w-14"
-              >
-                <span className="font-mono text-[10px] text-zinc-500">{h.time}</span>
-                <span className="font-mono text-sm text-zinc-200">{formatTemp(h.temp)}</span>
-                <span className="font-mono text-[10px] text-cyan-400">{h.pop}%</span>
-              </li>
-            ))}
-          </ul>
-        </div>
+        <HourlyStrip hourly={data.hourly.slice(0, 6)} />
       ) : null}
 
       {data.source === "mock" ? (
@@ -67,6 +54,61 @@ export function WeatherRender({ data }: { data: WeatherData }) {
           mock · API 키 등록 시 실 데이터로 전환
         </p>
       ) : null}
+    </div>
+  );
+}
+
+export function HourlyStrip({
+  hourly,
+  showAll,
+}: {
+  hourly: WeatherData["hourly"];
+  showAll?: boolean;
+}) {
+  const items = showAll ? hourly : hourly.slice(0, 6);
+  const temps = items.map((h) => h.temp);
+  const maxTemp = Math.max(...temps);
+  const minTemp = Math.min(...temps);
+  const range = Math.max(maxTemp - minTemp, 1);
+
+  return (
+    <div className="overflow-x-auto pb-1">
+      <ul className="flex gap-2 min-w-min">
+        {items.map((h) => {
+          const ratio = (h.temp - minTemp) / range;
+          return (
+            <li
+              key={h.time}
+              className="flex shrink-0 flex-col items-center gap-1.5 rounded-lg border border-zinc-800 bg-zinc-950/60 px-3 py-2.5 w-[68px]"
+            >
+              <span className="font-mono text-[10px] uppercase tracking-wider text-zinc-500">
+                {h.time}
+              </span>
+              <span
+                className="font-mono text-base font-semibold text-zinc-100"
+                style={{
+                  color:
+                    ratio > 0.66
+                      ? "rgb(252,165,165)"
+                      : ratio < 0.33
+                      ? "rgb(125,211,252)"
+                      : "rgb(244,244,245)",
+                }}
+              >
+                {Math.round(h.temp)}°
+              </span>
+              <div className="relative h-0.5 w-full overflow-hidden rounded-full bg-zinc-800">
+                <span
+                  aria-hidden
+                  className="absolute inset-y-0 left-0 bg-cyan-400/80"
+                  style={{ width: `${Math.min(h.pop, 100)}%` }}
+                />
+              </div>
+              <span className="font-mono text-[10px] text-cyan-400">{h.pop}%</span>
+            </li>
+          );
+        })}
+      </ul>
     </div>
   );
 }

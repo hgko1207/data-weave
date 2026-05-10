@@ -130,7 +130,7 @@ function mergeWeather(region: string, kma: KmaResp, air: AirResp): WeatherData {
   const skyText = pty && pty !== "0" ? PTY_TEXT[pty] || "강수" : SKY_TEXT[sky ?? "1"] || "맑음";
 
   const hourly = byKey("TMP")
-    .slice(0, 6)
+    .slice(0, 24)
     .map((it) => {
       const popMatch = items.find(
         (p) => p.category === "POP" && p.fcstDate === it.fcstDate && p.fcstTime === it.fcstTime,
