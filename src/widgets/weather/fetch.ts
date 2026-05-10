@@ -82,16 +82,25 @@ export async function fetchWeather(ctx: WidgetContext): Promise<WeatherData> {
     // 중기예보는 best-effort. 실패해도 단기 결과 살림.
     let midDaily: DailyPoint[] = [];
     if (cfg.midTermLandId && cfg.midTermTaId) {
+      const tmFc = midTermBaseTime(ctx.now);
       try {
-        const tmFc = midTermBaseTime(ctx.now);
         const [land, ta] = await Promise.all([
           fetchMid(MID_LAND_BASE, kmaKey, cfg.midTermLandId, tmFc, ctx.abort),
           fetchMid(MID_TA_BASE, kmaKey, cfg.midTermTaId, tmFc, ctx.abort),
         ]);
         midDaily = parseMidTerm(land, ta, ctx.now);
+        logger.info("weather.fetch mid-term ok", {
+          land: cfg.midTermLandId,
+          ta: cfg.midTermTaId,
+          tmFc,
+          extracted: midDaily.length,
+        });
       } catch (err) {
         logger.info("weather.fetch mid-term skipped", {
           reason: err instanceof Error ? err.message : String(err),
+          land: cfg.midTermLandId,
+          ta: cfg.midTermTaId,
+          tmFc,
         });
       }
     }
@@ -432,7 +441,8 @@ export function midTermBaseTime(now: Date): string {
   } else {
     baseHour = 18;
   }
-  return `${day.getFullYear()}${pad(day.getMonth() + 1)}${pad(day.getDate())}${pad(baseHour)}00`;
+  // KMA expects 10-digit tmFc: YYYYMMDDHH (no minutes).
+  return `${day.getFullYear()}${pad(day.getMonth() + 1)}${pad(day.getDate())}${pad(baseHour)}`;
 }
 
 export function kmaBaseDateTime(now: Date): { base_date: string; base_time: string } {
