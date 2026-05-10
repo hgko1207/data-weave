@@ -200,9 +200,63 @@
 
 ---
 
+## TODO 10 — Vercel 배포 (로컬-only → 다중 디바이스)
+
+**What.** Phase 1 완성 시점의 사이드 프로젝트는 의식적으로 *로컬-only*로 운영 중. 폰/태블릿에서도 보고 싶거나 가족·친구에게 공유하고 싶어지면 Vercel에 배포하여 HTTPS 도메인 + 자동 배포 파이프라인 활성화.
+
+**Why.** 로컬-only는 본인 PC 켜져 있을 때만 동작 = 모바일에서 못 봄, 외부 공유 불가, PWA install이 작동은 하지만 불완전 (Service Worker는 HTTPS 필수, localhost 예외만 활용). 다중 디바이스·공유 욕구가 생기면 그때 30분 투자.
+
+**Pros.**
+- 코드 변경 0 — `manifest.ts`, `sw.js`, 위젯 fetch 모두 Vercel에서 그대로 동작.
+- Free tier로 무제한 사용량 (개인 사이드 프로젝트 한도 충분).
+- `git push origin main` → 자동 재배포. CI 따로 셋업 X.
+- iOS/Android에서 HTTPS PWA 정식 install 가능.
+
+**Cons.**
+- 환경변수를 Vercel UI에 한 번 더 등록 (로컬 `.env.local` + Vercel = 2곳).
+- 도메인 노출 (Vercel은 자동으로 `*.vercel.app` 발급). 비밀스럽게 쓰고 싶으면 비공개 리포 + 비공개 도메인 셋업 필요 (TODO 2 다중 사용자 + auth 도래 시 자연 해결).
+
+**Context (단계별).**
+
+1. **Vercel 프로젝트 import.** https://vercel.com/new → "Import Git Repository" → `hgko1207/data-weave` → Import. Framework Preset = Next.js 자동 감지.
+
+2. **환경변수 등록 (Production + Preview).** Vercel 대시보드 → Settings → Environment Variables에 추가:
+   - `DATA_GO_KR_KEY` (.env.local의 동일 값)
+   - `FOODSAFETY_API_KEY` (.env.local의 동일 값)
+   - (선택) Supabase 사용 시 `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`
+
+3. **Deploy 버튼.** 빌드 1~2분 → 자동 도메인 (`data-weave-xxx.vercel.app`) 발급.
+
+4. **Smoke test (PLAN.md §13 완료 정의).**
+   - 폰에서 도메인 접속 → 위젯 3개 모두 live 확인
+   - PWA 설치 (방문 3회 이상 + 위젯 1개 이상이면 배너 자동 표시)
+   - 7일간 정상 사용 확인 (KMA / AirKorea / 응급의료 / foodsafetykorea API 안정성)
+
+5. **(선택) 커스텀 도메인.** 보유 도메인이 있으면 Settings → Domains에서 연결.
+
+6. **(선택) Supabase 프로덕션.** 위젯 인스턴스를 DB에 저장하고 싶으면:
+   - https://supabase.com 새 프로젝트
+   - SQL Editor에서 `supabase/migrations/0001_widgets.sql` 실행
+   - URL + anon key + service_role key 복사하여 Vercel env 등록
+   - 대시보드 페이지의 하드코딩 demo 인스턴스를 DB 조회로 전환 (TODO 2와 동시 진행 권장)
+
+**Effort.** 사람 ~20분 (UI 클릭 위주) → CC 보조 시 ~10분
+
+**Priority.** P2 — 본인의 다중 디바이스 욕구 또는 외부 공유 의도가 생길 때. 그때까지 로컬에서 `npm run dev`로 충분.
+
+**Depends on / blocks.** 없음. Phase 1 코드는 이미 배포 가능 상태 (`npm run build` 통과).
+
+**로컬-only 사용 팁 (배포 전까지).**
+- 매일 사용 시: `npm run build && npm run start` (프로덕션 모드 — 빠르고 가벼움, HMR 오버헤드 없음)
+- 코딩 중에만: `npm run dev` (HMR 활성)
+- Service Worker는 프로덕션 빌드에서만 등록되므로 PWA install/오프라인 캐시는 `npm run start` 모드에서 검증 가능 (localhost는 HTTPS 예외)
+
+---
+
 ## 변경 이력
 
 | 날짜 | 변경 |
 |------|------|
 | 2026-05-04 | 최초 작성 — 7개 항목 (자연어 위젯, 다중 사용자, 갤러리, 체육시설, 스마트홈, 착한가격업소, health 페이지) — `/plan-ceo-review` SCOPE EXPANSION |
 | 2026-05-04 | TODO 8 (Watcher Platform 인프라), TODO 9 (Phase 2 trigger 점검) 추가 — `/plan-eng-review` Phase 1 축소 결정 + Outside Voice 반영 |
+| 2026-05-10 | TODO 10 (Vercel 배포) 추가 — Phase 1 완성, 사용자 결정으로 로컬-only 운영. 다중 디바이스/공유 욕구 발생 시 활성화. |
