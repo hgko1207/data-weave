@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import {
   CommandDialog,
@@ -11,7 +11,8 @@ import {
   CommandList,
   CommandSeparator,
 } from "@/components/ui/command";
-import { Cloud, Pill, ShieldAlert, Settings, LayoutGrid, Plus } from "lucide-react";
+import { LayoutGrid, Settings } from "lucide-react";
+import { WIDGET_META } from "@/widgets/_metadata";
 
 type CommandPaletteProps = {
   open: boolean;
@@ -38,8 +39,13 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
   }
 
   return (
-    <CommandDialog open={open} onOpenChange={onOpenChange} title="명령" description="위젯·페이지로 빠르게 이동">
-      <CommandInput placeholder="위젯 추가, 설정, 카탈로그…" />
+    <CommandDialog
+      open={open}
+      onOpenChange={onOpenChange}
+      title="명령"
+      description="페이지·위젯으로 빠르게 이동"
+    >
+      <CommandInput placeholder="대시보드, 날씨, 설정…" />
       <CommandList>
         <CommandEmpty>일치하는 항목이 없습니다.</CommandEmpty>
         <CommandGroup heading="이동">
@@ -47,29 +53,22 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
             <LayoutGrid className="mr-2 h-4 w-4" />
             대시보드
           </CommandItem>
-          <CommandItem onSelect={() => go("/catalog")}>
-            <Plus className="mr-2 h-4 w-4" />
-            위젯 카탈로그
-          </CommandItem>
           <CommandItem onSelect={() => go("/settings")}>
             <Settings className="mr-2 h-4 w-4" />
             설정
           </CommandItem>
         </CommandGroup>
         <CommandSeparator />
-        <CommandGroup heading="위젯 추가">
-          <CommandItem onSelect={() => go("/catalog?add=weather")}>
-            <Cloud className="mr-2 h-4 w-4 text-emerald-400" />
-            날씨
-          </CommandItem>
-          <CommandItem onSelect={() => go("/catalog?add=pharmacy")}>
-            <Pill className="mr-2 h-4 w-4 text-emerald-400" />
-            SOS 병원·약국
-          </CommandItem>
-          <CommandItem onSelect={() => go("/catalog?add=food-recall")}>
-            <ShieldAlert className="mr-2 h-4 w-4 text-emerald-400" />
-            식품 리콜
-          </CommandItem>
+        <CommandGroup heading="공공데이터">
+          {WIDGET_META.map((w) => {
+            const Icon = w.icon;
+            return (
+              <CommandItem key={w.id} onSelect={() => go(`/w/${w.id}`)}>
+                <Icon className="mr-2 h-4 w-4 text-emerald-400" />
+                {w.title}
+              </CommandItem>
+            );
+          })}
         </CommandGroup>
       </CommandList>
     </CommandDialog>
