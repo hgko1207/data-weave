@@ -1,6 +1,17 @@
-import { Construction, ArrowRight } from "lucide-react";
 import Link from "next/link";
+import { ArrowRight } from "lucide-react";
 import { PageFrame } from "@/components/page-frame";
+import { WidgetPreview } from "@/components/widget/WidgetPreview";
+import { SidePanelStub, UpcomingBanner } from "@/components/widget/WidgetDetailStub";
+import type { WidgetConfig } from "@/widgets/_types";
+
+export const dynamic = "force-dynamic";
+
+const DEFAULT_CONFIG = {
+  v: 1,
+  allergyKeywords: [],
+  windowHours: 168,
+} satisfies WidgetConfig;
 
 export default function FoodRecallDetailPage() {
   return (
@@ -8,23 +19,32 @@ export default function FoodRecallDetailPage() {
       eyebrow="widget · food-recall"
       title="식품 리콜"
       description="식약처 회수·판매중지 정보. 키워드 검색, 기간 조절, 등급 필터, 페이지네이션."
+      actions={
+        <Link
+          href="/settings"
+          className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-white/[0.08] bg-white/[0.04] px-3 text-xs text-zinc-400 transition hover:border-white/15 hover:bg-white/[0.08] hover:text-zinc-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
+        >
+          위젯 관리
+          <ArrowRight className="h-3 w-3" aria-hidden />
+        </Link>
+      }
     >
-      <div className="rounded-2xl border border-white/[0.06] bg-zinc-900/50 p-8 backdrop-blur">
-        <div className="mx-auto flex max-w-md flex-col items-center text-center">
-          <div className="flex h-12 w-12 items-center justify-center rounded-full border border-amber-500/20 bg-amber-500/10">
-            <Construction className="h-5 w-5 text-amber-400" aria-hidden />
-          </div>
-          <h2 className="mt-4 text-base font-medium text-zinc-100">상세 검색 페이지 — Step C 작업 예정</h2>
-          <p className="mt-1.5 text-sm text-zinc-400">
-            현재는 대시보드 카드 형태로 동일 데이터를 보실 수 있습니다.
+      <UpcomingBanner />
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)]">
+        <SidePanelStub
+          items={[
+            "알레르기·키워드 다중 검색",
+            "1~3등급 필터",
+            "기간 조절 (24h ~ 30일)",
+            "회사·제품명 정렬",
+            "이미지 미리보기",
+          ]}
+        />
+        <div className="space-y-3">
+          <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
+            현재 미리보기 · 최근 7일 · 키워드 없음
           </p>
-          <Link
-            href="/"
-            className="mt-6 inline-flex items-center gap-1 rounded-lg border border-white/[0.08] bg-white/[0.04] px-3 py-2 text-xs text-zinc-300 transition hover:border-emerald-500/30 hover:bg-emerald-500/10 hover:text-emerald-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
-          >
-            대시보드로 가기
-            <ArrowRight className="h-3 w-3" aria-hidden />
-          </Link>
+          <WidgetPreview widgetId="food-recall" config={DEFAULT_CONFIG} />
         </div>
       </div>
     </PageFrame>

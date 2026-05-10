@@ -1,38 +1,53 @@
-import { Construction, ArrowRight } from "lucide-react";
 import Link from "next/link";
+import { ArrowRight } from "lucide-react";
 import { PageFrame } from "@/components/page-frame";
+import { WidgetPreview } from "@/components/widget/WidgetPreview";
+import { SidePanelStub, UpcomingBanner } from "@/components/widget/WidgetDetailStub";
+import type { WidgetConfig } from "@/widgets/_types";
+
+export const dynamic = "force-dynamic";
+
+const DEFAULT_CONFIG = {
+  v: 1,
+  regionName: "대전",
+  nx: 67,
+  ny: 100,
+  sidoName: "대전",
+} satisfies WidgetConfig;
 
 export default function WeatherDetailPage() {
   return (
     <PageFrame
       eyebrow="widget · weather"
       title="날씨"
-      description="기상청 단기예보 + 에어코리아 미세먼지. 지역 검색, 시간대별·주간 예보, 키워드 알림은 곧 추가됩니다."
-    >
-      <DetailStubBody />
-    </PageFrame>
-  );
-}
-
-function DetailStubBody() {
-  return (
-    <div className="rounded-2xl border border-white/[0.06] bg-zinc-900/50 p-8 backdrop-blur">
-      <div className="mx-auto flex max-w-md flex-col items-center text-center">
-        <div className="flex h-12 w-12 items-center justify-center rounded-full border border-amber-500/20 bg-amber-500/10">
-          <Construction className="h-5 w-5 text-amber-400" aria-hidden />
-        </div>
-        <h2 className="mt-4 text-base font-medium text-zinc-100">상세 검색 페이지 — Step B 작업 예정</h2>
-        <p className="mt-1.5 text-sm text-zinc-400">
-          현재는 대시보드 카드 형태로 동일 데이터를 보실 수 있습니다.
-        </p>
+      description="기상청 단기예보 + 에어코리아 미세먼지. 지역 검색·시간대별·주간 예보는 곧 추가됩니다."
+      actions={
         <Link
-          href="/"
-          className="mt-6 inline-flex items-center gap-1 rounded-lg border border-white/[0.08] bg-white/[0.04] px-3 py-2 text-xs text-zinc-300 transition hover:border-emerald-500/30 hover:bg-emerald-500/10 hover:text-emerald-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
+          href="/settings"
+          className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-white/[0.08] bg-white/[0.04] px-3 text-xs text-zinc-400 transition hover:border-white/15 hover:bg-white/[0.08] hover:text-zinc-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
         >
-          대시보드로 가기
+          위젯 관리
           <ArrowRight className="h-3 w-3" aria-hidden />
         </Link>
+      }
+    >
+      <UpcomingBanner />
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)]">
+        <SidePanelStub
+          items={[
+            "지역 검색 (광역·기초 + 위치 기반)",
+            "시간대별 24시간 그래프",
+            "주간 7일 예보",
+            "강수·미세먼지 알림 임계값",
+          ]}
+        />
+        <div className="space-y-3">
+          <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
+            현재 미리보기 · 대전
+          </p>
+          <WidgetPreview widgetId="weather" config={DEFAULT_CONFIG} />
+        </div>
       </div>
-    </div>
+    </PageFrame>
   );
 }
