@@ -48,7 +48,7 @@ export default function SettingsPage() {
         <h2 className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
           대시보드 위젯
         </h2>
-        <ul className="overflow-hidden rounded-2xl border border-white/[0.08] bg-zinc-900/50 backdrop-blur divide-y divide-white/[0.06]">
+        <ul className="overflow-hidden rounded-xl border border-white/[0.08] bg-zinc-900/50 backdrop-blur divide-y divide-white/[0.06]">
           {WIDGET_META.map((widget) => (
             <PinRow
               key={widget.id}

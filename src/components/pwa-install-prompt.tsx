@@ -78,7 +78,7 @@ export function PwaInstallPrompt({ activeWidgetCount }: { activeWidgetCount: num
     <aside
       role="dialog"
       aria-label="DataWeave 설치"
-      className="fixed bottom-4 left-4 right-4 z-40 rounded-xl border border-emerald-500/20 bg-zinc-900/95 p-4 shadow-2xl backdrop-blur md:left-auto md:right-4 md:w-96"
+      className="fixed bottom-4 left-4 right-4 z-40 rounded-xl border border-emerald-500/20 bg-zinc-900/95 p-4 shadow-2xl shadow-black/40 backdrop-blur md:left-auto md:right-4 md:w-96"
     >
       <div className="flex items-start gap-3">
         <Download className="mt-0.5 h-4 w-4 shrink-0 text-emerald-400" aria-hidden />
@@ -102,7 +102,7 @@ export function PwaInstallPrompt({ activeWidgetCount }: { activeWidgetCount: num
             <button
               type="button"
               onClick={dismiss}
-              className="rounded-lg border border-white/5 bg-white/5 px-3 py-1.5 text-xs text-zinc-300 hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
+              className="rounded-lg border border-white/[0.08] bg-white/[0.04] px-3 py-1.5 text-xs text-zinc-300 transition hover:border-white/15 hover:bg-white/[0.08] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
             >
               나중에
             </button>

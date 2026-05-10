@@ -16,7 +16,7 @@ export function SidePanelStub({ items }: { items: string[] }) {
   return (
     <aside
       aria-label="추가 예정 컨트롤"
-      className="rounded-2xl border border-dashed border-white/[0.08] bg-zinc-900/30 p-5 backdrop-blur"
+      className="rounded-xl border border-dashed border-white/[0.08] bg-zinc-900/30 p-5 backdrop-blur"
     >
       <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
         곧 추가

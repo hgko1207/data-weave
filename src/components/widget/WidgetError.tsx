@@ -19,7 +19,7 @@ export function WidgetError({ message, onRetry }: Props) {
         <button
           type="button"
           onClick={onRetry}
-          className="mt-1 rounded-lg border border-white/5 bg-white/5 px-2.5 py-1 text-xs text-zinc-300 hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
+          className="mt-1 inline-flex h-9 items-center rounded-lg border border-white/[0.08] bg-white/[0.04] px-3 text-xs text-zinc-300 transition hover:border-white/15 hover:bg-white/[0.08] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
         >
           다시 시도
         </button>
