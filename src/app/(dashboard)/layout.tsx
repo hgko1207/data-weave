@@ -23,7 +23,7 @@ export default function AppLayout({
 
       <div className="flex w-full flex-1 flex-col">
         <header className="sticky top-0 z-20 h-14 border-b border-white/5 bg-zinc-950/85 backdrop-blur">
-          <div className="flex h-full items-center justify-between gap-3 px-6 lg:px-8">
+          <div className="flex h-full items-center justify-between gap-3 px-4 md:px-6 lg:px-8">
             <div className="flex min-w-0 items-baseline gap-2">
               {eyebrow ? (
                 <span className="hidden font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500 sm:inline">
@@ -47,7 +47,7 @@ export default function AppLayout({
         </header>
 
         <main className="flex-1">
-          <div className="mx-auto max-w-7xl px-6 py-8 lg:px-8 lg:py-10">
+          <div className="mx-auto max-w-7xl px-4 py-6 md:px-6 md:py-8 lg:px-8 lg:py-10">
             {children}
           </div>
         </main>
