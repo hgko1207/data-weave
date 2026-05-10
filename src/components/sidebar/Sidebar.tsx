@@ -4,7 +4,7 @@ export function Sidebar() {
   return (
     <aside
       aria-label="주 메뉴"
-      className="sticky top-0 z-30 flex h-screen w-60 shrink-0 flex-col border-r border-white/5 bg-zinc-950/80 backdrop-blur"
+      className="sticky top-0 z-30 flex h-screen w-64 shrink-0 flex-col border-r border-white/[0.08] bg-zinc-900/95 backdrop-blur-sm"
     >
       <SidebarContent />
     </aside>

@@ -24,33 +24,22 @@ export function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
   }));
 
   return (
-    <div className="relative flex h-full flex-col">
-      {/* subtle aurora bleed at top */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-emerald-500/[0.06] to-transparent"
-      />
-
-      {/* logo */}
+    <div className="flex h-full flex-col">
       <Link
         href="/"
         onClick={onNavigate}
         aria-label="DataWeave 홈"
-        className="relative z-10 flex h-16 items-center gap-2 px-5"
+        className="group flex h-14 items-center gap-2 px-5 transition"
       >
-        <span className="h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_10px] shadow-emerald-400/70" />
+        <span className="h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_10px] shadow-emerald-400/70 transition group-hover:shadow-emerald-400/90" />
         <span className="text-sm font-semibold tracking-tight text-zinc-100">
           DataWeave
         </span>
       </Link>
 
-      <div
-        aria-hidden
-        className="mx-4 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent"
-      />
+      <div aria-hidden className="mx-4 h-px bg-white/[0.08]" />
 
-      {/* nav */}
-      <nav className="relative z-10 flex flex-1 flex-col px-3 py-4">
+      <nav className="flex flex-1 flex-col px-3 py-4">
         <NavSection items={PRIMARY} onNavigate={onNavigate} />
         <SectionLabel title="공공데이터" />
         <NavSection items={widgetItems} onNavigate={onNavigate} />
@@ -58,14 +47,6 @@ export function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
           <NavSection items={SECONDARY} onNavigate={onNavigate} />
         </div>
       </nav>
-
-      {/* footer keyboard hint */}
-      <div
-        aria-hidden
-        className="relative z-10 border-t border-white/5 px-5 py-3 text-[10px] text-zinc-600"
-      >
-        <span className="font-mono">⌘K</span> 빠른 이동
-      </div>
     </div>
   );
 }
@@ -89,16 +70,16 @@ function NavSection({
               href={it.href}
               onClick={onNavigate}
               aria-current={active ? "page" : undefined}
-              className={`group relative flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50 ${
+              className={`group relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50 ${
                 active
-                  ? "bg-gradient-to-r from-emerald-500/15 to-emerald-500/5 text-emerald-300"
+                  ? "bg-emerald-500/10 text-emerald-200"
                   : "text-zinc-400 hover:bg-white/5 hover:text-zinc-100"
               }`}
             >
               {active ? (
                 <span
                   aria-hidden
-                  className="absolute left-0 top-1/2 h-5 w-0.5 -translate-y-1/2 rounded-r-full bg-emerald-400 shadow-[0_0_8px] shadow-emerald-400/60"
+                  className="absolute left-0 top-1/2 h-6 w-[3px] -translate-y-1/2 rounded-r-full bg-emerald-400 shadow-[0_0_10px] shadow-emerald-400/70"
                 />
               ) : null}
               <Icon
@@ -120,11 +101,11 @@ function NavSection({
 
 function SectionLabel({ title }: { title: string }) {
   return (
-    <div className="mb-1.5 mt-4 flex items-center gap-2 px-3">
-      <span className="font-mono text-[10px] uppercase tracking-[0.15em] text-zinc-500">
+    <div className="mb-1.5 mt-5 flex items-center gap-2 px-3">
+      <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
         {title}
       </span>
-      <div className="h-px flex-1 bg-white/5" />
+      <div className="h-px flex-1 bg-white/[0.06]" />
     </div>
   );
 }

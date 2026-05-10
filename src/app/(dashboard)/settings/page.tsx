@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import type { LucideIcon } from "lucide-react";
+import { PageFrame } from "@/components/page-frame";
 import { WIDGET_META, type WidgetMeta } from "@/widgets/_metadata";
 import { DEFAULT_PINNED, readPinned, writePinned } from "@/lib/pinned-widgets";
 
@@ -27,31 +28,27 @@ export default function SettingsPage() {
   };
 
   return (
-    <section className="space-y-8">
-      <header>
-        <h1 className="text-2xl font-semibold tracking-tight text-zinc-100">설정</h1>
-        <p className="mt-1 text-sm text-zinc-400">
-          대시보드에 표시할 위젯을 선택하세요. 사이드바 메뉴에선 선택과 무관하게 모든
-          위젯에 접근할 수 있습니다.
-        </p>
-      </header>
-
-      <div className="space-y-2">
-        <div className="flex items-baseline justify-between">
-          <h2 className="font-mono text-[10px] uppercase tracking-widest text-zinc-500">
-            대시보드 위젯
-          </h2>
-          {pinned ? (
-            <button
-              type="button"
-              onClick={reset}
-              className="text-xs text-zinc-500 hover:text-zinc-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
-            >
-              기본값으로
-            </button>
-          ) : null}
-        </div>
-        <ul className="divide-y divide-white/5 rounded-xl border border-white/5 bg-zinc-900/40 backdrop-blur">
+    <PageFrame
+      eyebrow="settings"
+      title="설정"
+      description="대시보드에 표시할 위젯을 선택하세요. 사이드바 메뉴에선 선택과 무관하게 모든 위젯에 접근할 수 있습니다."
+      actions={
+        pinned ? (
+          <button
+            type="button"
+            onClick={reset}
+            className="inline-flex h-9 items-center rounded-lg border border-white/[0.08] bg-white/[0.04] px-3 text-xs text-zinc-400 transition hover:border-white/15 hover:bg-white/[0.08] hover:text-zinc-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
+          >
+            기본값으로
+          </button>
+        ) : null
+      }
+    >
+      <section className="space-y-3">
+        <h2 className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
+          대시보드 위젯
+        </h2>
+        <ul className="overflow-hidden rounded-2xl border border-white/[0.08] bg-zinc-900/50 backdrop-blur divide-y divide-white/[0.06]">
           {WIDGET_META.map((widget) => (
             <PinRow
               key={widget.id}
@@ -62,8 +59,8 @@ export default function SettingsPage() {
             />
           ))}
         </ul>
-      </div>
-    </section>
+      </section>
+    </PageFrame>
   );
 }
 
@@ -80,8 +77,10 @@ function PinRow({
 }) {
   const Icon: LucideIcon = widget.icon;
   return (
-    <li className="flex items-center gap-3 p-4">
-      <Icon className="h-5 w-5 shrink-0 text-emerald-400" aria-hidden />
+    <li className="flex items-center gap-4 px-5 py-4 transition hover:bg-white/[0.02]">
+      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-emerald-500/20 bg-emerald-500/10">
+        <Icon className="h-4 w-4 text-emerald-400" aria-hidden />
+      </div>
       <div className="min-w-0 flex-1">
         <p className="text-sm font-medium text-zinc-100">{widget.title}</p>
         <p className="truncate text-xs text-zinc-500">{widget.description}</p>
@@ -110,14 +109,14 @@ function Toggle({
       aria-label={label}
       disabled={disabled}
       onClick={onChange}
-      className={`relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50 ${
+      className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50 ${
         on ? "bg-emerald-500" : "bg-zinc-700"
       }`}
     >
       <span
         aria-hidden
-        className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition ${
-          on ? "translate-x-4" : "translate-x-0.5"
+        className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition ${
+          on ? "translate-x-[22px]" : "translate-x-0.5"
         }`}
       />
     </button>
