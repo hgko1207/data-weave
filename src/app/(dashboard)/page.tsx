@@ -41,7 +41,7 @@ const DEMO_INSTANCES: WidgetInstance[] = [
     config: {
       v: 1,
       allergyKeywords: [],
-      windowHours: 72,
+      windowHours: 168,
     } satisfies WidgetConfig,
     active: true,
   },

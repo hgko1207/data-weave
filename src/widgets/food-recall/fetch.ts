@@ -49,11 +49,27 @@ function extractRecalls(json: unknown): RecallItem[] {
   const raw = findItemsArray(json);
   return raw.flatMap((it) => {
     const r = it as Record<string, unknown>;
-    const productName = pick(r, ["PRDLST_NM", "PRDT_NM", "PRDUCT_NM", "productName"]);
-    const company = pick(r, ["BSSH_NM", "COMPANY_NM", "BSN_NM", "company"]);
-    const reason = pick(r, ["RTRVL_RSON", "RECALL_RSON", "RTRVL_RESN", "reason"]);
-    const dateRaw = pick(r, ["RTRVL_DT", "RECALL_DT", "PRMS_DT", "DT", "recallDate"]);
-    const image = pick(r, ["IMG_URL", "IMG_URL1", "imageUrl"]);
+    const productName = pick(r, [
+      "PRDTNM", "PRDLST_NM", "PRDT_NM", "PRDUCT_NM", "productName",
+    ]);
+    const company = pick(r, [
+      "BSSHNM", "BSSH_NM", "COMPANY_NM", "BSN_NM", "company",
+    ]);
+    const reasonText = pick(r, [
+      "RTRVLPRVNS",
+      "RTRVL_RSON",
+      "RECALL_RSON",
+      "RTRVL_RESN",
+      "reason",
+    ]);
+    const grade = pick(r, ["RTRVL_GRDCD_NM"]);
+    const reason = [grade ? `[${grade}]` : null, reasonText].filter(Boolean).join(" ").trim();
+    const dateRaw = pick(r, [
+      "CRET_DTM", "RTRVL_DT", "RECALL_DT", "PRMS_DT", "DT", "recallDate",
+    ]);
+    const image = pick(r, [
+      "IMG_FILE_PATH", "IMG_URL", "IMG_URL1", "imageUrl",
+    ]);
     if (!productName || !dateRaw) return [];
     return [
       {
@@ -61,7 +77,7 @@ function extractRecalls(json: unknown): RecallItem[] {
         productName: productName.trim(),
         company: (company ?? "").trim(),
         recallDate: normalizeDate(dateRaw),
-        reason: (reason ?? "사유 미기재").trim(),
+        reason: reason || "사유 미기재",
         imageUrl: image && image.startsWith("http") ? image : null,
       } satisfies RecallItem,
     ];
