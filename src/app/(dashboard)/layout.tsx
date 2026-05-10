@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { usePathname } from "next/navigation";
-import { Command as CommandIcon } from "lucide-react";
+import { Search } from "lucide-react";
 import { CommandPalette } from "@/components/command-palette";
 import { PwaInstallPrompt } from "@/components/pwa-install-prompt";
 import { Sidebar } from "@/components/sidebar/Sidebar";
@@ -18,36 +18,30 @@ export default function AppLayout({
   const { eyebrow, title } = getPageTitle(pathname);
 
   return (
-    <div className="flex min-h-full">
+    <div className="flex min-h-full bg-zinc-950">
       <Sidebar />
 
       <div className="flex w-full flex-1 flex-col">
-        <header className="sticky top-0 z-20 h-14 border-b border-white/5 bg-zinc-950/85 backdrop-blur">
-          <div className="flex h-full items-center justify-between gap-3 px-4 md:px-6 lg:px-8">
-            <div className="flex min-w-0 items-baseline gap-2">
-              {eyebrow ? (
-                <span className="hidden font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500 sm:inline">
-                  {eyebrow}
-                </span>
-              ) : null}
-              <span aria-hidden className="hidden text-zinc-700 sm:inline">/</span>
-              <h2 className="truncate text-sm font-medium text-zinc-200">{title}</h2>
-            </div>
+        <header className="sticky top-0 z-20 flex h-14 items-center border-b border-zinc-800/80 bg-zinc-950/85 backdrop-blur">
+          <div className="flex h-full w-full items-center justify-between gap-3 px-6 lg:px-8">
+            <Breadcrumb eyebrow={eyebrow} title={title} />
             <button
               type="button"
               onClick={() => setPaletteOpen(true)}
-              className="inline-flex h-9 items-center gap-2 rounded-lg border border-white/[0.08] bg-white/[0.04] px-3 text-xs text-zinc-400 transition hover:border-white/15 hover:bg-white/[0.08] hover:text-zinc-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
+              className="inline-flex h-9 min-w-[200px] items-center gap-2 rounded-lg border border-zinc-800 bg-zinc-900 px-3 text-sm text-zinc-500 transition hover:border-zinc-700 hover:bg-zinc-900/80 hover:text-zinc-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
               aria-label="명령 팔레트 열기"
             >
-              <CommandIcon className="h-3.5 w-3.5" />
-              <span className="hidden sm:inline">빠른 이동</span>
-              <kbd className="font-mono text-[10px] text-zinc-500">⌘K</kbd>
+              <Search className="h-3.5 w-3.5" aria-hidden />
+              <span className="flex-1 text-left">검색…</span>
+              <kbd className="hidden items-center gap-0.5 rounded border border-zinc-800 bg-zinc-950 px-1.5 py-0.5 font-mono text-[10px] text-zinc-400 sm:inline-flex">
+                ⌘K
+              </kbd>
             </button>
           </div>
         </header>
 
-        <main className="flex-1">
-          <div className="mx-auto max-w-7xl px-4 py-6 md:px-6 md:py-8 lg:px-8 lg:py-10">
+        <main className="flex-1 bg-zinc-950">
+          <div className="mx-auto max-w-7xl px-6 py-8 lg:px-8 lg:py-10">
             {children}
           </div>
         </main>
@@ -56,5 +50,21 @@ export default function AppLayout({
       <CommandPalette open={paletteOpen} onOpenChange={setPaletteOpen} />
       <PwaInstallPrompt activeWidgetCount={1} />
     </div>
+  );
+}
+
+function Breadcrumb({ eyebrow, title }: { eyebrow?: string; title: string }) {
+  return (
+    <nav aria-label="현재 위치" className="flex min-w-0 items-center gap-2">
+      {eyebrow ? (
+        <>
+          <span className="hidden font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500 md:inline">
+            {eyebrow.split(" · ").join(" / ")}
+          </span>
+          <span aria-hidden className="hidden text-zinc-700 md:inline">/</span>
+        </>
+      ) : null}
+      <h2 className="truncate text-sm font-semibold text-zinc-100">{title}</h2>
+    </nav>
   );
 }

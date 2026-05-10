@@ -31,7 +31,7 @@ export function BaseWidget({
   return (
     <article
       aria-label={`${title} 위젯`}
-      className="rounded-xl border border-white/[0.06] bg-zinc-900/55 p-6 shadow-lg shadow-black/20 backdrop-blur transition hover:border-white/10 hover:shadow-xl hover:shadow-black/30"
+      className="rounded-xl border border-zinc-800/80 bg-zinc-900 p-6 transition hover:border-zinc-700"
     >
       <WidgetHeader
         icon={icon}

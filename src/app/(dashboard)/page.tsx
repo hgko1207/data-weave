@@ -4,6 +4,7 @@ import { bootstrapWidgets } from "@/widgets/_registry.bootstrap";
 import { getWidget } from "@/widgets/_registry";
 import { DashboardWidget } from "@/components/widget/DashboardWidget";
 import { PageFrame } from "@/components/page-frame";
+import { DashboardStats } from "@/components/dashboard-stats";
 import type { WidgetConfig, WidgetInstance, WidgetStatus } from "@/widgets/_types";
 
 export const dynamic = "force-dynamic";
@@ -91,6 +92,11 @@ export default async function DashboardPage() {
   }
 
   const loaded = await Promise.all(instances.map(loadInstance));
+  const liveCount = loaded.filter((l) => {
+    if (l.status !== "success") return false;
+    const data = l.data as { source?: string } | null;
+    return data?.source === "live";
+  }).length;
 
   return (
     <PageFrame
@@ -100,14 +106,19 @@ export default async function DashboardPage() {
       actions={
         <Link
           href="/settings"
-          className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-white/[0.08] bg-white/[0.04] px-3 text-xs text-zinc-400 transition hover:border-white/15 hover:bg-white/[0.08] hover:text-zinc-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
+          className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-zinc-800 bg-zinc-900 px-3 text-xs text-zinc-300 transition hover:border-zinc-700 hover:bg-zinc-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
         >
           <SettingsIcon className="h-3.5 w-3.5" />
           위젯 관리
         </Link>
       }
     >
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 xl:grid-cols-3">
+      <DashboardStats
+        widgetCount={loaded.length}
+        liveCount={liveCount}
+        sourceCount={4}
+      />
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 xl:grid-cols-3 lg:gap-5">
         {loaded.map((entry) => {
           const widget = getWidget(entry.instance.type);
           if (!widget) return null;

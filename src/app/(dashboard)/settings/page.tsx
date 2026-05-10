@@ -37,7 +37,7 @@ export default function SettingsPage() {
           <button
             type="button"
             onClick={reset}
-            className="inline-flex h-9 items-center rounded-lg border border-white/[0.08] bg-white/[0.04] px-3 text-xs text-zinc-400 transition hover:border-white/15 hover:bg-white/[0.08] hover:text-zinc-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
+            className="inline-flex h-9 items-center rounded-lg border border-zinc-800 bg-zinc-900 px-3 text-xs text-zinc-300 transition hover:border-zinc-700 hover:bg-zinc-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
           >
             기본값으로
           </button>
@@ -48,7 +48,7 @@ export default function SettingsPage() {
         <h2 className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
           대시보드 위젯
         </h2>
-        <ul className="overflow-hidden rounded-xl border border-white/[0.08] bg-zinc-900/50 backdrop-blur divide-y divide-white/[0.06]">
+        <ul className="overflow-hidden rounded-xl border border-zinc-800/80 bg-zinc-900 divide-y divide-zinc-800/80">
           {WIDGET_META.map((widget) => (
             <PinRow
               key={widget.id}
@@ -77,7 +77,7 @@ function PinRow({
 }) {
   const Icon: LucideIcon = widget.icon;
   return (
-    <li className="flex items-center gap-4 px-5 py-4 transition hover:bg-white/[0.02]">
+    <li className="flex items-center gap-4 px-5 py-4 transition hover:bg-zinc-800/40">
       <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-emerald-500/20 bg-emerald-500/10">
         <Icon className="h-4 w-4 text-emerald-400" aria-hidden />
       </div>

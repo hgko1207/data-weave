@@ -8,19 +8,19 @@ type Props = {
 
 export function PageFrame({ eyebrow, title, description, actions, children }: Props) {
   return (
-    <section className="space-y-6">
-      <header className="flex flex-wrap items-end justify-between gap-4 border-b border-white/5 pb-5">
+    <section className="space-y-8">
+      <header className="flex flex-wrap items-end justify-between gap-4">
         <div className="min-w-0">
           {eyebrow ? (
-            <p className="font-mono text-[11px] uppercase leading-none tracking-[0.18em] text-emerald-400/80">
+            <p className="font-mono text-[11px] font-semibold uppercase leading-none tracking-[0.18em] text-emerald-400">
               {eyebrow}
             </p>
           ) : null}
-          <h1 className="mt-2 text-[1.625rem] font-semibold leading-tight tracking-tight text-zinc-100 md:text-[2rem]">
+          <h1 className="mt-3 text-3xl font-semibold leading-tight tracking-tight text-zinc-100">
             {title}
           </h1>
           {description ? (
-            <p className="mt-2 max-w-[60ch] text-sm leading-relaxed text-zinc-400">
+            <p className="mt-2.5 max-w-[60ch] text-sm leading-relaxed text-zinc-400">
               {description}
             </p>
           ) : null}

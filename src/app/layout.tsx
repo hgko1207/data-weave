@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
-import { AuroraBg } from "@/components/aurora-bg";
 import { ServiceWorkerRegister } from "@/components/sw-register";
 
 const inter = Inter({
@@ -44,7 +43,6 @@ export default function RootLayout({
       className={`dark ${inter.variable} ${jetbrainsMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-zinc-950 text-zinc-100">
-        <AuroraBg />
         {children}
         <ServiceWorkerRegister />
       </body>
