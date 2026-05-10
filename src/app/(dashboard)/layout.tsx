@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { Settings, Plus, Command as CommandIcon } from "lucide-react";
 import { CommandPalette } from "@/components/command-palette";
+import { PwaInstallPrompt } from "@/components/pwa-install-prompt";
 
 export default function DashboardLayout({
   children,
@@ -59,6 +60,7 @@ export default function DashboardLayout({
       </main>
 
       <CommandPalette open={paletteOpen} onOpenChange={setPaletteOpen} />
+      <PwaInstallPrompt activeWidgetCount={1} />
     </div>
   );
 }
