@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Plus } from "lucide-react";
+import { Settings as SettingsIcon } from "lucide-react";
 import { bootstrapWidgets } from "@/widgets/_registry.bootstrap";
 import { getWidget } from "@/widgets/_registry";
 import { DashboardWidget } from "@/components/widget/DashboardWidget";
@@ -87,8 +87,10 @@ export default async function DashboardPage() {
   const loaded = await Promise.all(instances.map(loadInstance));
 
   return (
-    <section className="grid grid-cols-1 gap-6 lg:grid-cols-2 xl:grid-cols-3">
-      {loaded.map((entry) => {
+    <section className="space-y-8">
+      <DashboardHeader />
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 xl:grid-cols-3">
+        {loaded.map((entry) => {
         const widget = getWidget(entry.instance.type);
         if (!widget) return null;
         const Render = widget.Render;
@@ -114,7 +116,30 @@ export default async function DashboardPage() {
           </DashboardWidget>
         );
       })}
+      </div>
     </section>
+  );
+}
+
+function DashboardHeader() {
+  return (
+    <header className="flex flex-wrap items-end justify-between gap-3">
+      <div>
+        <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-emerald-400/80">
+          dashboard
+        </p>
+        <h1 className="mt-1 text-2xl font-semibold tracking-tight text-zinc-100">
+          오늘의 한국 공공데이터
+        </h1>
+      </div>
+      <Link
+        href="/settings"
+        className="inline-flex items-center gap-1.5 rounded-lg border border-white/5 bg-white/5 px-2.5 py-1.5 text-xs text-zinc-400 hover:bg-white/10 hover:text-zinc-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
+      >
+        <SettingsIcon className="h-3.5 w-3.5" />
+        위젯 관리
+      </Link>
+    </header>
   );
 }
 
@@ -131,10 +156,11 @@ function EmptyState() {
         날씨, SOS 병원, 식품 리콜. 한국 공공데이터 위젯을 한 화면에 모아보세요.
       </p>
       <Link
-        href="/catalog"
+        href="/settings"
         className="mt-8 inline-flex items-center gap-1.5 rounded-lg bg-emerald-500 px-4 py-2 text-sm font-medium text-zinc-950 hover:bg-emerald-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
       >
-        <Plus className="h-4 w-4" />첫 위젯 추가
+        <SettingsIcon className="h-4 w-4" />
+        위젯 선택하기
       </Link>
     </section>
   );
