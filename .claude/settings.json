@@ -1,7 +1,9 @@
 {
   "permissions": {
     "allow": [
-      "Bash(curl -s \"http://localhost:3000/w/weather\" -o wd.html -w \"%{http_code}\\\\n\")"
+      "Bash(curl -s \"http://localhost:3000/w/weather\" -o wd.html -w \"%{http_code}\\\\n\")",
+      "Bash(curl -s \"http://localhost:3000/w/pharmacy\" -o pd.html -w \"%{http_code}\\\\n\")",
+      "Bash(curl -s \"http://localhost:3000/w/food-recall?q=%EC%9A%B0%EC%9C%A0&window=168\" -o fr.html)"
     ]
   }
 }

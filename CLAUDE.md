@@ -184,10 +184,14 @@ node scripts/generate-icons.mjs   # PWA 아이콘 재생성 (sharp)
 - 사이드바는 **항상 표시** (모바일 collapse·반응형 width 시도하다 사용자 피드백으로 폐기됨 — `w-64` 고정).
 - 사용자는 본인 1명, 데스크톱 위주, Windows. 백그라운드 dev 서버는 `npm run start`로 일상 사용.
 
-## 현재 상태 (Phase 1.5 진행 중)
+## 현재 상태 (Phase 1.5 완성)
 
-완성: Step 0~6 (Phase 1) + 사이드바 네비 + 설정 페이지(localStorage 핀 토글) + 날씨 상세 페이지(지역 셀렉터 + 시간대별 + 주간 예보 8일).
-
-진행 예정: SOS 병원·약국 상세 페이지 + 식품 리콜 상세 페이지 (같은 패턴).
+완성:
+- Step 0~6 (Phase 1)
+- 사이드바 네비 + 설정 페이지 (localStorage 핀 토글)
+- 위젯 3종 상세 페이지 — URL `searchParams` 기반 검색·필터 동기화
+  - `/w/weather?region=` — 지역 chip 셀렉터 + 시간대별 24h + 주간 예보 8일 (단기 3 + 중기 5)
+  - `/w/pharmacy?sido=&sigungu=&radius=&kind=` — 시·도/시·군·구 폼 + 반경·종류 chips + 카카오맵 링크
+  - `/w/food-recall?q=&window=` — 키워드 폼(쉼표 구분) + 자주 쓰는 키워드 chip + 기간 chips
 
 미진행 (Phase 2 이후 → [docs/TODOS.md](docs/TODOS.md)): 자연어 위젯 생성, 다중 사용자/Auth, 워치 갤러리, 알림 인프라 등.

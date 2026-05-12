@@ -1,52 +1,86 @@
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { PageFrame } from "@/components/page-frame";
-import { WidgetPreview } from "@/components/widget/WidgetPreview";
-import { SidePanelStub, UpcomingBanner } from "@/components/widget/WidgetDetailStub";
-import type { WidgetConfig } from "@/widgets/_types";
+import { FoodRecallFilters } from "@/components/widget/food-recall/FoodRecallFilters";
+import { FoodRecallDetail } from "@/components/widget/food-recall/FoodRecallDetail";
+import { fetchFoodRecall } from "@/widgets/food-recall/fetch";
+import {
+  foodRecallDataSchema,
+  type FoodRecallData,
+} from "@/widgets/food-recall/schema";
+import { logger } from "@/lib/logger";
 
 export const dynamic = "force-dynamic";
 
-const DEFAULT_CONFIG = {
-  v: 1,
-  allergyKeywords: [],
-  windowHours: 168,
-} satisfies WidgetConfig;
+const ALLOWED_WINDOWS = new Set([24, 72, 168, 720]);
 
-export default function FoodRecallDetailPage() {
+type Props = {
+  searchParams: Promise<{
+    q?: string;
+    window?: string;
+  }>;
+};
+
+export default async function FoodRecallDetailPage({ searchParams }: Props) {
+  const params = await searchParams;
+  const keywords = (params.q ?? "")
+    .split(",")
+    .map((k) => k.trim())
+    .filter(Boolean);
+  const windowNum = Number(params.window);
+  const windowHours = ALLOWED_WINDOWS.has(windowNum) ? windowNum : 168;
+
+  let data: FoodRecallData;
+  let errorMessage: string | undefined;
+  try {
+    data = await fetchFoodRecall({
+      config: {
+        v: 1,
+        allergyKeywords: keywords,
+        windowHours,
+      },
+      abort: new AbortController().signal,
+      now: new Date(),
+    });
+  } catch (err) {
+    logger.warn("food-recall detail page fetch failed", {
+      error: err instanceof Error ? err.message : String(err),
+    });
+    errorMessage = err instanceof Error ? err.message : "알 수 없는 오류";
+    data = foodRecallDataSchema.parse({
+      total: 0,
+      filteredTotal: 0,
+      items: [],
+      windowHours,
+      matchedKeywords: [],
+      source: "mock",
+    });
+  }
+
   return (
     <PageFrame
       eyebrow="widget · food-recall"
       title="식품 리콜"
-      description="식약처 회수·판매중지 정보. 키워드 검색, 기간 조절, 등급 필터, 페이지네이션."
+      description="식약처 회수·판매중지 정보. 알레르기 키워드와 기간으로 필터링합니다."
       actions={
         <Link
-          href="/settings"
+          href="/"
           className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-zinc-800 bg-zinc-900 px-3 text-xs text-zinc-300 transition hover:border-zinc-700 hover:bg-zinc-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
         >
-          위젯 관리
-          <ArrowRight className="h-3 w-3" aria-hidden />
+          <ArrowLeft className="h-3.5 w-3.5" aria-hidden />
+          대시보드
         </Link>
       }
     >
-      <UpcomingBanner />
-      <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)]">
-        <SidePanelStub
-          items={[
-            "알레르기·키워드 다중 검색",
-            "1~3등급 필터",
-            "기간 조절 (24h ~ 30일)",
-            "회사·제품명 정렬",
-            "이미지 미리보기",
-          ]}
-        />
-        <div className="space-y-3">
-          <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
-            현재 미리보기 · 최근 7일 · 키워드 없음
-          </p>
-          <WidgetPreview widgetId="food-recall" config={DEFAULT_CONFIG} />
+      <FoodRecallFilters current={{ keywords, windowHours }} />
+
+      {errorMessage ? (
+        <div className="rounded-lg border border-amber-500/20 bg-amber-500/[0.06] px-4 py-3 text-xs text-amber-200">
+          데이터를 불러오지 못했습니다: <span className="font-mono">{errorMessage}</span>
         </div>
-      </div>
+      ) : null}
+
+      <FoodRecallDetail data={data} />
     </PageFrame>
   );
 }
