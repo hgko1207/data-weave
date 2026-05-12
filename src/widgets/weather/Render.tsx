@@ -22,7 +22,7 @@ export function WeatherRender({ data }: { data: WeatherData }) {
         </span>
       </div>
 
-      <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs">
+      <div className="flex flex-wrap gap-x-4 gap-y-1.5 text-sm">
         <span className="text-cyan-400">
           강수확률 <span className="font-mono">{data.pop}%</span>
         </span>
@@ -39,7 +39,7 @@ export function WeatherRender({ data }: { data: WeatherData }) {
           </span>
         </span>
         {data.feelsLike != null ? (
-          <span className="text-zinc-500">
+          <span className="text-zinc-400">
             체감 <span className="font-mono">{formatTemp(data.feelsLike)}</span>
           </span>
         ) : null}
@@ -50,7 +50,7 @@ export function WeatherRender({ data }: { data: WeatherData }) {
       ) : null}
 
       {data.source === "mock" ? (
-        <p className="font-mono text-[10px] uppercase tracking-widest text-zinc-600">
+        <p className="font-mono text-xs uppercase tracking-wider text-zinc-500">
           mock · API 키 등록 시 실 데이터로 전환
         </p>
       ) : null}
@@ -79,13 +79,13 @@ export function HourlyStrip({
           return (
             <li
               key={h.time}
-              className="flex shrink-0 flex-col items-center gap-1.5 rounded-lg border border-zinc-800 bg-zinc-950/60 px-3 py-2.5 w-[68px]"
+              className="flex shrink-0 flex-col items-center gap-2 rounded-lg border border-zinc-800 bg-zinc-950/60 px-3 py-3 w-[76px]"
             >
-              <span className="font-mono text-[10px] uppercase tracking-wider text-zinc-500">
+              <span className="font-mono text-xs font-medium uppercase tracking-wider text-zinc-400">
                 {h.time}
               </span>
               <span
-                className="font-mono text-base font-semibold text-zinc-100"
+                className="font-mono text-lg font-semibold tabular-nums"
                 style={{
                   color:
                     ratio > 0.66
@@ -104,7 +104,7 @@ export function HourlyStrip({
                   style={{ width: `${Math.min(h.pop, 100)}%` }}
                 />
               </div>
-              <span className="font-mono text-[10px] text-cyan-400">{h.pop}%</span>
+              <span className="font-mono text-xs text-cyan-400 tabular-nums">{h.pop}%</span>
             </li>
           );
         })}

@@ -41,7 +41,7 @@ export function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
           <span className="text-sm font-semibold tracking-tight text-zinc-100">
             DataWeave
           </span>
-          <span className="text-[11px] text-zinc-500">한국 공공데이터</span>
+          <span className="text-xs text-zinc-400">한국 공공데이터</span>
         </div>
       </Link>
 
@@ -105,8 +105,8 @@ function NavSection({
 
 function SectionLabel({ title }: { title: string }) {
   return (
-    <div className="mb-1 mt-5 px-2.5">
-      <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-zinc-500">
+    <div className="mb-1.5 mt-5 px-2.5">
+      <span className="font-mono text-xs font-semibold uppercase tracking-[0.14em] text-zinc-400">
         {title}
       </span>
     </div>
@@ -124,8 +124,8 @@ function DataSourceStatus() {
     <div className="mt-3 flex items-center gap-2 rounded-md bg-zinc-950/60 px-2.5 py-2">
       <Activity className="h-3.5 w-3.5 shrink-0 text-emerald-400" aria-hidden />
       <div className="flex min-w-0 flex-1 flex-col leading-tight">
-        <span className="text-[11px] font-medium text-zinc-300">데이터 소스</span>
-        <span className="text-[10px] text-zinc-500">{sources.length}/4 연결됨</span>
+        <span className="text-xs font-medium text-zinc-300">데이터 소스</span>
+        <span className="text-[11px] text-zinc-500">{sources.length}/4 연결됨</span>
       </div>
       <div className="flex items-center gap-1">
         {sources.map((s) => (

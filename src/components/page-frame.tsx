@@ -12,7 +12,7 @@ export function PageFrame({ eyebrow, title, description, actions, children }: Pr
       <header className="flex flex-wrap items-end justify-between gap-4">
         <div className="min-w-0">
           {eyebrow ? (
-            <p className="font-mono text-[11px] font-semibold uppercase leading-none tracking-[0.18em] text-emerald-400">
+            <p className="font-mono text-xs font-semibold uppercase leading-none tracking-[0.16em] text-emerald-400">
               {eyebrow}
             </p>
           ) : null}

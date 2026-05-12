@@ -45,18 +45,18 @@ export function DashboardStats({ widgetCount, liveCount, sourceCount }: Props) {
           <div className="flex items-center gap-2.5">
             <span
               aria-hidden
-              className={`flex h-8 w-8 items-center justify-center rounded-md ${
+              className={`flex h-9 w-9 items-center justify-center rounded-md ${
                 it.highlight ? "bg-emerald-500/15 text-emerald-400" : "bg-zinc-800 text-zinc-400"
               }`}
             >
               <it.icon className="h-4 w-4" />
             </span>
-            <span className="text-xs font-medium text-zinc-400">{it.label}</span>
+            <span className="text-sm font-medium text-zinc-300">{it.label}</span>
           </div>
           <p className="mt-3 font-mono text-2xl font-semibold tracking-tight text-zinc-100">
             {it.value}
           </p>
-          <p className="mt-0.5 truncate text-[11px] text-zinc-500">{it.hint}</p>
+          <p className="mt-0.5 truncate text-xs text-zinc-500">{it.hint}</p>
         </article>
       ))}
     </div>

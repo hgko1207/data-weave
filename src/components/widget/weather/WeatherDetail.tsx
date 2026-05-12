@@ -53,7 +53,7 @@ function CurrentCard({ data }: { data: WeatherData }) {
             <CloudSun className="h-5 w-5" aria-hidden />
           </span>
           <div>
-            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
+            <p className="font-mono text-xs uppercase tracking-[0.16em] text-zinc-500">
               현재 날씨
             </p>
             <p className="text-sm font-medium text-zinc-100">{data.region}</p>
@@ -61,7 +61,7 @@ function CurrentCard({ data }: { data: WeatherData }) {
         </div>
         <div className="flex items-center gap-1.5">
           <SkyIcon className={`h-4 w-4 ${sky.color}`} aria-hidden />
-          <p className="text-xs text-zinc-400">{data.skyText}</p>
+          <p className="text-sm text-zinc-300">{data.skyText}</p>
         </div>
       </header>
 
@@ -84,24 +84,24 @@ function CurrentCard({ data }: { data: WeatherData }) {
         ) : null}
       </div>
 
-      <dl className="mt-6 grid grid-cols-2 gap-x-6 gap-y-3 text-sm">
+      <dl className="mt-6 grid grid-cols-2 gap-x-6 gap-y-3.5 text-sm">
         <DetailRow
-          icon={<Droplets className="h-3.5 w-3.5 text-cyan-400" aria-hidden />}
+          icon={<Droplets className="h-4 w-4 text-cyan-400" aria-hidden />}
           label="강수확률"
           value={`${data.pop}%`}
         />
         <DetailRow
-          icon={<ThermometerSun className="h-3.5 w-3.5 text-amber-400" aria-hidden />}
+          icon={<ThermometerSun className="h-4 w-4 text-amber-400" aria-hidden />}
           label="체감"
           value={data.feelsLike != null ? `${data.feelsLike.toFixed(1)}°C` : "—"}
         />
         <DetailRow
-          icon={<Gauge className="h-3.5 w-3.5 text-cyan-300" aria-hidden />}
+          icon={<Gauge className="h-4 w-4 text-cyan-300" aria-hidden />}
           label="습도"
           value={data.humidity != null ? `${data.humidity}%` : "—"}
         />
         <DetailRow
-          icon={<Compass className="h-3.5 w-3.5 text-zinc-300" aria-hidden />}
+          icon={<Compass className="h-4 w-4 text-zinc-300" aria-hidden />}
           label="바람"
           value={
             data.windSpeed != null
@@ -111,7 +111,7 @@ function CurrentCard({ data }: { data: WeatherData }) {
         />
         {data.precipitation != null && data.precipitation > 0 ? (
           <DetailRow
-            icon={<CloudRain className="h-3.5 w-3.5 text-cyan-400" aria-hidden />}
+            icon={<CloudRain className="h-4 w-4 text-cyan-400" aria-hidden />}
             label="강수량"
             value={`${data.precipitation.toFixed(1)}mm/h`}
           />
@@ -133,8 +133,8 @@ function DetailRow({
   return (
     <div className="flex items-center gap-2">
       {icon}
-      <dt className="text-zinc-500">{label}</dt>
-      <dd className="ml-auto font-mono text-zinc-100">{value}</dd>
+      <dt className="text-zinc-400">{label}</dt>
+      <dd className="ml-auto font-mono text-base font-medium text-zinc-100">{value}</dd>
     </div>
   );
 }
@@ -184,16 +184,16 @@ function AirQualityRow({
   grade: WeatherData["pm10Grade"];
 }) {
   return (
-    <div className="space-y-1">
+    <div className="space-y-1.5">
       <div className="flex items-baseline justify-between">
-        <dt className="text-xs text-zinc-500">{label}</dt>
-        <dd className={`text-xs font-medium ${gradeColor[grade]}`}>{grade}</dd>
+        <dt className="text-sm text-zinc-400">{label}</dt>
+        <dd className={`text-sm font-medium ${gradeColor[grade]}`}>{grade}</dd>
       </div>
       <div className="flex items-baseline gap-1.5">
-        <span className="font-mono text-xl font-semibold text-zinc-100">
+        <span className="font-mono text-2xl font-semibold text-zinc-100">
           {value ?? "—"}
         </span>
-        <span className="font-mono text-xs text-zinc-500">{unit}</span>
+        <span className="font-mono text-sm text-zinc-500">{unit}</span>
       </div>
     </div>
   );
@@ -210,8 +210,8 @@ function HourlyChartCard({ data }: { data: WeatherData }) {
   return (
     <article className="rounded-xl border border-zinc-800/80 bg-zinc-900 p-6">
       <header className="flex items-baseline justify-between">
-        <h2 className="text-sm font-medium text-zinc-100">시간대별 예보</h2>
-        <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
+        <h2 className="text-base font-semibold text-zinc-100">시간대별 예보</h2>
+        <p className="font-mono text-xs uppercase tracking-[0.16em] text-zinc-500">
           최대 {data.hourly.length}시간
         </p>
       </header>
@@ -225,73 +225,52 @@ function HourlyChartCard({ data }: { data: WeatherData }) {
 function DailyForecastCard({ daily }: { daily: DailyPoint[] }) {
   if (daily.length === 0) return null;
 
-  const tempBounds = daily.reduce(
-    (acc, d) => {
-      if (d.high != null && d.high > acc.max) acc.max = d.high;
-      if (d.low != null && d.low < acc.min) acc.min = d.low;
-      return acc;
-    },
-    { min: Infinity, max: -Infinity },
-  );
-  const range = Math.max(tempBounds.max - tempBounds.min, 1);
-
   return (
     <article className="rounded-xl border border-zinc-800/80 bg-zinc-900 p-6">
       <header className="flex items-baseline justify-between">
-        <h2 className="text-sm font-medium text-zinc-100">주간 예보</h2>
-        <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
-          {daily.length}일 · 단기 + 중기예보
+        <h2 className="text-base font-semibold text-zinc-100">주간 예보</h2>
+        <p className="font-mono text-xs uppercase tracking-[0.16em] text-zinc-500">
+          {daily.length}일 · 단기 + 중기
         </p>
       </header>
       <ul className="mt-2">
         {daily.map((d) => (
-          <DailyRow key={d.dayOffset} day={d} bounds={tempBounds} range={range} />
+          <DailyRow key={d.dayOffset} day={d} />
         ))}
       </ul>
     </article>
   );
 }
 
-function DailyRow({
-  day,
-  bounds,
-  range,
-}: {
-  day: DailyPoint;
-  bounds: { min: number; max: number };
-  range: number;
-}) {
-  const lowPct = day.low != null ? ((day.low - bounds.min) / range) * 100 : 0;
-  const highPct = day.high != null ? ((day.high - bounds.min) / range) * 100 : 100;
-  const widthPct = Math.max(highPct - lowPct, 4);
+function DailyRow({ day }: { day: DailyPoint }) {
   const sky = getSkyVisual(day.skyText);
   const Icon = sky.Icon;
   const isWeekend = day.label === "토요일" || day.label === "일요일";
   const popLevel = (day.pop ?? 0) > 30 ? "high" : (day.pop ?? 0) > 0 ? "low" : "none";
 
   return (
-    <li className="grid grid-cols-[68px_28px_1fr_56px_36px_minmax(96px,1fr)_36px] items-center gap-3 border-t border-zinc-800/60 py-3.5 first:border-t-0">
+    <li className="grid grid-cols-[80px_36px_1fr_88px_auto] items-center gap-4 border-t border-zinc-800/60 py-4 first:border-t-0">
       <span
-        className={`text-sm font-medium ${isWeekend ? "text-rose-300" : "text-zinc-100"}`}
+        className={`text-base font-medium ${isWeekend ? "text-rose-300" : "text-zinc-100"}`}
       >
         {day.label}
       </span>
 
-      <Icon className={`h-5 w-5 shrink-0 ${sky.color}`} aria-hidden />
+      <Icon className={`h-6 w-6 shrink-0 ${sky.color}`} aria-hidden />
 
-      <span className="truncate text-xs text-zinc-500">{day.skyText}</span>
+      <span className="truncate text-sm text-zinc-400">{day.skyText}</span>
 
-      <div className="flex items-center gap-1">
+      <div className="flex items-center gap-1.5">
         {popLevel === "none" ? (
-          <span className="font-mono text-xs text-zinc-700">—</span>
+          <span className="font-mono text-sm text-zinc-700">—</span>
         ) : (
           <>
             <Droplets
-              className={`h-3 w-3 ${popLevel === "high" ? "text-cyan-400" : "text-cyan-400/60"}`}
+              className={`h-4 w-4 ${popLevel === "high" ? "text-cyan-400" : "text-cyan-400/60"}`}
               aria-hidden
             />
             <span
-              className={`font-mono text-xs tabular-nums ${
+              className={`font-mono text-sm tabular-nums ${
                 popLevel === "high" ? "text-cyan-400" : "text-cyan-400/70"
               }`}
             >
@@ -301,26 +280,15 @@ function DailyRow({
         )}
       </div>
 
-      <span className="text-right font-mono text-sm font-medium tabular-nums text-cyan-300">
-        {day.low != null ? `${Math.round(day.low)}°` : "—"}
-      </span>
-
-      <div className="relative h-1.5 overflow-hidden rounded-full bg-zinc-800/70">
-        {day.low != null && day.high != null ? (
-          <span
-            aria-hidden
-            className="absolute inset-y-0 rounded-full bg-gradient-to-r from-cyan-400 to-rose-400"
-            style={{
-              left: `${lowPct}%`,
-              width: `${widthPct}%`,
-            }}
-          />
-        ) : null}
+      <div className="flex items-baseline gap-2.5 font-mono tabular-nums">
+        <span className="w-10 text-right text-base font-semibold text-cyan-300">
+          {day.low != null ? `${Math.round(day.low)}°` : "—"}
+        </span>
+        <span aria-hidden className="text-zinc-700">/</span>
+        <span className="w-10 text-base font-semibold text-rose-300">
+          {day.high != null ? `${Math.round(day.high)}°` : "—"}
+        </span>
       </div>
-
-      <span className="font-mono text-sm font-medium tabular-nums text-rose-300">
-        {day.high != null ? `${Math.round(day.high)}°` : "—"}
-      </span>
     </li>
   );
 }
