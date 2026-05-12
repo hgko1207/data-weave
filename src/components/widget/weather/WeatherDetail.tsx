@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { HourlyStrip } from "@/widgets/weather/Render";
 import type { DailyPoint, WeatherData } from "@/widgets/weather/schema";
+import { getSkyVisual } from "./sky-icon";
 
 const gradeColor: Record<WeatherData["pm10Grade"], string> = {
   "좋음": "text-emerald-400",
@@ -42,6 +43,8 @@ export function WeatherDetail({ data }: { data: WeatherData }) {
 }
 
 function CurrentCard({ data }: { data: WeatherData }) {
+  const sky = getSkyVisual(data.skyText);
+  const SkyIcon = sky.Icon;
   return (
     <article className="rounded-xl border border-zinc-800/80 bg-zinc-900 p-6">
       <header className="flex items-start justify-between gap-3">
@@ -56,7 +59,10 @@ function CurrentCard({ data }: { data: WeatherData }) {
             <p className="text-sm font-medium text-zinc-100">{data.region}</p>
           </div>
         </div>
-        <p className="text-xs text-zinc-500">{data.skyText}</p>
+        <div className="flex items-center gap-1.5">
+          <SkyIcon className={`h-4 w-4 ${sky.color}`} aria-hidden />
+          <p className="text-xs text-zinc-400">{data.skyText}</p>
+        </div>
       </header>
 
       <div className="mt-6 flex items-baseline gap-3">
@@ -237,7 +243,7 @@ function DailyForecastCard({ daily }: { daily: DailyPoint[] }) {
           {daily.length}일 · 단기 + 중기예보
         </p>
       </header>
-      <ul className="mt-4 divide-y divide-zinc-800/60">
+      <ul className="mt-2">
         {daily.map((d) => (
           <DailyRow key={d.dayOffset} day={d} bounds={tempBounds} range={range} />
         ))}
@@ -255,21 +261,55 @@ function DailyRow({
   bounds: { min: number; max: number };
   range: number;
 }) {
-  const lowPct =
-    day.low != null ? ((day.low - bounds.min) / range) * 100 : 0;
-  const highPct =
-    day.high != null ? ((day.high - bounds.min) / range) * 100 : 100;
+  const lowPct = day.low != null ? ((day.low - bounds.min) / range) * 100 : 0;
+  const highPct = day.high != null ? ((day.high - bounds.min) / range) * 100 : 100;
   const widthPct = Math.max(highPct - lowPct, 4);
+  const sky = getSkyVisual(day.skyText);
+  const Icon = sky.Icon;
+  const isWeekend = day.label === "토요일" || day.label === "일요일";
+  const popLevel = (day.pop ?? 0) > 30 ? "high" : (day.pop ?? 0) > 0 ? "low" : "none";
 
   return (
-    <li className="grid grid-cols-[minmax(0,4rem)_minmax(0,5rem)_1fr_auto] items-center gap-3 py-3">
-      <span className="text-sm font-medium text-zinc-100">{day.label}</span>
-      <span className="text-xs text-zinc-500">{day.skyText}</span>
-      <div className="relative h-1.5 rounded-full bg-zinc-800">
+    <li className="grid grid-cols-[68px_28px_1fr_56px_36px_minmax(96px,1fr)_36px] items-center gap-3 border-t border-zinc-800/60 py-3.5 first:border-t-0">
+      <span
+        className={`text-sm font-medium ${isWeekend ? "text-rose-300" : "text-zinc-100"}`}
+      >
+        {day.label}
+      </span>
+
+      <Icon className={`h-5 w-5 shrink-0 ${sky.color}`} aria-hidden />
+
+      <span className="truncate text-xs text-zinc-500">{day.skyText}</span>
+
+      <div className="flex items-center gap-1">
+        {popLevel === "none" ? (
+          <span className="font-mono text-xs text-zinc-700">—</span>
+        ) : (
+          <>
+            <Droplets
+              className={`h-3 w-3 ${popLevel === "high" ? "text-cyan-400" : "text-cyan-400/60"}`}
+              aria-hidden
+            />
+            <span
+              className={`font-mono text-xs tabular-nums ${
+                popLevel === "high" ? "text-cyan-400" : "text-cyan-400/70"
+              }`}
+            >
+              {day.pop}%
+            </span>
+          </>
+        )}
+      </div>
+
+      <span className="text-right font-mono text-sm font-medium tabular-nums text-cyan-300">
+        {day.low != null ? `${Math.round(day.low)}°` : "—"}
+      </span>
+
+      <div className="relative h-1.5 overflow-hidden rounded-full bg-zinc-800/70">
         {day.low != null && day.high != null ? (
           <span
             aria-hidden
-            className="absolute inset-y-0 rounded-full bg-gradient-to-r from-cyan-400/80 via-emerald-400/80 to-rose-400/80"
+            className="absolute inset-y-0 rounded-full bg-gradient-to-r from-cyan-400 to-rose-400"
             style={{
               left: `${lowPct}%`,
               width: `${widthPct}%`,
@@ -277,13 +317,9 @@ function DailyRow({
           />
         ) : null}
       </div>
-      <span className="font-mono text-xs tabular-nums text-zinc-400">
-        <span className="text-cyan-300">{day.low != null ? `${Math.round(day.low)}°` : "—"}</span>
-        <span className="text-zinc-600"> · </span>
-        <span className="text-rose-300">{day.high != null ? `${Math.round(day.high)}°` : "—"}</span>
-        {day.pop != null && day.pop > 0 ? (
-          <span className="ml-2 text-cyan-400">{day.pop}%</span>
-        ) : null}
+
+      <span className="font-mono text-sm font-medium tabular-nums text-rose-300">
+        {day.high != null ? `${Math.round(day.high)}°` : "—"}
       </span>
     </li>
   );

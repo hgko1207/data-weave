@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(curl -s \"http://localhost:3000/w/weather\" -o wd.html -w \"%{http_code}\\\\n\")"
+    ]
+  }
+}
