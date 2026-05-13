@@ -64,11 +64,14 @@ async function fetchEgen(
   const params = new URLSearchParams({
     serviceKey: normalizeServiceKey(serviceKey),
     Q0: q.Q0,
-    Q1: q.Q1,
     pageNo: "1",
-    numOfRows: "100",
+    numOfRows: "200",
     _type: "json",
   });
+  // '전체' 검색 시 Q1 생략 — 응급의료 OpenAPI는 Q1 없으면 시·도 전체 반환
+  if (q.Q1.trim()) {
+    params.set("Q1", q.Q1);
+  }
   return fetchWidget({
     url: `${base}?${params.toString()}`,
     schema: egenResponseSchema,

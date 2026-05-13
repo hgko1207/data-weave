@@ -27,7 +27,7 @@ type Props = {
 export default async function PharmacyDetailPage({ searchParams }: Props) {
   const params = await searchParams;
   const sido = params.sido?.trim() || "대전광역시";
-  const sigungu = params.sigungu?.trim() || "유성구";
+  const sigungu = (params.sigungu ?? "").trim(); // 빈 문자열이면 '전체'
   const radiusNum = Number(params.radius);
   const radius = ALLOWED_RADIUS.has(radiusNum) ? radiusNum : 5;
   const kindRaw = params.kind ?? "all";
@@ -35,6 +35,9 @@ export default async function PharmacyDetailPage({ searchParams }: Props) {
     kindRaw === "pharmacy" || kindRaw === "er" ? kindRaw : "all";
 
   const center = getSidoCenter(sido);
+  // '전체'면 반경을 시·도 단위로 넉넉히
+  const effectiveRadius = sigungu ? radius : Math.max(radius, 20);
+  const regionLabel = sigungu ? `${sido} ${sigungu}` : `${sido} 전체`;
 
   let data: SosData;
   let errorMessage: string | undefined;
@@ -46,7 +49,7 @@ export default async function PharmacyDetailPage({ searchParams }: Props) {
         sigungu,
         lat: center.lat,
         lng: center.lng,
-        radiusKm: radius,
+        radiusKm: effectiveRadius,
       },
       abort: new AbortController().signal,
       now: new Date(),
@@ -57,19 +60,22 @@ export default async function PharmacyDetailPage({ searchParams }: Props) {
     });
     errorMessage = err instanceof Error ? err.message : "알 수 없는 오류";
     data = sosDataSchema.parse({
-      region: `${sido} ${sigungu}`,
+      region: regionLabel,
       queriedAt: new Date().toISOString(),
       list: [],
-      radiusKm: radius,
+      radiusKm: effectiveRadius,
       origin: center,
       source: "mock",
     });
   }
 
+  // 전체 검색일 때는 fetch에서 region이 "{sido} " (trailing space)으로 옴 — label 덮어쓰기
+  const displayData: SosData = { ...data, region: regionLabel };
+
   return (
     <PageFrame
       eyebrow="widget · pharmacy"
-      title={`SOS 병원·약국 · ${sido} ${sigungu}`}
+      title={`SOS 병원·약국 · ${regionLabel}`}
       description="야간·공휴일 운영 약국 + 응급실. 시·도/시·군·구 검색, 반경 조절, 카카오맵 연결."
       actions={
         <Link
@@ -91,7 +97,7 @@ export default async function PharmacyDetailPage({ searchParams }: Props) {
         </div>
       ) : null}
 
-      <PharmacyDetail data={data} kindFilter={kind} />
+      <PharmacyDetail data={displayData} kindFilter={kind} />
     </PageFrame>
   );
 }

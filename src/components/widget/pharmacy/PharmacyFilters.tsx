@@ -1,5 +1,10 @@
+"use client";
+
+import { useMemo, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Search } from "lucide-react";
+import { getSigunguList } from "@/widgets/pharmacy/sigungu-list";
 
 const SIDOS = [
   "서울특별시",
@@ -36,6 +41,12 @@ export type PharmacyFilterValues = {
 };
 
 export function PharmacyFilters({ current }: { current: PharmacyFilterValues }) {
+  const router = useRouter();
+  const [sido, setSido] = useState(current.sido);
+  const [sigungu, setSigungu] = useState(current.sigungu);
+
+  const sigunguOptions = useMemo(() => getSigunguList(sido), [sido]);
+
   const buildHref = (overrides: Partial<PharmacyFilterValues>) => {
     const params = new URLSearchParams({
       sido: overrides.sido ?? current.sido,
@@ -46,18 +57,35 @@ export function PharmacyFilters({ current }: { current: PharmacyFilterValues }) 
     return `/w/pharmacy?${params.toString()}`;
   };
 
+  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const params = new URLSearchParams({
+      sido,
+      sigungu,
+      radius: String(current.radius),
+      kind: current.kind,
+    });
+    router.push(`/w/pharmacy?${params.toString()}`);
+  };
+
+  const onSidoChange = (value: string) => {
+    setSido(value);
+    // 새 시·도로 바꾸면 시·군·구는 '전체'(빈 값)로 리셋
+    setSigungu("");
+  };
+
   return (
     <section className="rounded-xl border border-zinc-800/80 bg-zinc-900 p-5">
       <p className="font-mono text-xs font-semibold uppercase tracking-[0.14em] text-zinc-400">
         검색 조건
       </p>
 
-      <form action="/w/pharmacy" method="GET" className="mt-4 grid gap-4 md:grid-cols-[1fr_1fr_auto] md:items-end">
+      <form onSubmit={onSubmit} className="mt-4 grid gap-4 md:grid-cols-[1fr_1fr_auto] md:items-end">
         <label className="flex flex-col gap-1.5">
           <span className="text-xs text-zinc-400">시·도</span>
           <select
-            name="sido"
-            defaultValue={current.sido}
+            value={sido}
+            onChange={(e) => onSidoChange(e.target.value)}
             className="h-10 rounded-lg border border-zinc-800 bg-zinc-950/60 px-3 text-sm text-zinc-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
           >
             {SIDOS.map((s) => (
@@ -70,17 +98,22 @@ export function PharmacyFilters({ current }: { current: PharmacyFilterValues }) 
 
         <label className="flex flex-col gap-1.5">
           <span className="text-xs text-zinc-400">시·군·구</span>
-          <input
-            type="text"
-            name="sigungu"
-            defaultValue={current.sigungu}
-            placeholder="예: 유성구"
-            className="h-10 rounded-lg border border-zinc-800 bg-zinc-950/60 px-3 text-sm text-zinc-100 placeholder:text-zinc-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
-          />
+          <select
+            value={sigungu}
+            onChange={(e) => setSigungu(e.target.value)}
+            disabled={sigunguOptions.length === 0}
+            className="h-10 rounded-lg border border-zinc-800 bg-zinc-950/60 px-3 text-sm text-zinc-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50 disabled:cursor-not-allowed disabled:text-zinc-500"
+          >
+            <option value="" className="bg-zinc-900">
+              {sigunguOptions.length === 0 ? "해당 없음" : "전체"}
+            </option>
+            {sigunguOptions.map((sg) => (
+              <option key={sg} value={sg} className="bg-zinc-900">
+                {sg}
+              </option>
+            ))}
+          </select>
         </label>
-
-        <input type="hidden" name="radius" value={current.radius} />
-        <input type="hidden" name="kind" value={current.kind} />
 
         <button
           type="submit"
