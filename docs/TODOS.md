@@ -253,6 +253,31 @@
 
 ---
 
+## TODO 11 — 유가 정보 위젯 (OPINET)
+
+**What.** 한국석유공사 OPINET API를 통해 사용자 지역의 주유소 가격 + 주변 최저가 주유소 조회. 휘발유·경유·LPG 가격 비교.
+
+**Why.** 운전자 일상 가치 큼. 동네 평균보다 비싼 주유소 알면 즉시 비용 절감. 우리 위젯 패턴(검색 + 리스트 + 거리/가격 mono 표시) 그대로 적용 가능.
+
+**Pros.** 일상 사용 빈도 높음. 데이터 명확 (가격만 비교). 위치 기반 검색 자연스러움.
+
+**Cons.** OPINET은 data.go.kr 별도 시스템 — foodsafetykorea처럼 별도 가입 + 별도 인증키 발급 필요 (DATA_GO_KR_KEY 호환 X). 키 발급 절차 한 단계 추가.
+
+**Context.** 기존 패턴 거의 그대로:
+- 위젯 타입: `gas-price`
+- API: `http://www.opinet.co.kr/api/...` (avgAllPrice, lowTop10, aroundAll 등 다양한 endpoint)
+- Render: 평균가 anchor + 주변 최저가 리스트 + 카카오맵 링크
+- ConfigForm: 시·도 / 시·군·구 / 유종 (휘발유/경유/LPG/등유) / 반경
+- 새 env: `OPINET_API_KEY`
+
+**Effort.** 사람 M (3~5일) → CC ~2시간
+
+**Priority.** P2 — 아파트 실거래가 위젯 안정화 후 진행
+
+**Depends on / blocks.** 없음. 사용자 OPINET 가입 + 키 발급 필요.
+
+---
+
 ## 변경 이력
 
 | 날짜 | 변경 |
@@ -260,3 +285,4 @@
 | 2026-05-04 | 최초 작성 — 7개 항목 (자연어 위젯, 다중 사용자, 갤러리, 체육시설, 스마트홈, 착한가격업소, health 페이지) — `/plan-ceo-review` SCOPE EXPANSION |
 | 2026-05-04 | TODO 8 (Watcher Platform 인프라), TODO 9 (Phase 2 trigger 점검) 추가 — `/plan-eng-review` Phase 1 축소 결정 + Outside Voice 반영 |
 | 2026-05-10 | TODO 10 (Vercel 배포) 추가 — Phase 1 완성, 사용자 결정으로 로컬-only 운영. 다중 디바이스/공유 욕구 발생 시 활성화. |
+| 2026-05-13 | TODO 11 (유가 정보 위젯) 추가 — 사용자가 아파트 실거래가 다음 차순으로 요청. |

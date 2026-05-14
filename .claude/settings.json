@@ -5,7 +5,20 @@
       "Bash(curl -s \"http://localhost:3000/w/pharmacy\" -o pd.html -w \"%{http_code}\\\\n\")",
       "Bash(curl -s \"http://localhost:3000/w/food-recall?q=%EC%9A%B0%EC%9C%A0&window=168\" -o fr.html)",
       "Bash(curl -s \"http://localhost:3000/w/pharmacy?sido=%EB%8C%80%EC%A0%84%EA%B4%91%EC%97%AD%EC%8B%9C&sigungu=&radius=5&kind=all\" -o pd.html)",
-      "Bash(curl -s \"http://localhost:3000/w/pharmacy?sido=%EC%84%9C%EC%9A%B8%ED%8A%B9%EB%B3%84%EC%8B%9C&sigungu=%EA%B0%95%EB%82%A8%EA%B5%AC&radius=5&kind=all\" -o pd.html)"
+      "Bash(curl -s \"http://localhost:3000/w/pharmacy?sido=%EC%84%9C%EC%9A%B8%ED%8A%B9%EB%B3%84%EC%8B%9C&sigungu=%EA%B0%95%EB%82%A8%EA%B5%AC&radius=5&kind=all\" -o pd.html)",
+      "WebFetch(domain:dribbble.com)",
+      "Bash(curl -s \"http://localhost:3000/w/apartment\" -o ap.html -w \"%{http_code}\\\\n\")",
+      "Bash(grep -oE '\\\\\\\\\"source\\\\\\\\\":\\\\\\\\\"[a-z]+\\\\\\\\\"' ap.html)",
+      "Bash(curl -s \"http://localhost:3000/w/apartment\" -o ap.html)",
+      "Bash(grep -oE '\\\\\\\\\"source\\\\\\\\\":\\\\\\\\\"[a-z]+\\\\\\\\\"|\\\\\\\\\"totalCount\\\\\\\\\":[0-9]+|냉동|봉명동|관평|아파트' ap.html)",
+      "Bash(curl -s \"http://localhost:3000/w/apartment\" -o /dev/null)",
+      "Bash(taskkill //F //IM node.exe)",
+      "Bash(grep -oE '\\(\\\\\\\\\"source\\\\\\\\\":\\\\\\\\\"[a-z]+\\\\\\\\\"|\\\\\\\\\"totalCount\\\\\\\\\":[0-9]+|봉명동|관평테크노|유성스카이\\)' ap.html)",
+      "Bash(grep -oE '\\\\\\\\\"aptName\\\\\\\\\":\\\\\\\\\"[^\\\\\\\\]+\\\\\\\\\"' ap.html)",
+      "Bash(grep -oE 'source.{0,20}' ap.html)",
+      "Bash(curl -s \"http://localhost:3000/w/apartment\")",
+      "Bash(node -e ' *)",
+      "Bash(curl -s \"http://localhost:3000/w/apartment?sido=%EC%84%9C%EC%9A%B8%ED%8A%B9%EB%B3%84%EC%8B%9C&sigungu=%EA%B0%95%EB%82%A8%EA%B5%AC&lawdCd=11680\")"
     ]
   }
 }
