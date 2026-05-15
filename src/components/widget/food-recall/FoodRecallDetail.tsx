@@ -1,8 +1,24 @@
 import { Building2, AlertTriangle, ShieldCheck } from "lucide-react";
 import type { FoodRecallData, RecallItem } from "@/widgets/food-recall/schema";
 
-export function FoodRecallDetail({ data }: { data: FoodRecallData }) {
+type Grade = "all" | "1" | "2" | "3";
+
+export function FoodRecallDetail({
+  data,
+  gradeFilter = "all",
+}: {
+  data: FoodRecallData;
+  gradeFilter?: Grade;
+}) {
   const hasFilter = data.matchedKeywords.length > 0;
+  const filteredItems =
+    gradeFilter === "all"
+      ? data.items
+      : data.items.filter((it) => extractGrade(it.reason)?.includes(gradeFilter));
+  const filteredTotal =
+    gradeFilter === "all"
+      ? data.filteredTotal
+      : filteredItems.length;
 
   return (
     <article className="rounded-xl border border-zinc-800/80 bg-zinc-900">
@@ -18,10 +34,10 @@ export function FoodRecallDetail({ data }: { data: FoodRecallData }) {
             <span className="text-xs text-zinc-500">매칭</span>
             <span
               className={`font-mono text-base font-semibold tabular-nums ${
-                data.filteredTotal > 0 ? "text-amber-400" : "text-emerald-400"
+                filteredTotal > 0 ? "text-amber-400" : "text-emerald-400"
               }`}
             >
-              {data.filteredTotal}
+              {filteredTotal}
             </span>
             <span className="text-xs text-zinc-500">건</span>
           </span>
@@ -51,10 +67,12 @@ export function FoodRecallDetail({ data }: { data: FoodRecallData }) {
         </div>
       ) : null}
 
-      {data.filteredTotal === 0 ? <EmptyState hasFilter={hasFilter} data={data} /> : null}
+      {filteredTotal === 0 ? (
+        <EmptyState hasFilter={hasFilter} gradeFilter={gradeFilter} data={data} />
+      ) : null}
 
       <ul className="divide-y divide-zinc-800/60">
-        {data.items.map((it) => (
+        {filteredItems.map((it) => (
           <RecallRow key={it.id} item={it} matched={data.matchedKeywords} />
         ))}
       </ul>
@@ -70,24 +88,34 @@ export function FoodRecallDetail({ data }: { data: FoodRecallData }) {
 
 function EmptyState({
   hasFilter,
+  gradeFilter,
   data,
 }: {
   hasFilter: boolean;
+  gradeFilter: Grade;
   data: FoodRecallData;
 }) {
+  const gradeLabel = gradeFilter === "all" ? null : `${gradeFilter}등급`;
+  let title: string;
+  let hint: string;
+  if (gradeLabel && hasFilter) {
+    title = `${gradeLabel} + 키워드 매칭 리콜이 없어요.`;
+    hint = "등급 또는 키워드를 풀어 다시 보세요.";
+  } else if (gradeLabel) {
+    title = `최근 ${data.windowHours}시간 ${gradeLabel} 리콜이 없어요.`;
+    hint = "등급 필터를 '전체'로 바꾸거나 기간을 늘려보세요.";
+  } else if (hasFilter) {
+    title = "키워드 매칭 리콜이 없어요.";
+    hint = "전체 리콜은 위 카운트에서 확인할 수 있어요.";
+  } else {
+    title = `최근 ${data.windowHours}시간 신규 리콜이 없어요. 안심`;
+    hint = "기간을 더 늘려보거나 키워드를 등록해보세요.";
+  }
   return (
     <div className="px-6 py-12 text-center">
       <ShieldCheck className="mx-auto h-7 w-7 text-emerald-400" aria-hidden />
-      <p className="mt-3 text-base font-medium text-zinc-100">
-        {hasFilter
-          ? "키워드 매칭 리콜이 없어요."
-          : `최근 ${data.windowHours}시간 신규 리콜이 없어요. 안심`}
-      </p>
-      <p className="mt-1 text-xs text-zinc-500">
-        {hasFilter
-          ? "전체 리콜은 위 카운트에서 확인할 수 있어요."
-          : "기간을 더 늘려보거나 키워드를 등록해보세요."}
-      </p>
+      <p className="mt-3 text-base font-medium text-zinc-100">{title}</p>
+      <p className="mt-1 text-xs text-zinc-500">{hint}</p>
     </div>
   );
 }

@@ -103,7 +103,8 @@ function normalizeItems(
         lat,
         lng,
         distanceKm: round(haversineKm(cfg.lat, cfg.lng, lat, lng), 2),
-        hoursToday: hoursToday(it, now),
+        hoursToday: hoursTodayLabel(it, now),
+        isOpenNow: isOpenNow(it, now),
       },
     ];
   });
@@ -131,13 +132,48 @@ function round(n: number, digits: number): number {
   return Math.round(n * f) / f;
 }
 
-function hoursToday(item: EgenItem, now: Date): string | null {
+function getKstDowIndex(now: Date): number {
   const dow = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Seoul" })).getDay();
-  const idx = dow === 0 ? 7 : dow;
+  return dow === 0 ? 7 : dow;
+}
+
+function getTodayHours(item: EgenItem, now: Date): { start: string; close: string } | null {
+  const idx = getKstDowIndex(now);
   const start = (item as Record<string, string | undefined>)[`dutyTime${idx}s`];
   const close = (item as Record<string, string | undefined>)[`dutyTime${idx}c`];
   if (!start || !close) return null;
-  return `${formatHHMM(start)} - ${formatHHMM(close)}`;
+  return { start, close };
+}
+
+function hoursTodayLabel(item: EgenItem, now: Date): string | null {
+  const hours = getTodayHours(item, now);
+  if (!hours) return null;
+  return `${formatHHMM(hours.start)} - ${formatHHMM(hours.close)}`;
+}
+
+function isOpenNow(item: EgenItem, now: Date): "open" | "closed" | "unknown" {
+  const hours = getTodayHours(item, now);
+  if (!hours) return "unknown";
+  const start = parseHHMM(hours.start);
+  const close = parseHHMM(hours.close);
+  if (start == null || close == null) return "unknown";
+  const tz = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Seoul" }));
+  const nowMin = tz.getHours() * 60 + tz.getMinutes();
+  // 자정 넘김: 예) 22:00 - 02:00 → start=1320, close=120
+  if (close === 1440 && start === 0) return "open"; // 24시간 운영
+  if (close > start) {
+    return nowMin >= start && nowMin < close ? "open" : "closed";
+  }
+  // close <= start: 자정 넘김 케이스
+  return nowMin >= start || nowMin < close ? "open" : "closed";
+}
+
+function parseHHMM(s: string): number | null {
+  if (s.length !== 4) return null;
+  const hh = Number(s.slice(0, 2));
+  const mm = Number(s.slice(2));
+  if (!Number.isFinite(hh) || !Number.isFinite(mm)) return null;
+  return hh * 60 + mm;
 }
 
 function formatHHMM(s: string): string {

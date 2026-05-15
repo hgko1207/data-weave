@@ -4,14 +4,18 @@ import type { Facility, SosData } from "@/widgets/pharmacy/schema";
 export function PharmacyDetail({
   data,
   kindFilter,
+  openNowFilter = false,
 }: {
   data: SosData;
   kindFilter: "all" | "pharmacy" | "er";
+  openNowFilter?: boolean;
 }) {
-  const filtered =
-    kindFilter === "all" ? data.list : data.list.filter((f) => f.kind === kindFilter);
+  let filtered = data.list;
+  if (kindFilter !== "all") filtered = filtered.filter((f) => f.kind === kindFilter);
+  if (openNowFilter) filtered = filtered.filter((f) => f.isOpenNow === "open");
   const pharmacyCount = data.list.filter((f) => f.kind === "pharmacy").length;
   const erCount = data.list.filter((f) => f.kind === "er").length;
+  const openCount = data.list.filter((f) => f.isOpenNow === "open").length;
 
   return (
     <article className="rounded-xl border border-zinc-800/80 bg-zinc-900">
@@ -26,19 +30,26 @@ export function PharmacyDetail({
           <CountLine label="전체" value={data.list.length} color="text-zinc-100" />
           <CountLine label="약국" value={pharmacyCount} color="text-emerald-300" />
           <CountLine label="응급실" value={erCount} color="text-cyan-300" />
+          <CountLine label="영업중" value={openCount} color="text-emerald-400" />
         </div>
       </header>
 
       {filtered.length === 0 ? (
         <div className="px-6 py-12 text-center">
           <p className="text-sm text-zinc-300">
-            {kindFilter === "all"
-              ? "반경 내 운영 중인 곳이 없어요."
+            {openNowFilter
+              ? "지금 영업 중인 곳이 없어요."
+              : kindFilter === "all"
+              ? "반경 내 시설이 없어요."
               : kindFilter === "pharmacy"
               ? "반경 내 약국이 없어요."
               : "반경 내 응급실이 없어요."}
           </p>
-          <p className="mt-1 text-xs text-zinc-500">시·군·구나 반경을 넓혀보세요.</p>
+          <p className="mt-1 text-xs text-zinc-500">
+            {openNowFilter
+              ? "'지금 영업중만' 필터를 해제하거나 반경을 넓혀보세요."
+              : "시·군·구나 반경을 넓혀보세요."}
+          </p>
         </div>
       ) : (
         <ul className="divide-y divide-zinc-800/60">
@@ -79,6 +90,28 @@ function CountLine({
   );
 }
 
+function OpenBadge({ status }: { status: Facility["isOpenNow"] }) {
+  if (status === "unknown") return null;
+  const isOpen = status === "open";
+  return (
+    <span
+      className={`inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[11px] font-medium ${
+        isOpen
+          ? "bg-emerald-500/15 text-emerald-300"
+          : "bg-zinc-800 text-zinc-500"
+      }`}
+    >
+      <span
+        aria-hidden
+        className={`h-1.5 w-1.5 rounded-full ${
+          isOpen ? "bg-emerald-400 shadow-[0_0_4px] shadow-emerald-400/70" : "bg-zinc-600"
+        }`}
+      />
+      {isOpen ? "영업중" : "영업종료"}
+    </span>
+  );
+}
+
 function FacilityCard({ facility }: { facility: Facility }) {
   const Icon = facility.kind === "pharmacy" ? Pill : Stethoscope;
   const iconColor =
@@ -105,6 +138,7 @@ function FacilityCard({ facility }: { facility: Facility }) {
             {kindLabel}
           </span>
           <h3 className="text-base font-medium text-zinc-100">{facility.name}</h3>
+          <OpenBadge status={facility.isOpenNow} />
           <span className="ml-auto shrink-0 font-mono text-sm font-semibold tabular-nums text-zinc-200">
             {facility.distanceKm.toFixed(1)}km
           </span>

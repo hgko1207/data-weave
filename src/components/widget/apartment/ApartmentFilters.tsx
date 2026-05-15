@@ -9,11 +9,27 @@ import { formatYm, nextMonth, previousMonth } from "@/widgets/apartment/fetch";
 
 const SIDOS = Object.keys(LAWD_BY_SIDO);
 
+export type ApartmentSort =
+  | "date-desc"
+  | "amount-desc"
+  | "amount-asc"
+  | "area-desc"
+  | "pyeong-desc";
+
+const SORT_OPTIONS: Array<{ value: ApartmentSort; label: string }> = [
+  { value: "date-desc", label: "최신순" },
+  { value: "amount-desc", label: "가격↓" },
+  { value: "amount-asc", label: "가격↑" },
+  { value: "area-desc", label: "면적↓" },
+  { value: "pyeong-desc", label: "평당가↓" },
+];
+
 export type ApartmentFilterValues = {
   sido: string;
   sigungu: string;
   lawdCd: string;
   dealYm: string;
+  sort: ApartmentSort;
 };
 
 export function ApartmentFilters({ current }: { current: ApartmentFilterValues }) {
@@ -30,6 +46,8 @@ export function ApartmentFilters({ current }: { current: ApartmentFilterValues }
       lawdCd: overrides.lawdCd ?? current.lawdCd,
       dealYm: overrides.dealYm ?? current.dealYm,
     });
+    const sort = overrides.sort ?? current.sort;
+    if (sort !== "date-desc") params.set("sort", sort);
     return `/w/apartment?${params.toString()}`;
   };
 
@@ -119,6 +137,29 @@ export function ApartmentFilters({ current }: { current: ApartmentFilterValues }
         >
           <ChevronRight className="h-4 w-4" aria-hidden />
         </Link>
+      </div>
+
+      <div className="mt-4 flex items-center gap-2">
+        <span className="text-xs text-zinc-500">정렬</span>
+        <div className="flex flex-wrap gap-1.5">
+          {SORT_OPTIONS.map((o) => {
+            const active = o.value === current.sort;
+            return (
+              <Link
+                key={o.value}
+                href={buildHref({ sort: o.value })}
+                aria-current={active ? "page" : undefined}
+                className={`inline-flex h-8 items-center rounded-md border px-3 text-xs font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50 ${
+                  active
+                    ? "border-emerald-500/30 bg-emerald-500/15 text-emerald-200"
+                    : "border-zinc-800 bg-zinc-950/60 text-zinc-400 hover:border-zinc-700 hover:bg-zinc-900 hover:text-zinc-100"
+                }`}
+              >
+                {o.label}
+              </Link>
+            );
+          })}
+        </div>
       </div>
     </section>
   );

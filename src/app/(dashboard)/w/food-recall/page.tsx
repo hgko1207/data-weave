@@ -18,6 +18,7 @@ type Props = {
   searchParams: Promise<{
     q?: string;
     window?: string;
+    grade?: string;
   }>;
 };
 
@@ -29,6 +30,10 @@ export default async function FoodRecallDetailPage({ searchParams }: Props) {
     .filter(Boolean);
   const windowNum = Number(params.window);
   const windowHours = ALLOWED_WINDOWS.has(windowNum) ? windowNum : 168;
+  const grade: "all" | "1" | "2" | "3" =
+    params.grade === "1" || params.grade === "2" || params.grade === "3"
+      ? params.grade
+      : "all";
 
   let data: FoodRecallData;
   let errorMessage: string | undefined;
@@ -72,7 +77,7 @@ export default async function FoodRecallDetailPage({ searchParams }: Props) {
         </Link>
       }
     >
-      <FoodRecallFilters current={{ keywords, windowHours }} />
+      <FoodRecallFilters current={{ keywords, windowHours, grade }} />
 
       {errorMessage ? (
         <div className="rounded-lg border border-amber-500/20 bg-amber-500/[0.06] px-4 py-3 text-xs text-amber-200">
@@ -80,7 +85,7 @@ export default async function FoodRecallDetailPage({ searchParams }: Props) {
         </div>
       ) : null}
 
-      <FoodRecallDetail data={data} />
+      <FoodRecallDetail data={data} gradeFilter={grade} />
     </PageFrame>
   );
 }

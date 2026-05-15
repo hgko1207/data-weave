@@ -22,6 +22,7 @@ export const facilitySchema = z
     lng: z.number(),
     distanceKm: z.number(),
     hoursToday: z.string().nullable(),
+    isOpenNow: z.enum(["open", "closed", "unknown"]),
   })
   .strict();
 

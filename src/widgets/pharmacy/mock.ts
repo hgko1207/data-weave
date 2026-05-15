@@ -16,6 +16,7 @@ export function buildMockSos(cfg: PharmacyConfig): SosData {
         lng: cfg.lng + 0.003,
         distanceKm: 0.5,
         hoursToday: "00:00 - 24:00",
+        isOpenNow: "open",
       },
       {
         kind: "er",
@@ -26,6 +27,7 @@ export function buildMockSos(cfg: PharmacyConfig): SosData {
         lng: cfg.lng - 0.018,
         distanceKm: 2.1,
         hoursToday: "24시간",
+        isOpenNow: "open",
       },
       {
         kind: "pharmacy",
@@ -36,6 +38,7 @@ export function buildMockSos(cfg: PharmacyConfig): SosData {
         lng: cfg.lng - 0.006,
         distanceKm: 1.2,
         hoursToday: "20:00 - 02:00",
+        isOpenNow: mockIsOpenInRange(20 * 60, 2 * 60),
       },
       {
         kind: "er",
@@ -46,6 +49,7 @@ export function buildMockSos(cfg: PharmacyConfig): SosData {
         lng: cfg.lng - 0.028,
         distanceKm: 3.4,
         hoursToday: "24시간",
+        isOpenNow: "open",
       },
       {
         kind: "pharmacy",
@@ -56,8 +60,16 @@ export function buildMockSos(cfg: PharmacyConfig): SosData {
         lng: cfg.lng - 0.045,
         distanceKm: 4.7,
         hoursToday: "공휴일 09:00 - 22:00",
+        isOpenNow: "unknown",
       },
     ],
     source: "mock",
   };
+}
+
+function mockIsOpenInRange(startMin: number, closeMin: number): "open" | "closed" {
+  const now = new Date();
+  const m = now.getHours() * 60 + now.getMinutes();
+  if (closeMin > startMin) return m >= startMin && m < closeMin ? "open" : "closed";
+  return m >= startMin || m < closeMin ? "open" : "closed";
 }

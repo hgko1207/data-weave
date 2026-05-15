@@ -18,7 +18,14 @@
       "Bash(grep -oE 'source.{0,20}' ap.html)",
       "Bash(curl -s \"http://localhost:3000/w/apartment\")",
       "Bash(node -e ' *)",
-      "Bash(curl -s \"http://localhost:3000/w/apartment?sido=%EC%84%9C%EC%9A%B8%ED%8A%B9%EB%B3%84%EC%8B%9C&sigungu=%EA%B0%95%EB%82%A8%EA%B5%AC&lawdCd=11680\")"
+      "Bash(curl -s \"http://localhost:3000/w/apartment?sido=%EC%84%9C%EC%9A%B8%ED%8A%B9%EB%B3%84%EC%8B%9C&sigungu=%EA%B0%95%EB%82%A8%EA%B5%AC&lawdCd=11680\")",
+      "Bash(curl -s \"http://localhost:3000/w/food-recall?grade=1\" -o fr.html -w \"%{http_code}\\\\n\")",
+      "Bash(curl -s \"http://localhost:3000/w/food-recall?grade=1\")",
+      "Bash(grep -oE '\\\\[[0-9]등급\\\\][^<]{0,40}')",
+      "Bash(node check.mjs)",
+      "Bash(grep -oE \"\\(매칭[^<]{0,50}|전체[^<]{0,50}|건[^<]{0,30}|총거래|새 리콜\\)\" fr.html)",
+      "Bash(curl -s \"http://localhost:3000/w/pharmacy?sido=%EB%8C%80%EC%A0%84%EA%B4%91%EC%97%AD%EC%8B%9C&sigungu=%EC%9C%A0%EC%84%B1%EA%B5%AC&radius=5&kind=all&openNow=1\")",
+      "Bash(curl -s -o /dev/null -w '%{http_code}' http://localhost:3000/w/apartment?sort=__TRACKED_VAR__)"
     ]
   }
 }

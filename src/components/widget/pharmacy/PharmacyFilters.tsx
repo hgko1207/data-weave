@@ -38,6 +38,7 @@ export type PharmacyFilterValues = {
   sigungu: string;
   radius: number;
   kind: "all" | "pharmacy" | "er";
+  openNow: boolean;
 };
 
 export function PharmacyFilters({ current }: { current: PharmacyFilterValues }) {
@@ -54,6 +55,8 @@ export function PharmacyFilters({ current }: { current: PharmacyFilterValues }) 
       radius: String(overrides.radius ?? current.radius),
       kind: overrides.kind ?? current.kind,
     });
+    const openNow = overrides.openNow ?? current.openNow;
+    if (openNow) params.set("openNow", "1");
     return `/w/pharmacy?${params.toString()}`;
   };
 
@@ -65,6 +68,7 @@ export function PharmacyFilters({ current }: { current: PharmacyFilterValues }) 
       radius: String(current.radius),
       kind: current.kind,
     });
+    if (current.openNow) params.set("openNow", "1");
     router.push(`/w/pharmacy?${params.toString()}`);
   };
 
@@ -143,6 +147,23 @@ export function PharmacyFilters({ current }: { current: PharmacyFilterValues }) 
             href: buildHref({ kind: k.value }),
           }))}
         />
+        <Link
+          href={buildHref({ openNow: !current.openNow })}
+          aria-pressed={current.openNow}
+          className={`inline-flex h-8 items-center gap-1.5 rounded-md border px-3 text-xs font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50 ${
+            current.openNow
+              ? "border-emerald-500/30 bg-emerald-500/15 text-emerald-200"
+              : "border-zinc-800 bg-zinc-950/60 text-zinc-400 hover:border-zinc-700 hover:bg-zinc-900 hover:text-zinc-100"
+          }`}
+        >
+          <span
+            aria-hidden
+            className={`h-1.5 w-1.5 rounded-full ${
+              current.openNow ? "bg-emerald-400 shadow-[0_0_4px] shadow-emerald-400/70" : "bg-zinc-600"
+            }`}
+          />
+          지금 영업중만
+        </Link>
       </div>
     </section>
   );

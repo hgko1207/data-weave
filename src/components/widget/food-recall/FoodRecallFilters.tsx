@@ -8,11 +8,19 @@ const WINDOW_OPTIONS = [
   { value: 720, label: "30일" },
 ] as const;
 
+const GRADE_OPTIONS = [
+  { value: "all", label: "전체" },
+  { value: "1", label: "1등급" },
+  { value: "2", label: "2등급" },
+  { value: "3", label: "3등급" },
+] as const;
+
 const COMMON_KEYWORDS = ["우유", "계란", "땅콩", "견과", "메밀", "밀", "갑각류", "복숭아"];
 
 export type FoodRecallFilterValues = {
   keywords: string[];
   windowHours: number;
+  grade: "all" | "1" | "2" | "3";
 };
 
 export function FoodRecallFilters({ current }: { current: FoodRecallFilterValues }) {
@@ -22,6 +30,8 @@ export function FoodRecallFilters({ current }: { current: FoodRecallFilterValues
     if (keywords.length > 0) params.set("q", keywords.join(","));
     const windowHours = overrides.windowHours ?? current.windowHours;
     params.set("window", String(windowHours));
+    const grade = overrides.grade ?? current.grade;
+    if (grade !== "all") params.set("grade", grade);
     return `/w/food-recall?${params.toString()}`;
   };
 
@@ -48,6 +58,9 @@ export function FoodRecallFilters({ current }: { current: FoodRecallFilterValues
         </label>
 
         <input type="hidden" name="window" value={current.windowHours} />
+        {current.grade !== "all" ? (
+          <input type="hidden" name="grade" value={current.grade} />
+        ) : null}
 
         <button
           type="submit"
@@ -66,6 +79,17 @@ export function FoodRecallFilters({ current }: { current: FoodRecallFilterValues
             label: w.label,
             active: w.value === current.windowHours,
             href: buildHref({ windowHours: w.value }),
+          }))}
+        />
+
+        <ChipGroup
+          label="등급"
+          options={GRADE_OPTIONS.map((g) => ({
+            value: g.value,
+            label: g.label,
+            active: g.value === current.grade,
+            href: buildHref({ grade: g.value }),
+            tone: gradeToneFor(g.value),
           }))}
         />
 
@@ -100,17 +124,32 @@ export function FoodRecallFilters({ current }: { current: FoodRecallFilterValues
   );
 }
 
+type ChipTone = "default" | "rose" | "amber" | "zinc";
+
+function gradeToneFor(value: string): ChipTone {
+  if (value === "1") return "rose";
+  if (value === "2") return "amber";
+  if (value === "3") return "zinc";
+  return "default";
+}
+
 function ChipGroup({
   label,
   options,
 }: {
   label: string;
-  options: Array<{ value: string; label: string; active: boolean; href: string }>;
+  options: Array<{
+    value: string;
+    label: string;
+    active: boolean;
+    href: string;
+    tone?: ChipTone;
+  }>;
 }) {
   return (
     <div className="flex items-center gap-2">
       <span className="text-xs text-zinc-500">{label}</span>
-      <div className="flex gap-1.5">
+      <div className="flex flex-wrap gap-1.5">
         {options.map((o) => (
           <Link
             key={o.value}
@@ -118,7 +157,7 @@ function ChipGroup({
             aria-current={o.active ? "page" : undefined}
             className={`inline-flex h-8 items-center rounded-md border px-3 text-xs font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50 ${
               o.active
-                ? "border-emerald-500/30 bg-emerald-500/15 text-emerald-200"
+                ? toneActiveClasses(o.tone)
                 : "border-zinc-800 bg-zinc-950/60 text-zinc-400 hover:border-zinc-700 hover:bg-zinc-900 hover:text-zinc-100"
             }`}
           >
@@ -128,4 +167,17 @@ function ChipGroup({
       </div>
     </div>
   );
+}
+
+function toneActiveClasses(tone: ChipTone | undefined): string {
+  switch (tone) {
+    case "rose":
+      return "border-rose-500/30 bg-rose-500/15 text-rose-200";
+    case "amber":
+      return "border-amber-500/30 bg-amber-500/15 text-amber-200";
+    case "zinc":
+      return "border-zinc-600 bg-zinc-700/40 text-zinc-100";
+    default:
+      return "border-emerald-500/30 bg-emerald-500/15 text-emerald-200";
+  }
 }

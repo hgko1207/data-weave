@@ -3,18 +3,27 @@ import { ArrowLeft } from "lucide-react";
 import { PageFrame } from "@/components/page-frame";
 import { ApartmentFilters } from "@/components/widget/apartment/ApartmentFilters";
 import { ApartmentDetail } from "@/components/widget/apartment/ApartmentDetail";
-import { fetchApartment, currentKstYmExport } from "@/widgets/apartment/fetch";
+import { fetchApartment, fetchMonthlyTrend, currentKstYmExport, type MonthlyTrendPoint } from "@/widgets/apartment/fetch";
+import { ApartmentTrendChart } from "@/components/widget/apartment/ApartmentTrendChart";
 import { findLawdCode, LAWD_BY_SIDO } from "@/widgets/apartment/lawd-codes";
 import {
   apartmentDataSchema,
   type ApartmentData,
 } from "@/widgets/apartment/schema";
+import type { ApartmentSort } from "@/components/widget/apartment/ApartmentFilters";
 import { logger } from "@/lib/logger";
 
 export const dynamic = "force-dynamic";
 
 const DEFAULT_SIDO = "대전광역시";
 const DEFAULT_SIGUNGU = "유성구";
+const ALLOWED_SORTS = new Set<ApartmentSort>([
+  "date-desc",
+  "amount-desc",
+  "amount-asc",
+  "area-desc",
+  "pyeong-desc",
+]);
 
 type Props = {
   searchParams: Promise<{
@@ -22,6 +31,7 @@ type Props = {
     sigungu?: string;
     lawdCd?: string;
     dealYm?: string;
+    sort?: string;
   }>;
 };
 
@@ -42,21 +52,29 @@ export default async function ApartmentDetailPage({ searchParams }: Props) {
   const dealYm = params.dealYm && /^\d{6}$/.test(params.dealYm)
     ? params.dealYm
     : currentKstYmExport();
+  const sortRaw = (params.sort ?? "date-desc") as ApartmentSort;
+  const sort: ApartmentSort = ALLOWED_SORTS.has(sortRaw) ? sortRaw : "date-desc";
+
+  const now = new Date();
+  const abort = new AbortController().signal;
+  const serviceKey = process.env.MOLIT_API_KEY || process.env.DATA_GO_KR_KEY || "";
 
   let data: ApartmentData;
+  let trend: MonthlyTrendPoint[] = [];
   let errorMessage: string | undefined;
   try {
-    data = await fetchApartment({
-      config: {
-        v: 1,
-        sido,
-        sigungu,
-        lawdCd,
-        dealYm,
-      },
-      abort: new AbortController().signal,
-      now: new Date(),
-    });
+    const [d, t] = await Promise.all([
+      fetchApartment({
+        config: { v: 1, sido, sigungu, lawdCd, dealYm },
+        abort,
+        now,
+      }),
+      serviceKey
+        ? fetchMonthlyTrend(serviceKey, lawdCd, 6, now, abort).catch(() => [])
+        : Promise.resolve([] as MonthlyTrendPoint[]),
+    ]);
+    data = d;
+    trend = t;
   } catch (err) {
     logger.warn("apartment detail page fetch failed", {
       error: err instanceof Error ? err.message : String(err),
@@ -90,7 +108,7 @@ export default async function ApartmentDetailPage({ searchParams }: Props) {
         </Link>
       }
     >
-      <ApartmentFilters current={{ sido, sigungu, lawdCd, dealYm }} />
+      <ApartmentFilters current={{ sido, sigungu, lawdCd, dealYm, sort }} />
 
       {errorMessage ? (
         <div className="rounded-lg border border-amber-500/20 bg-amber-500/[0.06] px-4 py-3 text-xs text-amber-200">
@@ -98,7 +116,11 @@ export default async function ApartmentDetailPage({ searchParams }: Props) {
         </div>
       ) : null}
 
-      <ApartmentDetail data={data} />
+      {trend.length > 0 ? (
+        <ApartmentTrendChart points={trend} region={`${sido} ${sigungu}`} />
+      ) : null}
+
+      <ApartmentDetail data={data} sort={sort} />
     </PageFrame>
   );
 }

@@ -2,12 +2,20 @@ import { TrendingUp, TrendingDown, Building2 } from "lucide-react";
 import { formatAmount } from "@/widgets/apartment/format";
 import { formatYm } from "@/widgets/apartment/fetch";
 import type { ApartmentData, ApartmentTrade } from "@/widgets/apartment/schema";
+import type { ApartmentSort } from "./ApartmentFilters";
 
-export function ApartmentDetail({ data }: { data: ApartmentData }) {
+export function ApartmentDetail({
+  data,
+  sort = "date-desc",
+}: {
+  data: ApartmentData;
+  sort?: ApartmentSort;
+}) {
+  const sorted = sortTrades(data.trades, sort);
   return (
     <div className="space-y-5">
       <StatsRow data={data} />
-      <TradesList data={data} />
+      <TradesList data={{ ...data, trades: sorted }} />
 
       {data.source === "mock" ? (
         <p className="font-mono text-xs uppercase tracking-wider text-zinc-500">
@@ -168,4 +176,21 @@ function formatDealDate(iso: string): string {
   const m = iso.match(/^(\d{4})-(\d{2})-(\d{2})$/);
   if (!m) return iso;
   return `${m[2]}.${m[3]}`;
+}
+
+function sortTrades(trades: ApartmentTrade[], sort: ApartmentSort): ApartmentTrade[] {
+  const copy = [...trades];
+  switch (sort) {
+    case "amount-desc":
+      return copy.sort((a, b) => b.dealAmount - a.dealAmount);
+    case "amount-asc":
+      return copy.sort((a, b) => a.dealAmount - b.dealAmount);
+    case "area-desc":
+      return copy.sort((a, b) => b.area - a.area);
+    case "pyeong-desc":
+      return copy.sort((a, b) => (b.pricePerPyeong ?? 0) - (a.pricePerPyeong ?? 0));
+    case "date-desc":
+    default:
+      return copy.sort((a, b) => b.dealDate.localeCompare(a.dealDate));
+  }
 }

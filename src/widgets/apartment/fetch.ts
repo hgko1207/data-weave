@@ -217,3 +217,57 @@ export function formatYm(ym: string): string {
 export function currentKstYmExport(now: Date = new Date()): string {
   return currentKstYm(now);
 }
+
+export type MonthlyTrendPoint = {
+  ym: string;
+  label: string;
+  avg: number | null;
+  count: number;
+};
+
+/**
+ * 최근 N개월(현재 포함) 평균 매매가 추이.
+ * 각 월별로 fetchApartment를 병렬 호출 — 6 month = 6 API calls.
+ */
+export async function fetchMonthlyTrend(
+  serviceKey: string,
+  lawdCd: string,
+  months: number,
+  now: Date,
+  abort: AbortSignal,
+): Promise<MonthlyTrendPoint[]> {
+  const ymList: string[] = [];
+  const current = currentKstYm(now);
+  const y0 = Number(current.slice(0, 4));
+  const m0 = Number(current.slice(4, 6));
+  for (let i = months - 1; i >= 0; i--) {
+    const d = new Date(y0, m0 - 1 - i, 1);
+    ymList.push(`${d.getFullYear()}${pad(d.getMonth() + 1)}`);
+  }
+  const results = await Promise.all(
+    ymList.map(async (ym) => {
+      try {
+        const rows = await fetchAllTrades(serviceKey, lawdCd, ym, abort);
+        const trades = rows.map(normalizeTrade).filter((t): t is ApartmentTrade => t !== null);
+        if (trades.length === 0) {
+          return { ym, label: monthLabel(ym), avg: null, count: 0 };
+        }
+        const sum = trades.reduce((acc, t) => acc + t.dealAmount, 0);
+        return {
+          ym,
+          label: monthLabel(ym),
+          avg: Math.round(sum / trades.length),
+          count: trades.length,
+        };
+      } catch {
+        return { ym, label: monthLabel(ym), avg: null, count: 0 };
+      }
+    }),
+  );
+  return results;
+}
+
+function monthLabel(ym: string): string {
+  if (!ym.match(/^\d{6}$/)) return ym;
+  return `${Number(ym.slice(4, 6))}월`;
+}

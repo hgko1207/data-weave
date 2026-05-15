@@ -21,6 +21,7 @@ type Props = {
     sigungu?: string;
     radius?: string;
     kind?: string;
+    openNow?: string;
   }>;
 };
 
@@ -33,6 +34,7 @@ export default async function PharmacyDetailPage({ searchParams }: Props) {
   const kindRaw = params.kind ?? "all";
   const kind: PharmacyFilterValues["kind"] =
     kindRaw === "pharmacy" || kindRaw === "er" ? kindRaw : "all";
+  const openNow = params.openNow === "1";
 
   const center = getSidoCenter(sido);
   // '전체'면 반경을 시·도 단위로 넉넉히
@@ -88,7 +90,7 @@ export default async function PharmacyDetailPage({ searchParams }: Props) {
       }
     >
       <PharmacyFilters
-        current={{ sido, sigungu, radius, kind }}
+        current={{ sido, sigungu, radius, kind, openNow }}
       />
 
       {errorMessage ? (
@@ -97,7 +99,7 @@ export default async function PharmacyDetailPage({ searchParams }: Props) {
         </div>
       ) : null}
 
-      <PharmacyDetail data={displayData} kindFilter={kind} />
+      <PharmacyDetail data={displayData} kindFilter={kind} openNowFilter={openNow} />
     </PageFrame>
   );
 }
