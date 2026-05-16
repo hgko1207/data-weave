@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { PageFrame } from "@/components/page-frame";
+import { BookmarkButton } from "@/components/bookmark/BookmarkButton";
 import { RegionPicker } from "@/components/widget/weather/RegionPicker";
 import { WeatherDetail } from "@/components/widget/weather/WeatherDetail";
 import { fetchWeather } from "@/widgets/weather/fetch";
@@ -69,13 +70,16 @@ export default async function WeatherDetailPage({ searchParams }: Props) {
       title={`날씨 · ${data.region}`}
       description="기상청 단기예보 + 에어코리아 미세먼지. 지역을 선택해 즉시 갱신됩니다."
       actions={
-        <Link
-          href="/"
-          className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-zinc-800 bg-zinc-900 px-3 text-xs text-zinc-300 transition hover:border-zinc-700 hover:bg-zinc-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
-        >
-          <ArrowLeft className="h-3.5 w-3.5" aria-hidden />
-          대시보드
-        </Link>
+        <>
+          <BookmarkButton label={`날씨 · ${data.region}`} widgetId="weather" />
+          <Link
+            href="/"
+            className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-zinc-800 bg-zinc-900 px-3 text-xs text-zinc-300 transition hover:border-zinc-700 hover:bg-zinc-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
+          >
+            <ArrowLeft className="h-3.5 w-3.5" aria-hidden />
+            대시보드
+          </Link>
+        </>
       }
     >
       <RegionPicker active={region.regionName} />

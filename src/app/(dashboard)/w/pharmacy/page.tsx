@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { PageFrame } from "@/components/page-frame";
+import { BookmarkButton } from "@/components/bookmark/BookmarkButton";
 import {
   PharmacyFilters,
   type PharmacyFilterValues,
@@ -80,13 +81,16 @@ export default async function PharmacyDetailPage({ searchParams }: Props) {
       title={`SOS 병원·약국 · ${regionLabel}`}
       description="야간·공휴일 운영 약국 + 응급실. 시·도/시·군·구 검색, 반경 조절, 카카오맵 연결."
       actions={
-        <Link
-          href="/"
-          className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-zinc-800 bg-zinc-900 px-3 text-xs text-zinc-300 transition hover:border-zinc-700 hover:bg-zinc-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
-        >
-          <ArrowLeft className="h-3.5 w-3.5" aria-hidden />
-          대시보드
-        </Link>
+        <>
+          <BookmarkButton label={`SOS · ${regionLabel}`} widgetId="pharmacy" />
+          <Link
+            href="/"
+            className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-zinc-800 bg-zinc-900 px-3 text-xs text-zinc-300 transition hover:border-zinc-700 hover:bg-zinc-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
+          >
+            <ArrowLeft className="h-3.5 w-3.5" aria-hidden />
+            대시보드
+          </Link>
+        </>
       }
     >
       <PharmacyFilters

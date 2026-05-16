@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import type { LucideIcon } from "lucide-react";
 import { LayoutDashboard, Settings, Activity } from "lucide-react";
 import { WIDGET_META } from "@/widgets/_metadata";
+import { SidebarBookmarks } from "./SidebarBookmarks";
 
 type NavItem = { href: string; icon: LucideIcon; label: string };
 
@@ -47,6 +48,7 @@ export function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
 
       <nav className="flex flex-1 flex-col overflow-y-auto px-2.5 py-4">
         <NavSection items={PRIMARY} onNavigate={onNavigate} />
+        <SidebarBookmarks onNavigate={onNavigate} />
         <SectionLabel title="공공데이터" />
         <NavSection items={widgetItems} onNavigate={onNavigate} />
       </nav>

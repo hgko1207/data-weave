@@ -1,9 +1,10 @@
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { PageFrame } from "@/components/page-frame";
+import { BookmarkButton } from "@/components/bookmark/BookmarkButton";
 import { ApartmentFilters } from "@/components/widget/apartment/ApartmentFilters";
 import { ApartmentDetail } from "@/components/widget/apartment/ApartmentDetail";
-import { fetchApartment, fetchMonthlyTrend, currentKstYmExport, type MonthlyTrendPoint } from "@/widgets/apartment/fetch";
+import { fetchApartment, fetchMonthlyTrend, currentKstYmExport, formatYm, type MonthlyTrendPoint } from "@/widgets/apartment/fetch";
 import { ApartmentTrendChart } from "@/components/widget/apartment/ApartmentTrendChart";
 import { findLawdCode, LAWD_BY_SIDO } from "@/widgets/apartment/lawd-codes";
 import {
@@ -99,13 +100,19 @@ export default async function ApartmentDetailPage({ searchParams }: Props) {
       title={`아파트 실거래가 · ${sido} ${sigungu}`}
       description="국토교통부 매매 실거래가 자료. 시·군·구별 월 단위 거래 내역과 가격 통계."
       actions={
-        <Link
-          href="/"
-          className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-zinc-800 bg-zinc-900 px-3 text-xs text-zinc-300 transition hover:border-zinc-700 hover:bg-zinc-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
-        >
-          <ArrowLeft className="h-3.5 w-3.5" aria-hidden />
-          대시보드
-        </Link>
+        <>
+          <BookmarkButton
+            label={`아파트 · ${sido} ${sigungu} · ${formatYm(dealYm)}`}
+            widgetId="apartment"
+          />
+          <Link
+            href="/"
+            className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-zinc-800 bg-zinc-900 px-3 text-xs text-zinc-300 transition hover:border-zinc-700 hover:bg-zinc-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
+          >
+            <ArrowLeft className="h-3.5 w-3.5" aria-hidden />
+            대시보드
+          </Link>
+        </>
       }
     >
       <ApartmentFilters current={{ sido, sigungu, lawdCd, dealYm, sort }} />
