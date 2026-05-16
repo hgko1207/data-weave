@@ -19,14 +19,25 @@
 
 ## 2. 컬러 팔레트
 
-### 표면 (Background)
-| 역할 | Tailwind | Hex |
-|------|----------|-----|
-| Page bg base | `bg-zinc-950` | `#09090b` |
-| Aurora gradient | `bg-gradient-to-br from-slate-950 via-zinc-950 to-black` | (gradient) |
-| Card bg | `bg-zinc-900/60 backdrop-blur` | `#18181b` w/ alpha |
-| Card border | `border border-white/5` | `rgba(255,255,255,0.05)` |
-| Modal/Dialog bg | `bg-zinc-950` | `#09090b` |
+### 표면 (Background) — Phase 1.5 솔리드 모델
+
+> ⚠️ Phase 1 초기 안(반투명 + Aurora bg)은 사용자 피드백("사이드바/메인 구분 안 됨")으로 폐기. 현재는 솔리드 surface + 명확한 border. §14 참조.
+
+| Layer | Tailwind | Hex | 용도 |
+|-------|----------|-----|------|
+| L0 page | `bg-zinc-950` | `#09090b` | 메인 영역 배경 |
+| L1 chrome | `bg-zinc-900` + `border-zinc-800/80` | `#18181b` | 사이드바, 헤더, 위젯 카드 (불투명) |
+| L2 inset | `bg-zinc-950/60` + `border-zinc-800` | `#09090b` 60% | 카드 안의 입력/chip/시간대 mini card |
+| Modal/Dialog bg | `bg-zinc-950` | `#09090b` | 다이얼로그 |
+
+**원칙:** 반투명·backdrop-blur 남용 금지. 솔리드 + 명확한 경계선이 다크 톤에서 더 읽힘.
+
+### (deprecated) 옛 표면 토큰
+| 역할 | Tailwind | 비고 |
+|------|----------|------|
+| ~~Aurora gradient~~ | `bg-gradient-to-br from-slate-950 via-zinc-950 to-black` | §7 deprecated |
+| ~~Card bg~~ | `bg-zinc-900/60 backdrop-blur` | L1으로 교체 |
+| ~~Card border~~ | `border border-white/5` | `border-zinc-800/80`로 교체 |
 
 ### 텍스트
 | 역할 | Tailwind | Hex |
@@ -136,10 +147,14 @@ Tailwind 기본 스케일 (4px 그리드) 따름.
 
 ---
 
-## 7. Aurora Background (Slop 회피 핵심)
+## 7. ~~Aurora Background~~ (Deprecated, Phase 1.5)
+
+> ⚠️ **사용 안 함.** Phase 1.5에서 솔리드 surface(§2)로 교체. 사용자 피드백 "사이드바/메인 구분 안 됨" → opaque chrome으로 해결. 컴포넌트 파일은 `src/components/aurora-bg.tsx`에 남아있으나 root layout에서 제거됨. 새 작업에서 사용 X.
+
+옛 안 (참고용):
 
 ```tsx
-// src/components/aurora-bg.tsx
+// src/components/aurora-bg.tsx (deprecated)
 export function AuroraBg() {
   return (
     <div className="fixed inset-0 -z-10 overflow-hidden">
@@ -409,9 +424,111 @@ STEP | USER DOES                        | FEELS    | DESIGN SUPPORTS
 
 ---
 
+## 14. Phase 1.5 Design Evolution
+
+> 사용자 피드백 + audit/arrange/typeset/polish 라운드를 통해 Phase 1 디자인이 진화한 결과. 옛 토큰은 deprecated 표시하고 새 결정만 정리.
+
+### 14.1 톤 — Supabase + shadcn 솔리드
+
+Aurora gradient + 반투명 카드 → **솔리드 zinc surface + 명확한 경계선**. Linear-tier 밀도 + shadcn 정갈함. Material Design 풍 부유 그림자/큰 둥근 모서리는 피함.
+
+### 14.2 버튼 시스템 (canonical)
+
+| 종류 | 클래스 | 용도 |
+|------|--------|------|
+| Primary (emerald) | `bg-emerald-500 text-zinc-950 hover:bg-emerald-400` | CTA, 검색 submit |
+| Ghost zinc | `border border-zinc-800 bg-zinc-900 text-zinc-300 hover:border-zinc-700 hover:bg-zinc-800` | 보조 액션 (대시보드 가기, 위젯 관리 등) |
+| Chip (inactive) | `border border-zinc-800 bg-zinc-950/60 text-zinc-400 hover:border-zinc-700 hover:bg-zinc-900 hover:text-zinc-100` | 필터 chip 비활성 |
+| Chip (active) | `border border-emerald-500/30 bg-emerald-500/15 text-emerald-200` | 필터 chip 활성 (기본 emerald 톤) |
+| Chip (toned active) | rose/amber/zinc 변형 | 등급 필터 같이 의미별 톤 (1=rose, 2=amber, 3=zinc) |
+| Star (북마크 활성) | `border-amber-400/40 bg-amber-400/10 text-amber-200` + `fill-amber-300` | 즐겨찾기 활성 |
+| Touch target | 최소 `h-9` (36px) — chip은 `h-8` (32px) 허용 | A11y |
+
+### 14.3 타이포 강화 (text-[10px] 금지)
+
+| 토큰 | 용도 |
+|------|------|
+| `text-3xl font-semibold tracking-tight` | 페이지 h1 (PageFrame 자동) |
+| `text-base font-semibold` | 카드 제목 |
+| `text-base` | 본문 강조 + dl 값 |
+| `text-sm` | 본문, 라벨 |
+| `text-xs font-mono uppercase tracking-[0.14em]` | eyebrow / 섹션 라벨 (모노) — **최소 사이즈** |
+| `font-mono tabular-nums` | 숫자/데이터 (°C, %, 거리, 금액 등) — 본문에 절대 X |
+
+**금지:**
+- `text-[10px]` — 다크에서 시인성 부족. eyebrow도 `text-xs` 하한.
+- `text-zinc-600` 이하 본문 — `text-zinc-400`/`text-zinc-500`만.
+- 본문에 mono.
+
+### 14.4 컴포넌트 빌딩 블록
+
+| 컴포넌트 | 위치 | 역할 |
+|----------|------|------|
+| `<PageFrame>` | `src/components/page-frame.tsx` | 모든 페이지 헤더 (eyebrow + h1 + description + actions). 새 페이지 직접 헤더 만들지 X |
+| `<BaseWidget>` / `<DashboardWidget>` | `src/components/widget/` | 위젯 카드. 새 위젯에서 절대 직접 카드 스타일 X |
+| `<DashboardStats>` | `src/components/dashboard-stats.tsx` | 대시보드 상단 4-up 통계 strip |
+| `<Sidebar>` / `<SidebarContent>` / `<SidebarBookmarks>` | `src/components/sidebar/` | 좌측 영구 네비 (w-64) |
+| `<BookmarkButton>` | `src/components/bookmark/` | 페이지 헤더 ★ 즐겨찾기 토글 |
+| `<CommandPalette>` | `src/components/command-palette.tsx` | ⌘K (cmdk) |
+| `getSkyVisual(skyText)` | `src/components/widget/weather/sky-icon.ts` | 날씨 텍스트 → Lucide 아이콘 + 색상 |
+
+### 14.5 차트 패턴 (SVG line + area)
+
+- 사이즈: viewBox `0 0 600 160`, `preserveAspectRatio="none"`, `min-w-full overflow-x-auto`
+- Line: `stroke="rgb(52, 211, 153)" strokeWidth="2" strokeLinecap="round"` (emerald-400)
+- Area fill: `<linearGradient>` emerald-400 0.25 → 0
+- Point dots: `r="3.5" fill="rgb(20, 20, 23)" stroke="rgb(52, 211, 153)" strokeWidth="2"`
+- 라벨: `fontSize="11"`, mono via `className="fill-zinc-300 font-mono"`
+- Trend pill (▲/▼/보합): rose/cyan/zinc + `font-mono text-xs`
+
+(예시: `src/components/widget/apartment/ApartmentTrendChart.tsx`)
+
+### 14.6 사이드바 패턴
+
+```
+┌── DataWeave (D-chip + wordmark + tagline)
+│
+├── 대시보드
+│
+├── ★ 즐겨찾기 (mounted 후 표시, 빈 리스트면 숨김)
+│   - 라벨 + 별표 + hover 시 X 제거 버튼
+│
+├── 공공데이터 (섹션 라벨, registry-driven)
+│   - 날씨 / SOS 병원·약국 / 식품 리콜 / 아파트 실거래가 / ...
+│
+└── 설정 (footer)
+    + 데이터 소스 상태 pill (4/4 연결됨)
+```
+
+- 너비 고정 `w-64` (반응형 collapse 시도 → 사용자 피드백으로 폐기, 항상 표시)
+- Active 메뉴: `bg-emerald-500/10 text-emerald-200` + 아이콘 chip emerald-500/15
+- 호버: `hover:bg-zinc-800/60 hover:text-zinc-100`
+
+### 14.7 검색 상태 = URL searchParams
+
+위젯 상세 페이지에서 클라이언트 상태 없음:
+- 필터 chip은 `<Link href={...}>` 또는 `router.push` (`useRouter`)
+- 사용자가 chip 클릭 → URL 갱신 → RSC 재 fetch → 새 결과 렌더
+- 효과: 새로고침/공유/북마크 친화
+
+(예시: `src/components/widget/apartment/ApartmentFilters.tsx`)
+
+### 14.8 필터 chip 색 매핑 (의미별 톤)
+
+- **기본 emerald**: 일반 필터 (기간, 종류, 정렬)
+- **rose**: 1등급 (식품 리콜 최고 위험)
+- **amber**: 2등급 / 경고
+- **zinc**: 3등급 / 약한 위험
+- **amber-star**: 즐겨찾기 활성
+
+위젯 데이터의 의미(위험도)가 chip 색에도 반영되어 한눈에 분류 가능.
+
+---
+
 ## 13. 디자인 변경 이력
 
 | 날짜 | 변경 |
 |------|------|
 | 2026-05-04 | 최초 작성. Emerald + Cyan 액센트 + Aurora bg + JetBrains Mono 데이터 |
 | 2026-05-05 | §12 Phase 1 Design Patches 추가 — `/plan-design-review` 7-pass: 카드 IA, 인터랙션 상태, User Journey 5초/5분/5년, Slop 차별화 4가지, 위젯-토큰 매핑, 모바일 변환, 로고 wordmark, PWA install prompt 트리거 |
+| 2026-05-16 | **§14 Phase 1.5 Design Evolution 추가**. Aurora bg + 반투명 surface 폐기 → Supabase/shadcn 톤 솔리드 surface로 교체. 옛 표면 토큰 deprecated 표시. 버튼 시스템 (Primary/Ghost-zinc/Chip with semantic tones) 정리. 타이포 하한 `text-xs`, `text-[10px]` 금지. PageFrame/사이드바/즐겨찾기/SVG 차트 패턴 정리. 검색 상태 = URL searchParams 컨벤션 명문화. |

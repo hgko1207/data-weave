@@ -1,10 +1,9 @@
-# DataWeave — Phase 1 Implementation Plan (v2)
+# DataWeave — Implementation Plan (v3)
 
-> 한국 공공데이터 **조회형 위젯 대시보드**. Phase 1은 의도적으로 단순. 알림 인프라 zero, 위젯 3개, 무료 호스팅.
-> Phase 2에서 Watcher Platform (알림형 위젯 + cron 인프라)를 활성화. 인터페이스는 Phase 2 호환을 미리 박아둠.
+> 한국 공공데이터 **조회형 위젯 대시보드** + 데이터 익스플로러. Phase 1 (위젯 3개, 무료 호스팅) ✅ 완성 → Phase 1.5 (사이드바 네비 + 상세 페이지 + 위젯 강화 + 신규 위젯) ✅ 완성 → Phase 2 (Watcher Platform: 알림형 위젯 + cron 인프라)는 [TODOS.md](TODOS.md) TODO 8.
 >
-> 본 문서는 `/plan-ceo-review` (SCOPE EXPANSION) + `/plan-eng-review` (Phase 1 축소 결정) 통과 결과물.
-> **다음 구현 세션의 단일 진실 원천 (SSOT).**
+> 본 문서는 `/plan-ceo-review` + `/plan-eng-review` 통과 후 실제 구현하며 진화한 결과물.
+> **단일 진실 원천 (SSOT) — 코드와 어긋나면 코드가 기준.**
 
 ---
 
@@ -14,6 +13,7 @@
 |------|------|------|------|
 | 2026-05-04 | v1 | 최초 작성 — 위젯 4개 + Web Push + Telegram 듀얼 알림 | `/plan-ceo-review` SCOPE EXPANSION |
 | 2026-05-04 | v2 | **Phase 1 조회형 3개로 축소**. 캠핑장 + 알림 인프라 → Phase 2. | `/plan-eng-review` + Outside Voice (#1 Vercel Hobby cron 1/day 한도) + 사용자 결정 (조회만, 무료) |
+| 2026-05-16 | v3 | **Phase 1 + 1.5 완성 반영.** Step 0~6 완료 마킹. 위젯 4개로 확장 (아파트 실거래가 추가). 사이드바 네비, 위젯별 상세 페이지(URL `searchParams`), 즐겨찾기, 위젯별 강화 기능 (등급/영업중/정렬/추이 차트) §14에 정리. Aurora bg는 §7 deprecated 표시 (solid surface로 교체 — [DESIGN.md](DESIGN.md) §14 참조). | 실제 구현 진화 반영, 사용자 요청 |
 
 ---
 
@@ -39,19 +39,25 @@
 - **Validation:** zod (strict 모드, schema drift 감지)
 - **Testing:** Vitest + MSW (unit + integration). Playwright E2E는 optional.
 - **PWA:** manifest.ts + Service Worker (offline 정적 캐시만). **Push subscribe 없음.**
-- **Design system:** [DESIGN.md](DESIGN.md) — Emerald + Cyan, Aurora bg, JetBrains Mono 데이터, Cmd+K
+- **Design system:** [DESIGN.md](DESIGN.md) — Emerald 액센트 + zinc 솔리드 surface (Supabase/shadcn 톤), JetBrains Mono 데이터, Cmd+K. Aurora bg는 §7에 deprecated.
+- **XML parser:** `fast-xml-parser` — 국토교통부 RTMS 응답이 XML only라 v3에서 추가.
 
 ---
 
-## 3. Phase 1 위젯 3개 (모두 조회형)
+## 3. 위젯 목록 (모두 조회형, v3 = 4개)
 
-| ID | 데이터 소스 | 캐시 (revalidate) | 핵심 동작 |
-|----|------------|------------------|----------|
-| `weather` | 기상청 단기예보 + 에어코리아 | 600s (10분) | 온도/강수확률/미세먼지 + 시간대별 mini graph |
-| `pharmacy` | 응급의료 OpenAPI (e-gen.or.kr) | 300s (5분) | 사용자 위치 5km 내 야간/공휴일 운영 병원·약국, 전화 버튼 |
-| `food-recall` | 식약처 회수·판매중지 OpenAPI | 21600s (6시간) | 최근 24시간 신규 리콜 + 사용자 알레르기 키워드 필터 |
+| ID | 데이터 소스 | API 시스템 | 상세 페이지 강화 |
+|----|------------|------------|------------------|
+| `weather` | 기상청 단기예보 + 에어코리아 + 기상청 중기예보 | data.go.kr 통합 키 | 지역 chip 셀렉터 + 시간대별 24h + 주간 예보 8일 + 습도/풍속/풍향/오늘 high·low |
+| `pharmacy` | 국립중앙의료원 응급의료 (응급실 + 약국) | data.go.kr 통합 키 | 시·도/시·군·구 cascade + 반경 + 종류 chip + **지금 영업중 토글** |
+| `food-recall` | 식품안전나라 I0490 (별도 시스템) | foodsafetykorea.go.kr **별도 키** | 키워드 chip + 기간 chip + **등급 필터 (1/2/3등급)** |
+| `apartment` | 국토교통부 RTMS 매매 실거래가 (15126469) | data.go.kr 통합 키 | 시·도/시·군·구 cascade + 월 stepper + **정렬 chip** + **6개월 평균가 추이 차트** |
 
-**Phase 1 위젯은 모두 사용자가 능동 조회.** 새로고침 버튼으로 강제 fetch 가능.
+**모든 위젯은 사용자 능동 조회.** 새로고침 버튼으로 강제 fetch. Phase 2에 cron 폴링 추가 예정 ([TODOS.md](TODOS.md) TODO 8).
+
+**공통 강화 (Phase 1.5, v3):**
+- **즐겨찾기**: 모든 상세 페이지 헤더에 ★ 버튼 — 현재 검색 URL을 `localStorage["dataweave.bookmarks"]`에 저장 → 사이드바 즐겨찾기 섹션에서 1클릭 복귀.
+- **검색 상태 = URL searchParams**: 클라이언트 상태 없음. 새로고침/공유/북마크 OK.
 
 ---
 
@@ -254,9 +260,9 @@ AIRKOREA_API_KEY=                      # 미세먼지 (날씨 위젯)
 
 ---
 
-## 9. 구현 순서 (Step 0~6)
+## 9. 구현 순서 (Step 0~6, 모두 ✅ 완성 — Phase 1.5는 §14 참조)
 
-### Step 0 — 프로젝트 부트스트랩
+### Step 0 — 프로젝트 부트스트랩 ✅
 1. `npx create-next-app@latest . --typescript --tailwind --app --src-dir --eslint --import-alias "@/*" --use-npm`
 2. shadcn/ui init: `npx shadcn@latest init` (Slate base, dark default)
 3. 컴포넌트 추가: `button card dialog form input select toast skeleton sheet command`
@@ -264,7 +270,7 @@ AIRKOREA_API_KEY=                      # 미세먼지 (날씨 위젯)
 5. dev deps: `vitest @vitejs/plugin-react msw playwright`
 6. **확인 체크포인트** (사용자)
 
-### Step 1 — 메인 레이아웃 + 디자인 시스템
+### Step 1 — 메인 레이아웃 + 디자인 시스템 ✅
 1. DESIGN.md 토큰을 `tailwind.config.ts`에 반영
 2. `<AuroraBg>` 배경 컴포넌트
 3. 헤더 (로고 + 설정 + 위젯 추가 + Cmd+K)
@@ -272,7 +278,7 @@ AIRKOREA_API_KEY=                      # 미세먼지 (날씨 위젯)
 5. `<CommandPalette>` (cmdk)
 6. **확인 체크포인트**
 
-### Step 2 — BaseWidget + 격리 + Mock + Registry
+### Step 2 — BaseWidget + 격리 + Mock + Registry ✅
 1. `BaseWidget` + Header/Body/Skeleton/Error/Refresh/HealthDot/Diff
 2. `<ErrorBoundary>` per-widget 격리
 3. `_fetch-wrapper.ts` (zod strict + retry + abort + 7s timeout)
@@ -281,33 +287,33 @@ AIRKOREA_API_KEY=                      # 미세먼지 (날씨 위젯)
 6. Supabase 마이그레이션 0001 적용
 7. **확인 체크포인트**
 
-### Step 3 — 위젯 1: 날씨 (mock → 실 API)
+### Step 3 — 위젯 1: 날씨 (mock → 실 API) ✅
 1. `widgets/weather/` 5개 파일 (index/fetch/schema/Render/mock + ConfigForm)
 2. mock 데이터로 카드 시각 완성
 3. 실제 KMA + 에어코리아 API 연동
 4. zod schema (drift 감지)
 5. **확인 체크포인트**
 
-### Step 4 — 위젯 2: SOS 병원/약국 (위치 기반)
+### Step 4 — 위젯 2: SOS 병원/약국 (위치 기반) ✅
 1. 위치 권한 hook (`navigator.geolocation`)
 2. 응급의료 OpenAPI 연동 + 거리 계산
 3. 카드 + 전화 버튼 + Naver/Kakao Map 링크
 4. **확인 체크포인트**
 
-### Step 5 — 위젯 3: 위해식품 리콜 (키워드 필터)
+### Step 5 — 위젯 3: 위해식품 리콜 (키워드 필터) ✅
 1. 식약처 OpenAPI 연동
 2. 알레르기 키워드 client-side 필터
 3. 최근 24시간 vs 전체 토글
 4. **확인 체크포인트**
 
-### Step 6 — PWA + 배포
-1. manifest.ts + 아이콘 + install prompt
-2. Service Worker (정적 캐시만)
-3. Vercel 배포 + env 등록
-4. Supabase 프로덕션 마이그레이션
-5. 첫 5분 smoke test
+### Step 6 — PWA + 배포 (PWA만 ✅, Vercel/Supabase는 deferred)
+1. ✅ manifest.ts + 아이콘 + install prompt
+2. ✅ Service Worker (정적 캐시만, dev 모드 자동 unregister)
+3. ⏳ Vercel 배포 → [TODOS.md](TODOS.md) TODO 10 (사용자 결정으로 로컬-only 운영)
+4. ⏳ Supabase 프로덕션 마이그레이션 → 데모 인스턴스 하드코딩 + localStorage로 충분, Vercel 시점에 함께
+5. ⏳ Smoke test → Vercel 배포 시점에
 
-**총 Step 6단계, CC ~4시간.**
+**총 Step 6단계 (PWA까지 완료), CC ~4시간. Phase 1 완성.**
 
 ---
 
@@ -390,18 +396,102 @@ Phase 2 추가 예정 (점선): cron worker + push dispatcher + push_subs/snapsh
 
 ---
 
-## 13. 완료 정의 (Phase 1 끝났다는 신호)
+## 13. 완료 정의 (Phase 1 + 1.5 완성)
 
-- [ ] 3개 위젯 모두 실 API 연동, mock fallback 동작
-- [ ] zod strict 파싱이 모든 위젯 fetch에 적용
-- [ ] BaseWidget Skeleton/Error/Refresh/HealthDot/Diff 모두 동작
-- [ ] D1 First Run Magic — 위젯 추가 시 즉시 데이터 표시
-- [ ] D2 Diff 색표시 — 새로고침 시 변화 강조
-- [ ] D3 위젯 카탈로그 페이지
-- [ ] 위젯 인스턴스 추가/삭제/config 편집 (UI)
-- [ ] PWA install prompt + 정적 offline cache
-- [ ] Vercel 배포 + 사용자가 자기 폰·PC에서 정상 사용 7일
-- [ ] tests: Vitest unit + integration 80%+, 모든 위젯의 schema drift 테스트 포함
+**Phase 1 (모두 ✅):**
+- [x] 3개 위젯 (날씨/SOS/리콜) 모두 실 API 연동, mock fallback 동작
+- [x] zod strict 파싱이 모든 위젯 fetch에 적용 (drift → mock 폴백)
+- [x] BaseWidget Skeleton/Error/Refresh/HealthDot 동작
+- [x] 위젯 인스턴스 demo 하드코딩 (Supabase deferred)
+- [x] PWA install prompt + 정적 offline cache (dev 모드 SW 자동 unregister)
+- [x] 사용자 로컬-only 운영 정상
+
+**Phase 1.5 (모두 ✅, §14 참조):**
+- [x] 사이드바 네비 (대시보드/공공데이터/즐겨찾기/설정)
+- [x] 위젯별 상세 페이지 (URL `searchParams` 동기화)
+- [x] 설정 페이지 — localStorage 핀 토글
+- [x] 신규 위젯: 아파트 실거래가 (국토교통부 RTMS)
+- [x] 위젯 강화: 등급 필터(리콜), 영업중 토글(약국), 정렬+추이 차트(아파트)
+- [x] 즐겨찾기 시스템 — 검색 URL을 localStorage에 핀
+
+**아직 안 한 것 (의식적 defer):**
+- ⏳ Vercel 배포 → TODO 10
+- ⏳ Supabase 인스턴스 영구 저장 → Vercel 시점에
+- ⏳ tests: Vitest unit + schema drift 테스트 → 안정화되면
+
+---
+
+## 14. Phase 1.5 — 사이드바 + 상세 페이지 + 위젯 강화
+
+> Phase 1 완성 후 사용자 피드백("공공데이터 익스플로러로 진화"): 단순 위젯 대시보드 → 사이드바 네비 + 위젯별 상세 페이지로 확장. v3에서 추가된 결정 사항 정리.
+
+### 14.1 라우트 구조 (App Router)
+
+```
+src/app/(dashboard)/
+├── layout.tsx           # Sidebar + 상단 header + main
+├── page.tsx             # / 대시보드 (RSC, DEMO_INSTANCES 하드코딩, DashboardStats + 위젯 카드 그리드)
+├── settings/page.tsx    # /settings — localStorage 핀 토글
+└── w/<id>/page.tsx      # /w/weather, /w/pharmacy, /w/food-recall, /w/apartment
+```
+
+### 14.2 URL = 진실의 원천
+
+- 모든 상세 페이지는 **RSC**. 검색 조건은 `searchParams`로.
+- 클라이언트 입력(셀렉터/chip)은 `<Link href={...}>` 또는 `router.push` → URL 갱신 → 새 server fetch.
+- 클라이언트 상태 X (즐겨찾기/핀 같은 사용자 메타데이터만 localStorage).
+- 효과: 새로고침 보존, 공유 가능 (북마크 가능), Service Worker 캐시 친화적.
+
+### 14.3 위젯별 상세 페이지 패턴
+
+각 페이지 동일 골격:
+1. **PageFrame** (eyebrow + title + description + actions slot) — [DESIGN.md §14](DESIGN.md) 참조
+2. **Filter 카드** — 검색·필터 chip 그룹 + form
+3. **Result 카드** — 결과 리스트/차트 + empty state
+4. **(선택) 보조 카드** — 통계, 차트, etc.
+
+검색 파라미터 정리:
+- `/w/weather?region=서울`
+- `/w/pharmacy?sido=대전광역시&sigungu=유성구&radius=5&kind=all&openNow=1`
+- `/w/food-recall?q=우유,계란&window=168&grade=1`
+- `/w/apartment?sido=서울특별시&sigungu=강남구&lawdCd=11680&dealYm=202605&sort=amount-desc`
+
+### 14.4 즐겨찾기 (Bookmark) 시스템
+
+저장 형식 — `localStorage["dataweave.bookmarks"]`:
+```ts
+type Bookmark = {
+  id: string;          // {widgetId}-{timestamp}
+  label: string;       // 자동 생성 (예: "아파트 · 서울특별시 강남구 · 2026년 5월")
+  href: string;        // 현재 페이지 URL (pathname + searchParams)
+  widgetId: string;    // 'weather' | 'pharmacy' | 'food-recall' | 'apartment'
+  createdAt: number;
+};
+```
+
+- 상세 페이지 헤더 `<BookmarkButton>` 클릭 → 현재 URL이 localStorage에 추가/제거.
+- 사이드바 "즐겨찾기" 섹션 (대시보드 ↔ 공공데이터 사이) — 저장된 항목을 별표 + 라벨로 표시, 클릭 시 URL 복귀.
+- 동기화: 같은 탭은 custom event(`dataweave-bookmarks-changed`), 다른 탭은 `storage` event.
+
+### 14.5 위젯별 강화 (v3)
+
+| 위젯 | 강화 |
+|------|------|
+| 날씨 | 시간대별 24h 카드 strip + 주간 8일 예보 (단기 3 + 중기 5, KMA 중기예보 별도 활용신청 필요) |
+| SOS | 시·도→시·군·구 cascade select (235개 매핑) + "전체" 옵션 + 종류 필터 + **지금 영업중 토글** (KST 기준 운영시간 파싱) |
+| 식품 리콜 | 키워드 chip + 기간 chip + **등급 필터** (1=rose / 2=amber / 3=zinc 톤) |
+| 아파트 | 시·도→시·군·구 cascade + 월 stepper + **정렬 chip** (최신/가격↓↑/면적/평당가) + **6개월 평균가 추이 SVG 차트** |
+
+### 14.6 새 위젯: 아파트 실거래가
+
+- **데이터**: 국토교통부 RTMS 매매 실거래가 (15126469)
+- **법정동 코드 매핑**: `src/widgets/apartment/lawd-codes.ts` — 229개 시·군·구 5자리 코드 (군위군 → 대구 27720 반영)
+- **응답 포맷**: XML only → `fast-xml-parser`로 파싱
+- **상세 페이지**: 시·도/시·군·구 cascade + 월 stepper + 정렬 chip + 추이 차트 + 거래 내역 리스트
+
+### 14.7 디자인 토큰 진화 (Aurora → Solid)
+
+Phase 1엔 Aurora gradient + 반투명 surface, Phase 1.5에서 **솔리드 surface로 교체** ([DESIGN.md §14](DESIGN.md) 참조). 사용자 피드백: "사이드바와 메인 구분 안 됨" → opaque chrome (zinc-900) + 명확한 border (zinc-800) 도입. Aurora bg는 `src/components/aurora-bg.tsx`에 남아있으나 root layout에서 제거됨.
 
 ---
 
