@@ -146,8 +146,9 @@ function normalizeTrade(row: RawTrade, idx: number): ApartmentTrade | null {
   if (!Number.isFinite(dealAmount) || dealAmount <= 0) return null;
   const dealDate = `${year}-${pad(month)}-${pad(day)}`;
   const areaNum = area ?? 0;
-  const pricePerPyeong =
-    areaNum > 0 ? Math.round((dealAmount / (areaNum / 3.3058)) * 10) / 10 : null;
+  // 평당가는 분양 평형(공급면적) 기준 — 한국 부동산 광고 관행
+  const pyeong = areaNum > 0 ? (areaNum * 1.296) / 3.3058 : 0;
+  const pricePerPyeong = pyeong > 0 ? Math.round((dealAmount / pyeong) * 10) / 10 : null;
 
   // idx를 포함해서 데이터가 똑같은 거래(같은 단지·날짜·면적·금액)도 React key 충돌 방지.
   // 호수는 API가 비공개라 동일 데이터의 다른 호수 거래가 같이 올 수 있음.

@@ -11,7 +11,7 @@ import {
   UserCircle2,
   XCircle,
 } from "lucide-react";
-import { formatAmount } from "@/widgets/apartment/format";
+import { formatAmount, pyeongLabel } from "@/widgets/apartment/format";
 import type { ApartmentTrade } from "@/widgets/apartment/schema";
 
 type Props = {
@@ -145,7 +145,7 @@ function TradeRow({
           </p>
           {/* mobile: 면적 + 날짜 인라인 */}
           <p className="mt-1 flex items-baseline gap-3 font-mono text-xs tabular-nums text-zinc-500 md:hidden">
-            <span>{trade.area.toFixed(1)}㎡</span>
+            <span>{trade.area.toFixed(1)}㎡ ({pyeongLabel(trade.area)})</span>
             <span>·</span>
             <span>{formatDealDate(trade.dealDate)}</span>
           </p>
@@ -153,9 +153,7 @@ function TradeRow({
 
         <div className="hidden flex-col items-start font-mono tabular-nums md:flex">
           <span className="text-sm text-zinc-200">{trade.area.toFixed(1)}㎡</span>
-          <span className="text-xs text-zinc-500">
-            {(trade.area / 3.3058).toFixed(1)}평
-          </span>
+          <span className="text-xs text-zinc-500">{pyeongLabel(trade.area)}</span>
         </div>
 
         <div className="text-right font-mono tabular-nums">
@@ -228,7 +226,7 @@ function ExpandedDetails({ trade }: { trade: ApartmentTrade }) {
         <DetailRow
           icon={<Building2 className="h-3.5 w-3.5 text-zinc-500" aria-hidden />}
           label="전용면적"
-          value={`${trade.area.toFixed(2)}㎡ (${(trade.area / 3.3058).toFixed(1)}평)`}
+          value={`${trade.area.toFixed(2)}㎡ · ${pyeongLabel(trade.area)} (전용 ${(trade.area / 3.3058).toFixed(1)}평)`}
         />
         <DetailRow
           icon={<CalendarClock className="h-3.5 w-3.5 text-zinc-500" aria-hidden />}

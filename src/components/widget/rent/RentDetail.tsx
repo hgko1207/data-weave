@@ -1,5 +1,5 @@
 import { Key, Coins, Building2 } from "lucide-react";
-import { formatAmount } from "@/widgets/apartment/format";
+import { formatAmount, pyeongLabel } from "@/widgets/apartment/format";
 import { formatYm } from "@/widgets/apartment/fetch";
 import type { RentData, RentTrade } from "@/widgets/rent/schema";
 import type { RentSort, RentTypeFilter } from "./RentFilters";
@@ -175,7 +175,7 @@ function TradeRow({ trade }: { trade: RentTrade }) {
           {trade.area.toFixed(1)}㎡
         </span>
         <span className="font-mono text-xs text-zinc-500 tabular-nums">
-          {(trade.area / 3.3058).toFixed(1)}평
+          {pyeongLabel(trade.area)}
         </span>
       </div>
 

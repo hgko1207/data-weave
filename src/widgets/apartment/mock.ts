@@ -18,7 +18,8 @@ export function buildMockApartment(region: string, dealYm: string): ApartmentDat
     const area = 59 + (i % 5) * 17;
     const baseAmount = 45000 + (i % 4) * 12000 + (i % 3) * 5000;
     const dealAmount = baseAmount + (i * 1234) % 8000;
-    const pyeong = area / 3.3058;
+    // 평당가는 공급평 기준 (전용 × 1.296)
+    const pyeong = (area * 1.296) / 3.3058;
     const day = ((i * 7) % 27) + 1;
     const d = new Date(now.getFullYear(), now.getMonth(), day);
     const dong = ["봉명동", "도룡동", "노은동", "관평동", "지족동", "전민동"][i % 6];
