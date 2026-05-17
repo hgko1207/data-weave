@@ -1,5 +1,5 @@
 import type { LucideIcon } from "lucide-react";
-import { Building2, CloudSun, Pill, ShieldAlert } from "lucide-react";
+import { Building2, CloudSun, Key, Pill, ShieldAlert } from "lucide-react";
 
 export type WidgetMeta = {
   id: string;
@@ -32,5 +32,11 @@ export const WIDGET_META: WidgetMeta[] = [
     title: "아파트 실거래가",
     icon: Building2,
     description: "국토교통부 시·군·구별 아파트 매매 실거래가",
+  },
+  {
+    id: "rent",
+    title: "전월세 실거래가",
+    icon: Key,
+    description: "국토교통부 시·군·구별 아파트 전세·월세 실거래가",
   },
 ];
