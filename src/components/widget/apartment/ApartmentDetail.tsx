@@ -5,6 +5,14 @@ import type { ApartmentData, ApartmentTrade } from "@/widgets/apartment/schema";
 import type { ApartmentSort } from "./ApartmentFilters";
 import { ApartmentTradesList } from "./ApartmentTradesList";
 
+const SORT_LABELS: Record<ApartmentSort, string> = {
+  "date-desc": "최신순",
+  "amount-desc": "가격↓",
+  "amount-asc": "가격↑",
+  "area-desc": "면적↓",
+  "pyeong-desc": "평당가↓",
+};
+
 export function ApartmentDetail({
   data,
   sort = "date-desc",
@@ -17,6 +25,7 @@ export function ApartmentDetail({
   const filtered = filterByQuery(data.trades, query);
   const sorted = sortTrades(filtered, sort);
   const hasQuery = query.trim().length > 0;
+  const sortLabel = sort !== "date-desc" ? SORT_LABELS[sort] : null;
 
   return (
     <div className="space-y-5">
@@ -28,6 +37,7 @@ export function ApartmentDetail({
           trades={sorted}
           totalAvailable={data.totalCount}
           query={hasQuery ? query : null}
+          sortLabel={sortLabel}
         />
       )}
 

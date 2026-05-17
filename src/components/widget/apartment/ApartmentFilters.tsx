@@ -41,7 +41,10 @@ export function ApartmentFilters({ current }: { current: ApartmentFilterValues }
 
   const sigunguOptions = useMemo(() => getSigunguListWithCode(sido), [sido]);
 
-  const buildHref = (overrides: Partial<ApartmentFilterValues>) => {
+  const buildHref = (
+    overrides: Partial<ApartmentFilterValues>,
+    opts?: { hash?: string },
+  ) => {
     const params = new URLSearchParams({
       sido: overrides.sido ?? current.sido,
       sigungu: overrides.sigungu ?? current.sigungu,
@@ -52,7 +55,8 @@ export function ApartmentFilters({ current }: { current: ApartmentFilterValues }
     if (sort !== "date-desc") params.set("sort", sort);
     const q = overrides.q ?? current.q;
     if (q) params.set("q", q);
-    return `/w/apartment?${params.toString()}`;
+    const base = `/w/apartment?${params.toString()}`;
+    return opts?.hash ? `${base}#${opts.hash}` : base;
   };
 
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -163,7 +167,7 @@ export function ApartmentFilters({ current }: { current: ApartmentFilterValues }
         </div>
       </form>
 
-      {/* 정렬 chips — 클릭 즉시 URL 갱신 (검색 버튼 누를 필요 X) */}
+      {/* 정렬 chips — 클릭 즉시 URL 갱신 (검색 버튼 누를 필요 X) + 거래 내역으로 스크롤 */}
       <div className="mt-4 flex flex-wrap items-center gap-2">
         <span className="text-xs text-zinc-500">정렬</span>
         <div className="flex flex-wrap gap-1.5">
@@ -172,7 +176,7 @@ export function ApartmentFilters({ current }: { current: ApartmentFilterValues }
             return (
               <Link
                 key={o.value}
-                href={buildHref({ sort: o.value })}
+                href={buildHref({ sort: o.value }, { hash: "apartment-trades" })}
                 aria-current={active ? "page" : undefined}
                 className={`inline-flex h-8 items-center rounded-md border px-3 text-xs font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50 ${
                   active

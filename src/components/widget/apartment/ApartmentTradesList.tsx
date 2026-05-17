@@ -18,15 +18,24 @@ type Props = {
   trades: ApartmentTrade[];
   totalAvailable: number;
   query?: string | null;
+  sortLabel?: string | null;
 };
 
-export function ApartmentTradesList({ trades, totalAvailable, query }: Props) {
+export function ApartmentTradesList({
+  trades,
+  totalAvailable,
+  query,
+  sortLabel,
+}: Props) {
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   return (
-    <article className="rounded-xl border border-zinc-800/80 bg-zinc-900">
+    <article
+      id="apartment-trades"
+      className="scroll-mt-20 rounded-xl border border-zinc-800/80 bg-zinc-900"
+    >
       <header className="flex flex-wrap items-baseline justify-between gap-3 border-b border-zinc-800/80 px-6 py-4">
-        <div className="flex items-baseline gap-3">
+        <div className="flex flex-wrap items-baseline gap-3">
           <h2 className="text-base font-semibold text-zinc-100">거래 내역</h2>
           {query ? (
             <p className="font-mono text-xs tabular-nums text-zinc-500">
@@ -37,6 +46,11 @@ export function ApartmentTradesList({ trades, totalAvailable, query }: Props) {
               {Math.min(trades.length, 200)}건
             </p>
           )}
+          {sortLabel ? (
+            <span className="inline-flex items-center gap-1 rounded-md bg-emerald-500/15 px-2 py-0.5 font-mono text-[11px] text-emerald-300">
+              정렬 · {sortLabel}
+            </span>
+          ) : null}
         </div>
         <p className="inline-flex items-center gap-1 font-mono text-[11px] text-zinc-500">
           <Info className="h-3 w-3" aria-hidden />
