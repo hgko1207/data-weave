@@ -35,7 +35,8 @@
       "Bash(curl -s \"http://localhost:3000/w/apartment?sido=%EC%84%9C%EC%9A%B8%ED%8A%B9%EB%B3%84%EC%8B%9C&sigungu=%EA%B0%95%EB%82%A8%EA%B5%AC&lawdCd=11680&sort=amount-desc\")",
       "Bash(curl -s \"http://localhost:3000/w/apartment?sido=%EB%8C%80%EC%A0%84%EA%B4%91%EC%97%AD%EC%8B%9C&sigungu=%EC%9C%A0%EC%84%B1%EA%B5%AC&lawdCd=30200&dealYm=202605&sort=amount-desc\")",
       "Bash(node debug-sort.mjs)",
-      "Bash(curl -s \"http://localhost:3000/w/apartment?sort=amount-desc\")"
+      "Bash(curl -s \"http://localhost:3000/w/apartment?sort=amount-desc\")",
+      "Bash(node check-dupes.mjs)"
     ]
   }
 }

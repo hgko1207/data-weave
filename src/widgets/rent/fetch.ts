@@ -33,7 +33,7 @@ export async function fetchRent(ctx: WidgetContext): Promise<RentData> {
 
   try {
     const rows = await fetchAllRents(key, cfg.lawdCd, dealYm, ctx.abort);
-    const trades = rows.map(normalizeTrade).filter((t): t is RentTrade => t !== null);
+    const trades = rows.map((r, i) => normalizeTrade(r, i)).filter((t): t is RentTrade => t !== null);
 
     if (trades.length === 0) {
       return rentDataSchema.parse({
@@ -125,7 +125,7 @@ function walkForItems(node: unknown): unknown {
   return null;
 }
 
-function normalizeTrade(row: RawTrade): RentTrade | null {
+function normalizeTrade(row: RawTrade, idx: number): RentTrade | null {
   const aptName = pickString(row, ["aptNm", "APT_NM", "aptName"]);
   const dong = pickString(row, ["umdNm", "UMD_NM"]) ?? "";
   const jibun = pickString(row, ["jibun", "JIBUN"]) ?? null;
@@ -147,8 +147,9 @@ function normalizeTrade(row: RawTrade): RentTrade | null {
   const validMonthly = Number.isFinite(monthlyRent) ? monthlyRent : 0;
   const dealDate = `${year}-${pad(month)}-${pad(day)}`;
 
+  // idx 포함 — 호수 비공개로 동일 단지·날짜·금액 거래가 여럿일 수 있음. React key 충돌 방지.
   return {
-    id: `${aptName}-${dealDate}-${jibun ?? ""}-${deposit}-${validMonthly}`,
+    id: `t${idx}-${aptName}-${dealDate}-${jibun ?? ""}-${deposit}-${validMonthly}`,
     aptName: aptName.trim(),
     dong: dong.trim(),
     jibun,

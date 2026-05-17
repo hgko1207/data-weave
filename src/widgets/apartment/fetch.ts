@@ -34,7 +34,7 @@ export async function fetchApartment(ctx: WidgetContext): Promise<ApartmentData>
 
   try {
     const rows = await fetchAllTrades(key, cfg.lawdCd, dealYm, ctx.abort);
-    const trades = rows.map(normalizeTrade).filter((t): t is ApartmentTrade => t !== null);
+    const trades = rows.map((r, i) => normalizeTrade(r, i)).filter((t): t is ApartmentTrade => t !== null);
 
     if (trades.length === 0) {
       // 빈 결과 — live 호출은 성공이지만 그 달 거래 0건. mock 대신 빈 데이터.
@@ -119,7 +119,7 @@ function walkForItems(node: unknown): unknown {
   return null;
 }
 
-function normalizeTrade(row: RawTrade): ApartmentTrade | null {
+function normalizeTrade(row: RawTrade, idx: number): ApartmentTrade | null {
   const aptName = pickString(row, ["aptNm", "aptName", "APT_NM"]);
   const aptDong = pickString(row, ["aptDong", "APT_DONG"]) ?? null;
   const dong = pickString(row, ["umdNm", "umdName", "UMD_NM"]) ?? "";
@@ -149,8 +149,10 @@ function normalizeTrade(row: RawTrade): ApartmentTrade | null {
   const pricePerPyeong =
     areaNum > 0 ? Math.round((dealAmount / (areaNum / 3.3058)) * 10) / 10 : null;
 
+  // idx를 포함해서 데이터가 똑같은 거래(같은 단지·날짜·면적·금액)도 React key 충돌 방지.
+  // 호수는 API가 비공개라 동일 데이터의 다른 호수 거래가 같이 올 수 있음.
   return {
-    id: `${aptName}-${dealDate}-${jibun ?? ""}-${dealAmount}-${aptDong ?? ""}-${floor ?? ""}`,
+    id: `t${idx}-${aptName}-${dealDate}-${jibun ?? ""}-${dealAmount}-${floor ?? ""}`,
     aptName: aptName.trim(),
     aptDong: aptDong?.trim() || null,
     dong: dong.trim(),
@@ -264,7 +266,7 @@ export async function fetchMonthlyTrend(
     ymList.map(async (ym) => {
       try {
         const rows = await fetchAllTrades(serviceKey, lawdCd, ym, abort);
-        const trades = rows.map(normalizeTrade).filter((t): t is ApartmentTrade => t !== null);
+        const trades = rows.map((r, i) => normalizeTrade(r, i)).filter((t): t is ApartmentTrade => t !== null);
         if (trades.length === 0) {
           return { ym, label: monthLabel(ym), avg: null, count: 0 };
         }
