@@ -28,7 +28,9 @@
       "Bash(curl -s -o /dev/null -w '%{http_code}' http://localhost:3000/w/apartment?sort=__TRACKED_VAR__)",
       "Bash(curl -s \"http://localhost:3000/w/rent\" -o r.html -w \"%{http_code}\\\\n\")",
       "Bash(curl -s \"http://localhost:3000/w/rent\" -o /dev/null)",
-      "Bash(curl -s \"http://localhost:3000/w/rent\")"
+      "Bash(curl -s \"http://localhost:3000/w/rent\")",
+      "Bash(curl -s \"http://localhost:3000/w/apartment?q=%EC%9C%A0%EC%84%B1\" -o ap.html)",
+      "Bash(curl -s \"http://localhost:3000/w/apartment?q=xyz0nomatchstring\" -o ap.html)"
     ]
   }
 }

@@ -33,6 +33,7 @@ type Props = {
     lawdCd?: string;
     dealYm?: string;
     sort?: string;
+    q?: string;
   }>;
 };
 
@@ -55,6 +56,7 @@ export default async function ApartmentDetailPage({ searchParams }: Props) {
     : currentKstYmExport();
   const sortRaw = (params.sort ?? "date-desc") as ApartmentSort;
   const sort: ApartmentSort = ALLOWED_SORTS.has(sortRaw) ? sortRaw : "date-desc";
+  const q = (params.q ?? "").slice(0, 60);
 
   const now = new Date();
   const abort = new AbortController().signal;
@@ -115,7 +117,7 @@ export default async function ApartmentDetailPage({ searchParams }: Props) {
         </>
       }
     >
-      <ApartmentFilters current={{ sido, sigungu, lawdCd, dealYm, sort }} />
+      <ApartmentFilters current={{ sido, sigungu, lawdCd, dealYm, sort, q }} />
 
       {errorMessage ? (
         <div className="rounded-lg border border-amber-500/20 bg-amber-500/[0.06] px-4 py-3 text-xs text-amber-200">
@@ -127,7 +129,7 @@ export default async function ApartmentDetailPage({ searchParams }: Props) {
         <ApartmentTrendChart points={trend} region={`${sido} ${sigungu}`} />
       ) : null}
 
-      <ApartmentDetail data={data} sort={sort} />
+      <ApartmentDetail data={data} sort={sort} query={q} />
     </PageFrame>
   );
 }

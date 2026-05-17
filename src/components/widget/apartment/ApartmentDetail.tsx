@@ -8,18 +8,27 @@ import { ApartmentTradesList } from "./ApartmentTradesList";
 export function ApartmentDetail({
   data,
   sort = "date-desc",
+  query = "",
 }: {
   data: ApartmentData;
   sort?: ApartmentSort;
+  query?: string;
 }) {
-  const sorted = sortTrades(data.trades, sort);
+  const filtered = filterByQuery(data.trades, query);
+  const sorted = sortTrades(filtered, sort);
+  const hasQuery = query.trim().length > 0;
+
   return (
     <div className="space-y-5">
       <StatsRow data={data} />
       {sorted.length === 0 ? (
-        <EmptyState dealYm={data.dealYm} />
+        <EmptyState dealYm={data.dealYm} query={query} />
       ) : (
-        <ApartmentTradesList trades={sorted} totalAvailable={data.totalCount} />
+        <ApartmentTradesList
+          trades={sorted}
+          totalAvailable={data.totalCount}
+          query={hasQuery ? query : null}
+        />
       )}
 
       {data.source === "mock" ? (
@@ -29,6 +38,15 @@ export function ApartmentDetail({
       ) : null}
     </div>
   );
+}
+
+function filterByQuery(trades: ApartmentTrade[], query: string): ApartmentTrade[] {
+  const q = query.trim().toLowerCase();
+  if (!q) return trades;
+  return trades.filter((t) => {
+    const hay = [t.aptName, t.aptDong, t.dong, t.roadName].filter(Boolean).join(" ").toLowerCase();
+    return hay.includes(q);
+  });
 }
 
 function StatsRow({ data }: { data: ApartmentData }) {
@@ -100,15 +118,20 @@ function StatCard({
   );
 }
 
-function EmptyState({ dealYm }: { dealYm: string }) {
+function EmptyState({ dealYm, query }: { dealYm: string; query: string }) {
+  const hasQuery = query.trim().length > 0;
   return (
     <article className="rounded-xl border border-zinc-800/80 bg-zinc-900 p-12 text-center">
       <Building2 className="mx-auto h-7 w-7 text-zinc-500" aria-hidden />
       <p className="mt-3 text-base font-medium text-zinc-100">
-        {formatYm(dealYm)}에 등록된 거래가 없어요
+        {hasQuery
+          ? `"${query}" 일치 거래가 없어요`
+          : `${formatYm(dealYm)}에 등록된 거래가 없어요`}
       </p>
       <p className="mt-1 text-xs text-zinc-500">
-        이전 달을 보거나 다른 시·군·구를 검색해보세요.
+        {hasQuery
+          ? "단지명·동을 다르게 입력하거나 검색을 비워보세요."
+          : "이전 달을 보거나 다른 시·군·구를 검색해보세요."}
       </p>
     </article>
   );

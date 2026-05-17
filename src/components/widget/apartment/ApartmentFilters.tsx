@@ -30,12 +30,14 @@ export type ApartmentFilterValues = {
   lawdCd: string;
   dealYm: string;
   sort: ApartmentSort;
+  q: string;
 };
 
 export function ApartmentFilters({ current }: { current: ApartmentFilterValues }) {
   const router = useRouter();
   const [sido, setSido] = useState(current.sido);
   const [sigungu, setSigungu] = useState(current.sigungu);
+  const [query, setQuery] = useState(current.q);
 
   const sigunguOptions = useMemo(() => getSigunguListWithCode(sido), [sido]);
 
@@ -48,6 +50,8 @@ export function ApartmentFilters({ current }: { current: ApartmentFilterValues }
     });
     const sort = overrides.sort ?? current.sort;
     if (sort !== "date-desc") params.set("sort", sort);
+    const q = overrides.q ?? current.q;
+    if (q) params.set("q", q);
     return `/w/apartment?${params.toString()}`;
   };
 
@@ -60,6 +64,7 @@ export function ApartmentFilters({ current }: { current: ApartmentFilterValues }
         sido,
         sigungu: match.name,
         lawdCd: match.code,
+        q: query.trim(),
       }),
     );
   };
@@ -78,7 +83,7 @@ export function ApartmentFilters({ current }: { current: ApartmentFilterValues }
 
       <form
         onSubmit={onSubmit}
-        className="mt-4 grid gap-4 md:grid-cols-[1fr_1fr_auto] md:items-end"
+        className="mt-4 grid gap-4 md:grid-cols-[1fr_1fr] md:items-end"
       >
         <label className="flex flex-col gap-1.5">
           <span className="text-xs text-zinc-400">시·도</span>
@@ -110,13 +115,29 @@ export function ApartmentFilters({ current }: { current: ApartmentFilterValues }
           </select>
         </label>
 
-        <button
-          type="submit"
-          className="inline-flex h-10 items-center justify-center gap-1.5 rounded-lg bg-emerald-500 px-4 text-sm font-medium text-zinc-950 transition hover:bg-emerald-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
-        >
-          <Search className="h-4 w-4" aria-hidden />
-          검색
-        </button>
+        <div className="flex gap-2 md:col-span-2 md:items-end">
+          <label className="flex flex-1 flex-col gap-1.5">
+            <span className="text-xs text-zinc-400">단지명·동 검색 (선택)</span>
+            <div className="relative">
+              <Search className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-zinc-500" aria-hidden />
+              <input
+                type="text"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="예: 스카이뷰, 봉명동, SK뷰"
+                className="h-10 w-full rounded-lg border border-zinc-800 bg-zinc-950/60 pl-9 pr-3 text-sm text-zinc-100 placeholder:text-zinc-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
+              />
+            </div>
+          </label>
+
+          <button
+            type="submit"
+            className="inline-flex h-10 shrink-0 items-center justify-center gap-1.5 rounded-lg bg-emerald-500 px-4 text-sm font-medium text-zinc-950 transition hover:bg-emerald-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
+          >
+            <Search className="h-4 w-4" aria-hidden />
+            검색
+          </button>
+        </div>
       </form>
 
       <div className="mt-4 flex items-center justify-between rounded-lg border border-zinc-800 bg-zinc-950/60 px-3 py-2">
