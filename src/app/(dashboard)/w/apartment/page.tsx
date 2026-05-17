@@ -129,7 +129,7 @@ export default async function ApartmentDetailPage({ searchParams }: Props) {
         <ApartmentTrendChart points={trend} region={`${sido} ${sigungu}`} />
       ) : null}
 
-      <ApartmentDetail data={data} sort={sort} query={q} />
+      <ApartmentDetail data={data} sort={sort} query={q} context={{ sido, sigungu, lawdCd }} />
     </PageFrame>
   );
 }

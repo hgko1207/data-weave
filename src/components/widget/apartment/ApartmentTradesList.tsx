@@ -1,9 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import {
   Building2,
   ChevronDown,
+  ExternalLink,
   Info,
   MapPin,
   CalendarClock,
@@ -14,11 +16,18 @@ import {
 import { formatAmount, pyeongLabel } from "@/widgets/apartment/format";
 import type { ApartmentTrade } from "@/widgets/apartment/schema";
 
+type Context = {
+  sido: string;
+  sigungu: string;
+  lawdCd: string;
+};
+
 type Props = {
   trades: ApartmentTrade[];
   totalAvailable: number;
   query?: string | null;
   sortLabel?: string | null;
+  context: Context;
 };
 
 export function ApartmentTradesList({
@@ -26,6 +35,7 @@ export function ApartmentTradesList({
   totalAvailable,
   query,
   sortLabel,
+  context,
 }: Props) {
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
@@ -78,6 +88,7 @@ export function ApartmentTradesList({
             onToggle={() =>
               setExpandedId((cur) => (cur === trade.id ? null : trade.id))
             }
+            context={context}
           />
         ))}
       </ul>
@@ -96,20 +107,32 @@ function TradeRow({
   trade,
   expanded,
   onToggle,
+  context,
 }: {
   index: number;
   trade: ApartmentTrade;
   expanded: boolean;
   onToggle: () => void;
+  context: Context;
 }) {
   const isCancelled = trade.cancelDealDay != null;
+  const buildingHref = buildBuildingHref(context, trade);
+
   return (
     <li className={isCancelled ? "opacity-60" : ""}>
-      <button
-        type="button"
+      {/* Row container: div(role=button)으로 변경 — aptName 링크를 안에 nest하기 위해 */}
+      <div
+        role="button"
+        tabIndex={0}
         onClick={onToggle}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            onToggle();
+          }
+        }}
         aria-expanded={expanded}
-        className={`grid w-full grid-cols-[40px_1fr_100px_24px] items-center gap-3 px-6 py-3.5 text-left transition hover:bg-zinc-800/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-emerald-500/50 md:grid-cols-[40px_1fr_120px_100px_120px_24px] md:gap-4 ${
+        className={`grid w-full cursor-pointer grid-cols-[40px_1fr_100px_24px] items-center gap-3 px-6 py-3.5 text-left transition hover:bg-zinc-800/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-emerald-500/50 md:grid-cols-[40px_1fr_120px_100px_120px_24px] md:gap-4 ${
           expanded ? "bg-zinc-800/30" : ""
         }`}
       >
@@ -119,7 +142,17 @@ function TradeRow({
 
         <div className="min-w-0">
           <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
-            <h3 className="text-base font-medium text-zinc-100">{trade.aptName}</h3>
+            <Link
+              href={buildingHref}
+              onClick={(e) => e.stopPropagation()}
+              className="group inline-flex items-baseline gap-1 text-base font-medium text-zinc-100 transition hover:text-emerald-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
+            >
+              <span className="group-hover:underline">{trade.aptName}</span>
+              <ExternalLink
+                className="h-3 w-3 shrink-0 text-zinc-600 transition group-hover:text-emerald-400"
+                aria-hidden
+              />
+            </Link>
             {trade.aptDong ? (
               <span className="rounded bg-zinc-800 px-1.5 py-0.5 font-mono text-[11px] text-zinc-300">
                 {trade.aptDong}
@@ -177,16 +210,41 @@ function TradeRow({
           }`}
           aria-hidden
         />
-      </button>
+      </div>
 
-      {expanded ? <ExpandedDetails trade={trade} /> : null}
+      {expanded ? <ExpandedDetails trade={trade} buildingHref={buildingHref} /> : null}
     </li>
   );
 }
 
-function ExpandedDetails({ trade }: { trade: ApartmentTrade }) {
+function buildBuildingHref(ctx: Context, trade: ApartmentTrade): string {
+  const params = new URLSearchParams({
+    sido: ctx.sido,
+    sigungu: ctx.sigungu,
+    lawdCd: ctx.lawdCd,
+    apt: trade.aptName,
+    dong: trade.dong,
+  });
+  return `/w/apartment/building?${params.toString()}`;
+}
+
+function ExpandedDetails({
+  trade,
+  buildingHref,
+}: {
+  trade: ApartmentTrade;
+  buildingHref: string;
+}) {
   return (
-    <div className="border-t border-zinc-800/60 bg-zinc-950/40 px-6 py-4">
+    <div className="space-y-4 border-t border-zinc-800/60 bg-zinc-950/40 px-6 py-4">
+      <Link
+        href={buildingHref}
+        className="inline-flex h-9 items-center gap-2 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-3 text-xs font-medium text-emerald-200 transition hover:border-emerald-500/50 hover:bg-emerald-500/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
+      >
+        <Building2 className="h-3.5 w-3.5" aria-hidden />
+        단지 종합 정보 보기
+        <ExternalLink className="h-3 w-3 text-emerald-400" aria-hidden />
+      </Link>
       <dl className="grid grid-cols-1 gap-x-6 gap-y-3 text-sm sm:grid-cols-2 lg:grid-cols-3">
         <DetailRow
           icon={<MapPin className="h-3.5 w-3.5 text-zinc-500" aria-hidden />}

@@ -32,7 +32,9 @@ src/
 │       ├── layout.tsx             # Sidebar + 상단 header + 본문
 │       ├── page.tsx               # / 대시보드 (RSC, demo instances)
 │       ├── settings/page.tsx      # 위젯 핀 토글 (localStorage)
-│       └── w/<id>/page.tsx        # 위젯별 상세 (RSC, searchParams 기반)
+│       ├── w/<id>/page.tsx        # 위젯별 상세 (RSC, searchParams 기반)
+│       └── w/apartment/building/  # 단지 상세 — 거래 행 → 아파트명 클릭 진입
+│           └── page.tsx           # ?sido&sigungu&lawdCd&apt&dong → 6개월 거래 집계
 │
 ├── components/
 │   ├── sidebar/                   # Sidebar.tsx, SidebarContent.tsx

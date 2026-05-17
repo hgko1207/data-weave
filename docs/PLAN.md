@@ -14,6 +14,7 @@
 | 2026-05-04 | v1 | 최초 작성 — 위젯 4개 + Web Push + Telegram 듀얼 알림 | `/plan-ceo-review` SCOPE EXPANSION |
 | 2026-05-04 | v2 | **Phase 1 조회형 3개로 축소**. 캠핑장 + 알림 인프라 → Phase 2. | `/plan-eng-review` + Outside Voice (#1 Vercel Hobby cron 1/day 한도) + 사용자 결정 (조회만, 무료) |
 | 2026-05-16 | v3 | **Phase 1 + 1.5 완성 반영.** Step 0~6 완료 마킹. 위젯 4개로 확장 (아파트 실거래가 추가). 사이드바 네비, 위젯별 상세 페이지(URL `searchParams`), 즐겨찾기, 위젯별 강화 기능 (등급/영업중/정렬/추이 차트) §14에 정리. Aurora bg는 §7 deprecated 표시 (solid surface로 교체 — [DESIGN.md](DESIGN.md) §14 참조). | 실제 구현 진화 반영, 사용자 요청 |
+| 2026-05-17 | v3.1 | **Phase A — 아파트 단지 상세 페이지** (`/w/apartment/building`) 추가. 거래 목록에서 아파트명 클릭 → 최근 6개월 거래 집계 + 평형별 그룹 + 카카오맵 외부 링크. 평수 표시는 공급평(33평형) 기준으로 통일. §14.8 추가. | 사용자 요청 (지도 + 단지 상세) |
 
 ---
 
@@ -492,6 +493,39 @@ type Bookmark = {
 ### 14.7 디자인 토큰 진화 (Aurora → Solid)
 
 Phase 1엔 Aurora gradient + 반투명 surface, Phase 1.5에서 **솔리드 surface로 교체** ([DESIGN.md §14](DESIGN.md) 참조). 사용자 피드백: "사이드바와 메인 구분 안 됨" → opaque chrome (zinc-900) + 명확한 border (zinc-800) 도입. Aurora bg는 `src/components/aurora-bg.tsx`에 남아있으나 root layout에서 제거됨.
+
+---
+
+### 14.8 Phase A — 아파트 단지 상세 페이지 (v3.1)
+
+> 거래 행에서 아파트명을 클릭하면 그 단지의 종합 정보로 진입. 사용자 요청: "상세 정보 페이지를 만들어서 뭔가 아파트 정보나 아니면 지도 까지 있으면 좋을거같은데."
+
+**라우트**: `/w/apartment/building?sido=&sigungu=&lawdCd=&apt=<aptName>&dong=<법정동>`
+
+- 같은 시·군·구 내에 동일 단지명이 다른 법정동에 존재할 수 있어 `(aptName, dong)` 페어를 단지 식별자로 사용. RTMS는 고유 building_id 미제공.
+- `[id]` 동적 세그먼트 대신 query string — URL=진실 원칙 유지 + 즐겨찾기/공유 가능.
+
+**데이터**: `fetchBuilding(cfg, months=6)` — 시·군·구 RTMS API를 최근 6개월 분 병렬 호출 → `aptName + dong` 일치만 추려 시간 역순 정렬.
+- 6 API call (월별). 키 없으면 mock 폴백.
+- 좌표가 없어 카카오맵 좌표 임베드 X. 도로명/지번 검색 외부 링크(`https://map.kakao.com/?q=...`)로 폴백.
+
+**페이지 구성**:
+1. 단지 헤더 (아파트명 h1, 법정동·도로명·건축년도, 거래 N건, 집계 범위)
+2. 통계 4-up (평균가 / 최저 / 최고 / 평당 평균 + 최근 거래일)
+3. **평형별 거래** 카드 — 공급평 round (33평형/26평형 등) 그룹별 평균/최저/최고 + 면적 범위
+4. 거래 내역 (최신순)
+5. 카카오맵 외부 링크 버튼 (도로명 우선, 폴백: `region + dong + aptName + jibun`)
+
+**진입점**: `ApartmentTradesList` 거래 행의 아파트명을 `<Link>`로. 외부 링크 아이콘으로 affordance. 클릭 시 `e.stopPropagation()` → 행 확장과 별개 동작.
+- 행 자체는 `<button>` → `<div role="button" tabIndex={0}>`로 전환 (a/button nesting 회피, 키보드 접근성 onKeyDown 처리).
+- 확장 패널에도 "단지 종합 정보 보기" emerald 버튼 중복 배치 (확장 후에도 빠른 진입).
+
+**즐겨찾기 호환**: 단지 페이지 헤더에 `BookmarkButton` 동일하게 배치. 라벨 예: `단지 · 삼성푸른아파트 (대전 유성구 봉명동)`.
+
+**향후 (TODO)**:
+- 단지별 시간순 가격 추이 차트 (현재는 거래 리스트만)
+- 좌표 매핑(법정동 → 위경도) 확보 시 카카오맵 임베드 인라인 — 현재 외부 링크
+- 단지 정보 캐싱 (RTMS 6회 호출 비용 절감)
 
 ---
 

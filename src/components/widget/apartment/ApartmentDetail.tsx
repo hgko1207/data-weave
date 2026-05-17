@@ -17,10 +17,12 @@ export function ApartmentDetail({
   data,
   sort = "date-desc",
   query = "",
+  context,
 }: {
   data: ApartmentData;
   sort?: ApartmentSort;
   query?: string;
+  context: { sido: string; sigungu: string; lawdCd: string };
 }) {
   const filtered = filterByQuery(data.trades, query);
   const sorted = sortTrades(filtered, sort);
@@ -38,6 +40,7 @@ export function ApartmentDetail({
           totalAvailable={data.totalCount}
           query={hasQuery ? query : null}
           sortLabel={sortLabel}
+          context={context}
         />
       )}
 

@@ -290,3 +290,77 @@ function monthLabel(ym: string): string {
   if (!ym.match(/^\d{6}$/)) return ym;
   return `${Number(ym.slice(4, 6))}월`;
 }
+
+export type BuildingResult = {
+  aptName: string;
+  dong: string;
+  trades: ApartmentTrade[];
+  source: "live" | "mock";
+  monthsScanned: number;
+};
+
+/**
+ * 최근 N개월 거래에서 특정 단지(aptName + 법정동) 매칭만 추려낸다.
+ * 6 month = 6 API calls 병렬. 키 없으면 mock에서 단지명 매칭.
+ */
+export async function fetchBuilding(
+  cfg: { lawdCd: string; aptName: string; dong: string; region: string },
+  months: number,
+  now: Date,
+  abort: AbortSignal,
+): Promise<BuildingResult> {
+  const key = process.env.MOLIT_API_KEY || process.env.DATA_GO_KR_KEY;
+  const ymList = recentYmList(months, now);
+
+  if (!key) {
+    const mockTrades = ymList.flatMap((ym) => {
+      const m = buildMockApartment(cfg.region, ym);
+      return m.trades.filter(
+        (t) => t.aptName === cfg.aptName && t.dong === cfg.dong,
+      );
+    });
+    return {
+      aptName: cfg.aptName,
+      dong: cfg.dong,
+      trades: mockTrades.sort((a, b) => b.dealDate.localeCompare(a.dealDate)),
+      source: "mock",
+      monthsScanned: months,
+    };
+  }
+
+  const buckets = await Promise.all(
+    ymList.map(async (ym) => {
+      try {
+        const rows = await fetchAllTrades(key, cfg.lawdCd, ym, abort);
+        return rows
+          .map((r, i) => normalizeTrade(r, i))
+          .filter((t): t is ApartmentTrade => t !== null);
+      } catch {
+        return [] as ApartmentTrade[];
+      }
+    }),
+  );
+  const all = buckets.flat();
+  const matched = all
+    .filter((t) => t.aptName === cfg.aptName && t.dong === cfg.dong)
+    .sort((a, b) => b.dealDate.localeCompare(a.dealDate));
+  return {
+    aptName: cfg.aptName,
+    dong: cfg.dong,
+    trades: matched,
+    source: "live",
+    monthsScanned: months,
+  };
+}
+
+function recentYmList(months: number, now: Date): string[] {
+  const current = currentKstYm(now);
+  const y0 = Number(current.slice(0, 4));
+  const m0 = Number(current.slice(4, 6));
+  const out: string[] = [];
+  for (let i = months - 1; i >= 0; i--) {
+    const d = new Date(y0, m0 - 1 - i, 1);
+    out.push(`${d.getFullYear()}${pad(d.getMonth() + 1)}`);
+  }
+  return out;
+}
