@@ -121,8 +121,10 @@ function walkForItems(node: unknown): unknown {
 
 function normalizeTrade(row: RawTrade): ApartmentTrade | null {
   const aptName = pickString(row, ["aptNm", "aptName", "APT_NM"]);
+  const aptDong = pickString(row, ["aptDong", "APT_DONG"]) ?? null;
   const dong = pickString(row, ["umdNm", "umdName", "UMD_NM"]) ?? "";
   const jibun = pickString(row, ["jibun", "JIBUN"]) ?? null;
+  const roadName = pickString(row, ["roadNm", "ROAD_NM"]) ?? null;
   const year = pickNumber(row, ["dealYear", "DEAL_YEAR"]);
   const month = pickNumber(row, ["dealMonth", "DEAL_MONTH"]);
   const day = pickNumber(row, ["dealDay", "DEAL_DAY"]);
@@ -130,6 +132,12 @@ function normalizeTrade(row: RawTrade): ApartmentTrade | null {
   const area = pickNumber(row, ["excluUseAr", "EXCLU_USE_AR"]);
   const floor = pickNumber(row, ["floor", "FLOOR"]);
   const buildYear = pickNumber(row, ["buildYear", "BUILD_YEAR"]);
+  const dealType = pickString(row, ["dealingGbn", "DEALING_GBN"]) ?? null;
+  const agentSido = pickString(row, ["estateAgentSggNm", "ESTATE_AGENT_SGG_NM"]) ?? null;
+  const sellerType = pickString(row, ["slerGbn", "SLER_GBN"]) ?? null;
+  const buyerType = pickString(row, ["buyerGbn", "BUYER_GBN"]) ?? null;
+  const rgstDate = pickString(row, ["rgstDate", "RGST_DATE"]) ?? null;
+  const cancelDealDay = pickString(row, ["cdealDay", "CDEAL_DAY"]) ?? null;
 
   if (!aptName || !amountRaw || year == null || month == null || day == null) {
     return null;
@@ -142,16 +150,24 @@ function normalizeTrade(row: RawTrade): ApartmentTrade | null {
     areaNum > 0 ? Math.round((dealAmount / (areaNum / 3.3058)) * 10) / 10 : null;
 
   return {
-    id: `${aptName}-${dealDate}-${jibun ?? ""}-${dealAmount}`,
+    id: `${aptName}-${dealDate}-${jibun ?? ""}-${dealAmount}-${aptDong ?? ""}-${floor ?? ""}`,
     aptName: aptName.trim(),
+    aptDong: aptDong?.trim() || null,
     dong: dong.trim(),
     jibun,
+    roadName: roadName?.trim() || null,
     dealDate,
     dealAmount,
     area: areaNum,
     pricePerPyeong,
     floor: floor ?? null,
     buildYear: buildYear ?? null,
+    dealType: dealType?.trim() || null,
+    agentSido: agentSido?.trim() || null,
+    sellerType: sellerType?.trim() || null,
+    buyerType: buyerType?.trim() || null,
+    rgstDate: rgstDate?.trim() || null,
+    cancelDealDay: cancelDealDay?.trim() || null,
   };
 }
 
