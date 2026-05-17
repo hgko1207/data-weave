@@ -30,7 +30,9 @@
       "Bash(curl -s \"http://localhost:3000/w/rent\" -o /dev/null)",
       "Bash(curl -s \"http://localhost:3000/w/rent\")",
       "Bash(curl -s \"http://localhost:3000/w/apartment?q=%EC%9C%A0%EC%84%B1\" -o ap.html)",
-      "Bash(curl -s \"http://localhost:3000/w/apartment?q=xyz0nomatchstring\" -o ap.html)"
+      "Bash(curl -s \"http://localhost:3000/w/apartment?q=xyz0nomatchstring\" -o ap.html)",
+      "Bash(curl -s \"http://localhost:3000/w/apartment?sido=%EC%84%9C%EC%9A%B8%ED%8A%B9%EB%B3%84%EC%8B%9C&sigungu=%EA%B0%95%EB%82%A8%EA%B5%AC&lawdCd=11680&sort=date-desc\")",
+      "Bash(curl -s \"http://localhost:3000/w/apartment?sido=%EC%84%9C%EC%9A%B8%ED%8A%B9%EB%B3%84%EC%8B%9C&sigungu=%EA%B0%95%EB%82%A8%EA%B5%AC&lawdCd=11680&sort=amount-desc\")"
     ]
   }
 }

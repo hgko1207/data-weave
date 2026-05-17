@@ -81,55 +81,78 @@ export function ApartmentFilters({ current }: { current: ApartmentFilterValues }
         검색 조건
       </p>
 
-      <form
-        onSubmit={onSubmit}
-        className="mt-4 grid gap-4 md:grid-cols-[1fr_1fr] md:items-end"
-      >
-        <label className="flex flex-col gap-1.5">
-          <span className="text-xs text-zinc-400">시·도</span>
-          <select
-            value={sido}
-            onChange={(e) => onSidoChange(e.target.value)}
-            className="h-10 rounded-lg border border-zinc-800 bg-zinc-950/60 px-3 text-sm text-zinc-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
-          >
-            {SIDOS.map((s) => (
-              <option key={s} value={s} className="bg-zinc-900">
-                {s}
-              </option>
-            ))}
-          </select>
-        </label>
-
-        <label className="flex flex-col gap-1.5">
-          <span className="text-xs text-zinc-400">시·군·구</span>
-          <select
-            value={sigungu}
-            onChange={(e) => setSigungu(e.target.value)}
-            className="h-10 rounded-lg border border-zinc-800 bg-zinc-950/60 px-3 text-sm text-zinc-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
-          >
-            {sigunguOptions.map((sg) => (
-              <option key={sg.code} value={sg.name} className="bg-zinc-900">
-                {sg.name}
-              </option>
-            ))}
-          </select>
-        </label>
-
-        <div className="flex gap-2 md:col-span-2 md:items-end">
-          <label className="flex flex-1 flex-col gap-1.5">
-            <span className="text-xs text-zinc-400">단지명·동 검색 (선택)</span>
-            <div className="relative">
-              <Search className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-zinc-500" aria-hidden />
-              <input
-                type="text"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="예: 스카이뷰, 봉명동, SK뷰"
-                className="h-10 w-full rounded-lg border border-zinc-800 bg-zinc-950/60 pl-9 pr-3 text-sm text-zinc-100 placeholder:text-zinc-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
-              />
-            </div>
+      <form onSubmit={onSubmit} className="mt-4 space-y-3">
+        {/* row 1: 시·도 + 시·군·구 + 월 stepper — 3등분 */}
+        <div className="grid gap-3 md:grid-cols-3">
+          <label className="flex flex-col gap-1.5">
+            <span className="text-xs text-zinc-400">시·도</span>
+            <select
+              value={sido}
+              onChange={(e) => onSidoChange(e.target.value)}
+              className="h-10 rounded-lg border border-zinc-800 bg-zinc-950/60 px-3 text-sm text-zinc-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
+            >
+              {SIDOS.map((s) => (
+                <option key={s} value={s} className="bg-zinc-900">
+                  {s}
+                </option>
+              ))}
+            </select>
           </label>
 
+          <label className="flex flex-col gap-1.5">
+            <span className="text-xs text-zinc-400">시·군·구</span>
+            <select
+              value={sigungu}
+              onChange={(e) => setSigungu(e.target.value)}
+              className="h-10 rounded-lg border border-zinc-800 bg-zinc-950/60 px-3 text-sm text-zinc-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
+            >
+              {sigunguOptions.map((sg) => (
+                <option key={sg.code} value={sg.name} className="bg-zinc-900">
+                  {sg.name}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <div className="flex flex-col gap-1.5">
+            <span className="text-xs text-zinc-400">기간</span>
+            <div className="flex h-10 items-center justify-between rounded-lg border border-zinc-800 bg-zinc-950/60 px-2">
+              <Link
+                href={buildHref({ dealYm: previousMonth(current.dealYm) })}
+                aria-label="이전 달"
+                className="inline-flex h-7 w-7 items-center justify-center rounded-md text-zinc-400 transition hover:bg-zinc-800 hover:text-zinc-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
+              >
+                <ChevronLeft className="h-4 w-4" aria-hidden />
+              </Link>
+              <p className="font-mono text-sm font-medium text-zinc-100">
+                {formatYm(current.dealYm)}
+              </p>
+              <Link
+                href={buildHref({ dealYm: nextMonth(current.dealYm) })}
+                aria-label="다음 달"
+                className="inline-flex h-7 w-7 items-center justify-center rounded-md text-zinc-400 transition hover:bg-zinc-800 hover:text-zinc-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
+              >
+                <ChevronRight className="h-4 w-4" aria-hidden />
+              </Link>
+            </div>
+          </div>
+        </div>
+
+        {/* row 2: 단지명 검색 + 검색 버튼 */}
+        <div className="flex gap-2">
+          <div className="relative flex-1">
+            <Search
+              className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-zinc-500"
+              aria-hidden
+            />
+            <input
+              type="text"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="단지명·동 검색 (예: 스카이뷰, 봉명동)"
+              className="h-10 w-full rounded-lg border border-zinc-800 bg-zinc-950/60 pl-9 pr-3 text-sm text-zinc-100 placeholder:text-zinc-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
+            />
+          </div>
           <button
             type="submit"
             className="inline-flex h-10 shrink-0 items-center justify-center gap-1.5 rounded-lg bg-emerald-500 px-4 text-sm font-medium text-zinc-950 transition hover:bg-emerald-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
@@ -140,27 +163,8 @@ export function ApartmentFilters({ current }: { current: ApartmentFilterValues }
         </div>
       </form>
 
-      <div className="mt-4 flex items-center justify-between rounded-lg border border-zinc-800 bg-zinc-950/60 px-3 py-2">
-        <Link
-          href={buildHref({ dealYm: previousMonth(current.dealYm) })}
-          aria-label="이전 달"
-          className="inline-flex h-8 w-8 items-center justify-center rounded-md text-zinc-400 transition hover:bg-zinc-800 hover:text-zinc-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
-        >
-          <ChevronLeft className="h-4 w-4" aria-hidden />
-        </Link>
-        <p className="font-mono text-sm font-medium text-zinc-100">
-          {formatYm(current.dealYm)}
-        </p>
-        <Link
-          href={buildHref({ dealYm: nextMonth(current.dealYm) })}
-          aria-label="다음 달"
-          className="inline-flex h-8 w-8 items-center justify-center rounded-md text-zinc-400 transition hover:bg-zinc-800 hover:text-zinc-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
-        >
-          <ChevronRight className="h-4 w-4" aria-hidden />
-        </Link>
-      </div>
-
-      <div className="mt-4 flex items-center gap-2">
+      {/* 정렬 chips — 클릭 즉시 URL 갱신 (검색 버튼 누를 필요 X) */}
+      <div className="mt-4 flex flex-wrap items-center gap-2">
         <span className="text-xs text-zinc-500">정렬</span>
         <div className="flex flex-wrap gap-1.5">
           {SORT_OPTIONS.map((o) => {
