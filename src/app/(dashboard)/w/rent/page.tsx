@@ -35,6 +35,7 @@ type Props = {
     dealYm?: string;
     type?: string;
     sort?: string;
+    q?: string;
   }>;
 };
 
@@ -58,6 +59,7 @@ export default async function RentDetailPage({ searchParams }: Props) {
   const type: RentTypeFilter = ALLOWED_TYPES.has(typeRaw) ? typeRaw : "all";
   const sortRaw = (params.sort ?? "date-desc") as RentSort;
   const sort: RentSort = ALLOWED_SORTS.has(sortRaw) ? sortRaw : "date-desc";
+  const q = (params.q ?? "").slice(0, 60);
 
   let data: RentData;
   let errorMessage: string | undefined;
@@ -107,7 +109,7 @@ export default async function RentDetailPage({ searchParams }: Props) {
         </>
       }
     >
-      <RentFilters current={{ sido, sigungu, lawdCd, dealYm, type, sort }} />
+      <RentFilters current={{ sido, sigungu, lawdCd, dealYm, type, sort, q }} />
 
       {errorMessage ? (
         <div className="rounded-lg border border-amber-500/20 bg-amber-500/[0.06] px-4 py-3 text-xs text-amber-200">
@@ -119,6 +121,7 @@ export default async function RentDetailPage({ searchParams }: Props) {
         data={data}
         typeFilter={type}
         sort={sort}
+        query={q}
         context={{ sido, sigungu, lawdCd }}
       />
     </PageFrame>

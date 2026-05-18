@@ -104,9 +104,46 @@ type RawTrade = Record<string, unknown>;
 function extractTrades(text: string): RawTrade[] {
   // API는 XML 반환 (국토교통부 RTMS는 JSON 미지원).
   const parsed = xmlParser.parse(text) as unknown;
+  // 데이터 정상 응답: <response><body><items><item>...</item></items></body></response>
+  // 키 에러 응답: <OpenAPI_ServiceResponse><cmmMsgHeader><returnAuthMsg>SERVICE KEY IS NOT REGISTERED ERROR</returnAuthMsg>...
+  // 본문 에러: <response><header><resultCode>!=00</resultCode><resultMsg>...</resultMsg></header>
+  // → 에러 응답을 명시적으로 throw해서 caller가 mock으로 폴백하도록 한다.
+  assertApiOk(parsed);
   const items = walkForItems(parsed);
   if (!items) return [];
   return (Array.isArray(items) ? items : [items]) as RawTrade[];
+}
+
+function assertApiOk(node: unknown): void {
+  if (!node || typeof node !== "object") return;
+  const root = node as Record<string, unknown>;
+  // 1) OpenAPI_ServiceResponse 형태 (활용신청 안 됨, 키 무효 등)
+  const svcResp = root["OpenAPI_ServiceResponse"];
+  if (svcResp && typeof svcResp === "object") {
+    const header = (svcResp as Record<string, unknown>)["cmmMsgHeader"];
+    if (header && typeof header === "object") {
+      const auth = (header as Record<string, unknown>)["returnAuthMsg"];
+      const reason = (header as Record<string, unknown>)["returnReasonCode"];
+      throw new Error(
+        `RTMS API error: ${String(auth ?? "unknown")} (code ${String(reason ?? "?")})`,
+      );
+    }
+    throw new Error("RTMS API error: service response without items");
+  }
+  // 2) 정상 response 안의 header.resultCode가 '00' 외이면 실패
+  const resp = root["response"];
+  if (resp && typeof resp === "object") {
+    const header = (resp as Record<string, unknown>)["header"];
+    if (header && typeof header === "object") {
+      const code = (header as Record<string, unknown>)["resultCode"];
+      const msg = (header as Record<string, unknown>)["resultMsg"];
+      const codeStr = String(code ?? "");
+      // 정상이면 '00', 일부 시스템은 '000' — 'NORMAL_SERVICE' 메시지로 정상 식별 가능
+      if (codeStr && codeStr !== "00" && codeStr !== "000") {
+        throw new Error(`RTMS API error: ${String(msg ?? "unknown")} (code ${codeStr})`);
+      }
+    }
+  }
 }
 
 function walkForItems(node: unknown): unknown {

@@ -110,9 +110,40 @@ type RawTrade = Record<string, unknown>;
 
 function extractTrades(text: string): RawTrade[] {
   const parsed = xmlParser.parse(text) as unknown;
+  // 활용신청 안됨/키 무효 등 에러 응답을 명시적으로 throw → caller가 mock으로 폴백.
+  assertApiOk(parsed);
   const items = walkForItems(parsed);
   if (!items) return [];
   return (Array.isArray(items) ? items : [items]) as RawTrade[];
+}
+
+function assertApiOk(node: unknown): void {
+  if (!node || typeof node !== "object") return;
+  const root = node as Record<string, unknown>;
+  const svcResp = root["OpenAPI_ServiceResponse"];
+  if (svcResp && typeof svcResp === "object") {
+    const header = (svcResp as Record<string, unknown>)["cmmMsgHeader"];
+    if (header && typeof header === "object") {
+      const auth = (header as Record<string, unknown>)["returnAuthMsg"];
+      const reason = (header as Record<string, unknown>)["returnReasonCode"];
+      throw new Error(
+        `RTMS rent API error: ${String(auth ?? "unknown")} (code ${String(reason ?? "?")})`,
+      );
+    }
+    throw new Error("RTMS rent API error: service response without items");
+  }
+  const resp = root["response"];
+  if (resp && typeof resp === "object") {
+    const header = (resp as Record<string, unknown>)["header"];
+    if (header && typeof header === "object") {
+      const code = (header as Record<string, unknown>)["resultCode"];
+      const msg = (header as Record<string, unknown>)["resultMsg"];
+      const codeStr = String(code ?? "");
+      if (codeStr && codeStr !== "00" && codeStr !== "000") {
+        throw new Error(`RTMS rent API error: ${String(msg ?? "unknown")} (code ${codeStr})`);
+      }
+    }
+  }
 }
 
 function walkForItems(node: unknown): unknown {

@@ -41,12 +41,14 @@ export type RentFilterValues = {
   dealYm: string;
   type: RentTypeFilter;
   sort: RentSort;
+  q: string;
 };
 
 export function RentFilters({ current }: { current: RentFilterValues }) {
   const router = useRouter();
   const [sido, setSido] = useState(current.sido);
   const [sigungu, setSigungu] = useState(current.sigungu);
+  const [query, setQuery] = useState(current.q);
 
   const sigunguOptions = useMemo(() => getSigunguListWithCode(sido), [sido]);
 
@@ -61,6 +63,8 @@ export function RentFilters({ current }: { current: RentFilterValues }) {
     if (type !== "all") params.set("type", type);
     const sort = overrides.sort ?? current.sort;
     if (sort !== "date-desc") params.set("sort", sort);
+    const q = overrides.q ?? current.q;
+    if (q) params.set("q", q);
     return `/w/rent?${params.toString()}`;
   };
 
@@ -68,7 +72,9 @@ export function RentFilters({ current }: { current: RentFilterValues }) {
     e.preventDefault();
     const match = sigunguOptions.find((o) => o.name === sigungu);
     if (!match) return;
-    router.push(buildHref({ sido, sigungu: match.name, lawdCd: match.code }));
+    router.push(
+      buildHref({ sido, sigungu: match.name, lawdCd: match.code, q: query.trim() }),
+    );
   };
 
   const onSidoChange = (next: string) => {
@@ -140,11 +146,24 @@ export function RentFilters({ current }: { current: RentFilterValues }) {
           </div>
         </div>
 
-        {/* row 2: 검색 버튼 */}
-        <div className="flex justify-end">
+        {/* row 2: 단지명 검색 + 검색 버튼 (매매와 동일 패턴) */}
+        <div className="flex gap-2">
+          <div className="relative flex-1">
+            <Search
+              className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-zinc-500"
+              aria-hidden
+            />
+            <input
+              type="text"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="단지명·동 검색 (예: 스카이뷰, 봉명동)"
+              className="h-10 w-full rounded-lg border border-zinc-800 bg-zinc-950/60 pl-9 pr-3 text-sm text-zinc-100 placeholder:text-zinc-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
+            />
+          </div>
           <button
             type="submit"
-            className="inline-flex h-10 items-center justify-center gap-1.5 rounded-lg bg-emerald-500 px-4 text-sm font-medium text-zinc-950 transition hover:bg-emerald-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
+            className="inline-flex h-10 shrink-0 items-center justify-center gap-1.5 rounded-lg bg-emerald-500 px-4 text-sm font-medium text-zinc-950 transition hover:bg-emerald-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
           >
             <Search className="h-4 w-4" aria-hidden />
             검색

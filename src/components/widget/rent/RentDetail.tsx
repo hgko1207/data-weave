@@ -23,17 +23,21 @@ export function RentDetail({
   data,
   typeFilter = "all",
   sort = "date-desc",
+  query = "",
   context,
 }: {
   data: RentData;
   typeFilter?: RentTypeFilter;
   sort?: RentSort;
+  query?: string;
   context: Context;
 }) {
-  const filtered =
+  const byType =
     typeFilter === "all" ? data.trades : data.trades.filter((t) => t.type === typeFilter);
+  const filtered = filterByQuery(byType, query);
   const sorted = sortTrades(filtered, sort);
   const sortLabel = sort !== "date-desc" ? SORT_LABELS[sort] : null;
+  const hasQuery = query.trim().length > 0;
 
   return (
     <div className="space-y-5">
@@ -43,6 +47,8 @@ export function RentDetail({
         trades={sorted}
         typeFilter={typeFilter}
         sortLabel={sortLabel}
+        query={hasQuery ? query : null}
+        totalAvailable={byType.length}
         context={context}
       />
 
@@ -53,6 +59,15 @@ export function RentDetail({
       ) : null}
     </div>
   );
+}
+
+function filterByQuery(trades: RentTrade[], query: string): RentTrade[] {
+  const q = query.trim().toLowerCase();
+  if (!q) return trades;
+  return trades.filter((t) => {
+    const hay = [t.aptName, t.dong, t.jibun].filter(Boolean).join(" ").toLowerCase();
+    return hay.includes(q);
+  });
 }
 
 function StatsRow({ data }: { data: RentData }) {
@@ -129,24 +144,35 @@ function TradesList({
   trades,
   typeFilter,
   sortLabel,
+  query,
+  totalAvailable,
   context,
 }: {
   data: RentData;
   trades: RentTrade[];
   typeFilter: RentTypeFilter;
   sortLabel: string | null;
+  query: string | null;
+  totalAvailable: number;
   context: Context;
 }) {
   if (trades.length === 0) {
+    const hasQuery = !!query;
     const label =
       typeFilter === "all" ? "거래" : typeFilter === "jeonse" ? "전세 거래" : "월세 거래";
     return (
       <article className="rounded-xl border border-zinc-800/80 bg-zinc-900 p-12 text-center">
         <Key className="mx-auto h-7 w-7 text-zinc-500" aria-hidden />
         <p className="mt-3 text-base font-medium text-zinc-100">
-          {formatYm(data.dealYm)}에 {label}가 없어요
+          {hasQuery
+            ? `"${query}" 일치 거래가 없어요`
+            : `${formatYm(data.dealYm)}에 ${label}가 없어요`}
         </p>
-        <p className="mt-1 text-xs text-zinc-500">이전 달을 보거나 종류 필터를 풀어보세요.</p>
+        <p className="mt-1 text-xs text-zinc-500">
+          {hasQuery
+            ? "단지명·동을 다르게 입력하거나 검색을 비워보세요."
+            : "이전 달을 보거나 종류 필터를 풀어보세요."}
+        </p>
       </article>
     );
   }
@@ -156,9 +182,15 @@ function TradesList({
       <header className="flex flex-wrap items-baseline justify-between gap-3 border-b border-zinc-800/80 px-6 py-4">
         <div className="flex flex-wrap items-baseline gap-3">
           <h2 className="text-base font-semibold text-zinc-100">거래 내역</h2>
-          <p className="font-mono text-xs uppercase tracking-[0.14em] text-zinc-500">
-            {Math.min(trades.length, 200)}건
-          </p>
+          {query ? (
+            <p className="font-mono text-xs tabular-nums text-zinc-500">
+              <span className="text-emerald-300">{trades.length}</span>건 매칭 · 전체 {totalAvailable}건
+            </p>
+          ) : (
+            <p className="font-mono text-xs uppercase tracking-[0.14em] text-zinc-500">
+              {Math.min(trades.length, 200)}건
+            </p>
+          )}
           {sortLabel ? (
             <span className="inline-flex items-center gap-1 rounded-md bg-emerald-500/15 px-2 py-0.5 font-mono text-[11px] text-emerald-300">
               정렬 · {sortLabel}
