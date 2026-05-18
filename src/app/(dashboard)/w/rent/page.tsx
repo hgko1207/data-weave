@@ -115,7 +115,12 @@ export default async function RentDetailPage({ searchParams }: Props) {
         </div>
       ) : null}
 
-      <RentDetail data={data} typeFilter={type} sort={sort} />
+      <RentDetail
+        data={data}
+        typeFilter={type}
+        sort={sort}
+        context={{ sido, sigungu, lawdCd }}
+      />
     </PageFrame>
   );
 }

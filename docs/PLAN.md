@@ -15,6 +15,7 @@
 | 2026-05-04 | v2 | **Phase 1 조회형 3개로 축소**. 캠핑장 + 알림 인프라 → Phase 2. | `/plan-eng-review` + Outside Voice (#1 Vercel Hobby cron 1/day 한도) + 사용자 결정 (조회만, 무료) |
 | 2026-05-16 | v3 | **Phase 1 + 1.5 완성 반영.** Step 0~6 완료 마킹. 위젯 4개로 확장 (아파트 실거래가 추가). 사이드바 네비, 위젯별 상세 페이지(URL `searchParams`), 즐겨찾기, 위젯별 강화 기능 (등급/영업중/정렬/추이 차트) §14에 정리. Aurora bg는 §7 deprecated 표시 (solid surface로 교체 — [DESIGN.md](DESIGN.md) §14 참조). | 실제 구현 진화 반영, 사용자 요청 |
 | 2026-05-17 | v3.1 | **Phase A — 아파트 단지 상세 페이지** (`/w/apartment/building`) 추가. 거래 목록에서 아파트명 클릭 → 최근 6개월 거래 집계 + 평형별 그룹 + 카카오맵 외부 링크. 평수 표시는 공급평(33평형) 기준으로 통일. §14.8 추가. | 사용자 요청 (지도 + 단지 상세) |
+| 2026-05-18 | v3.2 | **Phase A 가독성 폴리시 + 전월세 미러.** 매매 단지 페이지 카카오맵을 헤더 우측 액션으로 이동, 통계에 아이콘+accent, 거래 행 컬럼 재배치(면적→가격→날짜). 동일 골격을 전월세에 미러링 — `/w/rent/building` + `fetchRentBuilding` + `RentBuildingDetail`. RentDetail 자체도 column header / row index / sort badge / aptName Link 적용해 매매 톤과 통일. §14.8 확장. | 사용자 요청 (가독성 + 매매↔전월세 일관) |
 
 ---
 
@@ -526,6 +527,11 @@ Phase 1엔 Aurora gradient + 반투명 surface, Phase 1.5에서 **솔리드 surf
 - 단지별 시간순 가격 추이 차트 (현재는 거래 리스트만)
 - 좌표 매핑(법정동 → 위경도) 확보 시 카카오맵 임베드 인라인 — 현재 외부 링크
 - 단지 정보 캐싱 (RTMS 6회 호출 비용 절감)
+
+**v3.2 — 가독성 폴리시 + 전월세 미러**:
+- 매매 단지 페이지 가독성: 카카오맵 → 헤더 우측 액션, 통계 4-up 아이콘+accent, 거래 행 컬럼 `면적·평형 → 거래가 → 날짜·평당가`, EmptyState에 백 링크.
+- 전월세 미러: `/w/rent/building`, `fetchRentBuilding`, `RentBuildingDetail` — 같은 단지의 전세·월세 거래를 한 페이지에서 평형별 그룹(전세/월세 가격 동시 표시), 거래 내역, 카카오맵.
+- RentDetail 폴리시: column header, row index, sort badge, hover bg, aptName Link.
 
 ---
 
