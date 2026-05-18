@@ -1,5 +1,14 @@
 import Link from "next/link";
-import { Building2, MapPin, CalendarClock, TrendingUp, ExternalLink } from "lucide-react";
+import {
+  Building2,
+  MapPin,
+  CalendarClock,
+  TrendingUp,
+  TrendingDown,
+  Coins,
+  ExternalLink,
+  ArrowLeft,
+} from "lucide-react";
 import { formatAmount, pyeongLabel, supplyPyeong } from "@/widgets/apartment/format";
 import type { ApartmentTrade } from "@/widgets/apartment/schema";
 
@@ -10,6 +19,7 @@ type Props = {
   trades: ApartmentTrade[];
   monthsScanned: number;
   source: "live" | "mock";
+  backHref: string;
 };
 
 export function BuildingDetail({
@@ -19,6 +29,7 @@ export function BuildingDetail({
   trades,
   monthsScanned,
   source,
+  backHref,
 }: Props) {
   if (trades.length === 0) {
     return (
@@ -30,6 +41,13 @@ export function BuildingDetail({
         <p className="mt-1 text-xs text-zinc-500">
           단지명·법정동이 변경되었거나 거래가 발생하지 않았을 수 있어요.
         </p>
+        <Link
+          href={backHref}
+          className="mt-5 inline-flex h-9 items-center gap-1.5 rounded-lg border border-zinc-800 bg-zinc-900 px-3 text-xs text-zinc-300 transition hover:border-zinc-700 hover:bg-zinc-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
+        >
+          <ArrowLeft className="h-3.5 w-3.5" aria-hidden />
+          거래 목록으로
+        </Link>
       </article>
     );
   }
@@ -38,6 +56,10 @@ export function BuildingDetail({
   const buildYear = trades.find((t) => t.buildYear != null)?.buildYear ?? null;
   const roadName = trades.find((t) => t.roadName)?.roadName ?? null;
   const jibun = trades.find((t) => t.jibun)?.jibun ?? null;
+  const mapQuery = roadName
+    ? roadName
+    : `${region} ${sample.dong} ${aptName}${jibun ? ` ${jibun}` : ""}`;
+  const mapHref = `https://map.kakao.com/?q=${encodeURIComponent(mapQuery)}`;
 
   return (
     <div className="space-y-6">
@@ -50,6 +72,7 @@ export function BuildingDetail({
         buildYear={buildYear}
         tradeCount={trades.length}
         monthsScanned={monthsScanned}
+        mapHref={mapHref}
       />
 
       <BuildingStats trades={trades} />
@@ -57,8 +80,6 @@ export function BuildingDetail({
       <BuildingAreaGroups trades={trades} />
 
       <BuildingTradeList trades={trades} />
-
-      <MapLink aptName={aptName} region={region} roadName={roadName} jibun={jibun} sampleDong={sample.dong} />
 
       {source === "mock" ? (
         <p className="font-mono text-xs uppercase tracking-wider text-zinc-500">
@@ -78,6 +99,7 @@ function BuildingHeader({
   buildYear,
   tradeCount,
   monthsScanned,
+  mapHref,
 }: {
   aptName: string;
   dong: string;
@@ -87,43 +109,74 @@ function BuildingHeader({
   buildYear: number | null;
   tradeCount: number;
   monthsScanned: number;
+  mapHref: string;
 }) {
   return (
     <article className="rounded-xl border border-zinc-800/80 bg-zinc-900 p-6">
-      <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-        <h2 className="text-2xl font-semibold tracking-tight text-zinc-100">{aptName}</h2>
-        {buildYear != null ? (
-          <span className="font-mono text-xs text-zinc-500">{buildYear}년식</span>
-        ) : null}
-      </div>
-      <dl className="mt-3 grid grid-cols-1 gap-x-6 gap-y-1.5 text-sm sm:grid-cols-2">
-        <div className="flex items-center gap-2">
-          <MapPin className="h-3.5 w-3.5 text-zinc-500" aria-hidden />
-          <dt className="text-xs text-zinc-500">법정동</dt>
-          <dd className="ml-auto font-mono text-sm text-zinc-200">
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div className="min-w-0">
+          <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+            <h2 className="text-2xl font-semibold tracking-tight text-zinc-100">
+              {aptName}
+            </h2>
+            {buildYear != null ? (
+              <span className="font-mono text-xs text-zinc-500">{buildYear}년식</span>
+            ) : null}
+          </div>
+          <p className="mt-1 text-sm text-zinc-400">
             {region} {dong}
             {jibun ? ` ${jibun}` : ""}
-          </dd>
+          </p>
         </div>
+        <a
+          href={mapHref}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-3 text-xs font-medium text-emerald-200 transition hover:border-emerald-500/50 hover:bg-emerald-500/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
+        >
+          <MapPin className="h-3.5 w-3.5" aria-hidden />
+          카카오맵
+          <ExternalLink className="h-3 w-3 text-emerald-400" aria-hidden />
+        </a>
+      </div>
+      <dl className="mt-5 grid grid-cols-1 gap-x-8 gap-y-2 text-sm sm:grid-cols-2 lg:grid-cols-3">
         {roadName ? (
-          <div className="flex items-center gap-2">
-            <MapPin className="h-3.5 w-3.5 text-zinc-500" aria-hidden />
-            <dt className="text-xs text-zinc-500">도로명</dt>
-            <dd className="ml-auto truncate font-mono text-sm text-zinc-200">{roadName}</dd>
-          </div>
+          <MetaRow icon={<MapPin className="h-3.5 w-3.5" aria-hidden />} label="도로명" value={roadName} />
         ) : null}
-        <div className="flex items-center gap-2">
-          <CalendarClock className="h-3.5 w-3.5 text-zinc-500" aria-hidden />
-          <dt className="text-xs text-zinc-500">집계 범위</dt>
-          <dd className="ml-auto font-mono text-sm text-zinc-200">최근 {monthsScanned}개월</dd>
-        </div>
-        <div className="flex items-center gap-2">
-          <TrendingUp className="h-3.5 w-3.5 text-zinc-500" aria-hidden />
-          <dt className="text-xs text-zinc-500">거래 수</dt>
-          <dd className="ml-auto font-mono text-sm tabular-nums text-zinc-200">{tradeCount}건</dd>
-        </div>
+        <MetaRow
+          icon={<CalendarClock className="h-3.5 w-3.5" aria-hidden />}
+          label="집계 범위"
+          value={`최근 ${monthsScanned}개월`}
+        />
+        <MetaRow
+          icon={<TrendingUp className="h-3.5 w-3.5" aria-hidden />}
+          label="거래 수"
+          value={`${tradeCount}건`}
+        />
       </dl>
     </article>
+  );
+}
+
+function MetaRow({
+  icon,
+  label,
+  value,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: string;
+}) {
+  return (
+    <div className="flex items-center gap-2">
+      <span className="text-zinc-500" aria-hidden>
+        {icon}
+      </span>
+      <dt className="text-xs text-zinc-500">{label}</dt>
+      <dd className="ml-auto truncate font-mono text-sm tabular-nums text-zinc-200">
+        {value}
+      </dd>
+    </div>
   );
 }
 
@@ -143,13 +196,32 @@ function BuildingStats({ trades }: { trades: ApartmentTrade[] }) {
 
   return (
     <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-      <StatCard label="평균가" value={formatAmount(avg)} accent="text-emerald-200" />
-      <StatCard label="최저가" value={formatAmount(min)} accent="text-zinc-200" />
-      <StatCard label="최고가" value={formatAmount(max)} accent="text-zinc-200" />
       <StatCard
+        icon={<TrendingUp className="h-4 w-4" aria-hidden />}
+        label="평균가"
+        value={formatAmount(avg)}
+        accent="bg-emerald-500/15 text-emerald-400"
+        valueClass="text-emerald-200"
+      />
+      <StatCard
+        icon={<TrendingDown className="h-4 w-4" aria-hidden />}
+        label="최저가"
+        value={formatAmount(min)}
+        accent="bg-cyan-500/15 text-cyan-400"
+        valueClass="text-cyan-200"
+      />
+      <StatCard
+        icon={<TrendingUp className="h-4 w-4" aria-hidden />}
+        label="최고가"
+        value={formatAmount(max)}
+        accent="bg-rose-500/15 text-rose-400"
+        valueClass="text-rose-200"
+      />
+      <StatCard
+        icon={<Coins className="h-4 w-4" aria-hidden />}
         label="평당 평균"
         value={avgPyeong != null ? formatAmount(Math.round(avgPyeong)) : "—"}
-        accent="text-zinc-200"
+        accent="bg-zinc-800 text-zinc-300"
         sub={`최근 거래 ${formatShortDate(latest)}`}
       />
     </div>
@@ -157,20 +229,38 @@ function BuildingStats({ trades }: { trades: ApartmentTrade[] }) {
 }
 
 function StatCard({
+  icon,
   label,
   value,
   accent,
+  valueClass,
   sub,
 }: {
+  icon: React.ReactNode;
   label: string;
   value: string;
   accent: string;
+  valueClass?: string;
   sub?: string;
 }) {
   return (
     <article className="rounded-xl border border-zinc-800/80 bg-zinc-900 p-4">
-      <p className="text-xs font-medium text-zinc-500">{label}</p>
-      <p className={`mt-2 font-mono text-2xl font-semibold tracking-tight ${accent}`}>{value}</p>
+      <div className="flex items-center gap-2.5">
+        <span
+          aria-hidden
+          className={`flex h-9 w-9 items-center justify-center rounded-md ${accent}`}
+        >
+          {icon}
+        </span>
+        <span className="text-sm font-medium text-zinc-300">{label}</span>
+      </div>
+      <p
+        className={`mt-3 font-mono text-2xl font-semibold tracking-tight ${
+          valueClass ?? "text-zinc-100"
+        }`}
+      >
+        {value}
+      </p>
       {sub ? <p className="mt-1 font-mono text-[11px] text-zinc-600">{sub}</p> : null}
     </article>
   );
@@ -240,22 +330,32 @@ function BuildingTradeList({ trades }: { trades: ApartmentTrade[] }) {
           {trades.length}건
         </p>
       </header>
+
+      {/* 컬럼 헤더 — 데스크탑만 */}
+      <div className="hidden grid-cols-[40px_1fr_140px_120px] items-center gap-4 border-b border-zinc-800/80 px-6 py-2.5 text-[11px] font-medium uppercase tracking-wider text-zinc-500 md:grid">
+        <span className="text-right">#</span>
+        <span>면적·평형</span>
+        <span className="text-right">거래가</span>
+        <span className="text-right">날짜·평당가</span>
+      </div>
+
       <ul className="divide-y divide-zinc-800/60">
-        {trades.map((t) => (
+        {trades.map((t, idx) => (
           <li
             key={t.id}
-            className="grid grid-cols-[1fr_auto] items-center gap-3 px-6 py-3 md:grid-cols-[100px_1fr_auto_120px]"
+            className="grid grid-cols-[1fr_auto] items-center gap-3 px-6 py-3 md:grid-cols-[40px_1fr_140px_120px] md:gap-4"
           >
-            <span className="hidden font-mono text-xs tabular-nums text-zinc-500 md:block">
-              {formatShortDate(t.dealDate)}
+            <span className="hidden text-right font-mono text-xs tabular-nums text-zinc-600 md:block">
+              {String(idx + 1).padStart(2, "0")}
             </span>
             <div className="min-w-0">
               <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
-                <span className="font-mono text-sm font-medium tabular-nums text-zinc-200">
-                  {t.area.toFixed(1)}㎡ · {pyeongLabel(t.area)}
+                <span className="font-mono text-sm font-medium tabular-nums text-zinc-100">
+                  {t.area.toFixed(1)}㎡
                 </span>
+                <span className="font-mono text-xs text-zinc-500">{pyeongLabel(t.area)}</span>
                 {t.floor != null ? (
-                  <span className="font-mono text-xs text-zinc-500">{t.floor}층</span>
+                  <span className="font-mono text-xs text-zinc-500">· {t.floor}층</span>
                 ) : null}
                 {t.cancelDealDay ? (
                   <span className="inline-flex items-center rounded bg-rose-500/15 px-1.5 py-0.5 font-mono text-[11px] text-rose-300">
@@ -263,52 +363,32 @@ function BuildingTradeList({ trades }: { trades: ApartmentTrade[] }) {
                   </span>
                 ) : null}
               </div>
-              <p className="mt-0.5 font-mono text-[11px] tabular-nums text-zinc-500 md:hidden">
-                {formatShortDate(t.dealDate)}
+              {/* 모바일: 날짜·평당가 행 아래 인라인 */}
+              <p className="mt-0.5 flex items-baseline gap-2 font-mono text-[11px] tabular-nums text-zinc-500 md:hidden">
+                <span>{formatShortDate(t.dealDate)}</span>
+                {t.pricePerPyeong != null ? (
+                  <>
+                    <span className="text-zinc-700">·</span>
+                    <span>평당 {formatAmount(Math.round(t.pricePerPyeong))}</span>
+                  </>
+                ) : null}
               </p>
             </div>
             <p className="text-right font-mono text-base font-semibold tabular-nums text-zinc-100">
               {formatAmount(t.dealAmount)}
             </p>
-            <p className="hidden text-right font-mono text-xs tabular-nums text-zinc-500 md:block">
-              {t.pricePerPyeong != null ? `평당 ${formatAmount(Math.round(t.pricePerPyeong))}` : "—"}
-            </p>
+            <div className="hidden text-right font-mono tabular-nums md:block">
+              <p className="text-sm text-zinc-300">{formatShortDate(t.dealDate)}</p>
+              <p className="mt-0.5 text-[11px] text-zinc-500">
+                {t.pricePerPyeong != null
+                  ? `평당 ${formatAmount(Math.round(t.pricePerPyeong))}`
+                  : "—"}
+              </p>
+            </div>
           </li>
         ))}
       </ul>
     </article>
-  );
-}
-
-function MapLink({
-  aptName,
-  region,
-  roadName,
-  jibun,
-  sampleDong,
-}: {
-  aptName: string;
-  region: string;
-  roadName: string | null;
-  jibun: string | null;
-  sampleDong: string;
-}) {
-  // 좌표가 없어 카카오맵 검색으로 폴백. 도로명이 있으면 가장 정확.
-  const query = roadName
-    ? roadName
-    : `${region} ${sampleDong} ${aptName}${jibun ? ` ${jibun}` : ""}`;
-  const href = `https://map.kakao.com/?q=${encodeURIComponent(query)}`;
-  return (
-    <a
-      href={href}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="inline-flex h-10 items-center gap-2 self-start rounded-lg border border-zinc-800 bg-zinc-900 px-4 text-sm text-zinc-200 transition hover:border-zinc-700 hover:bg-zinc-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
-    >
-      <MapPin className="h-4 w-4 text-emerald-400" aria-hidden />
-      카카오맵에서 보기
-      <ExternalLink className="h-3.5 w-3.5 text-zinc-500" aria-hidden />
-    </a>
   );
 }
 
