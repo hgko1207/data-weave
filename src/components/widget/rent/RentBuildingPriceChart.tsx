@@ -128,9 +128,14 @@ function SubChart({
   const xMin = xs[0];
   const xMax = xs[xs.length - 1];
   const xRange = Math.max(xMax - xMin, 1);
-  const yMin = Math.min(...ys);
-  const yMax = Math.max(...ys);
-  const yRange = Math.max(yMax - yMin, 1);
+  const dataYMin = Math.min(...ys);
+  const dataYMax = Math.max(...ys);
+  const dataYRange = Math.max(dataYMax - dataYMin, 1);
+  // 점이 plot edge에 닿지 않게 위·아래 10% 패딩 (sub-chart는 작아서 살짝 더 여유).
+  const yPad = dataYRange * 0.1;
+  const yMin = dataYMin - yPad;
+  const yMax = dataYMax + yPad;
+  const yRange = yMax - yMin;
 
   const W = 280;
   const H = 140;
@@ -148,6 +153,10 @@ function SubChart({
   });
   const linePath = pts.map((p, i) => (i === 0 ? `M ${p.x} ${p.y}` : `L ${p.x} ${p.y}`)).join(" ");
 
+  // y축 그리드는 실제 데이터값(dataYMin/Max) 위치에 그려서 라벨이 의미 있게.
+  const gridYTop = PAD_TOP + chartH * (1 - (dataYMax - yMin) / yRange);
+  const gridYBot = PAD_TOP + chartH * (1 - (dataYMin - yMin) / yRange);
+
   return (
     <div className="rounded-lg border border-zinc-800/80 bg-zinc-950/40 p-3">
       <div className="flex items-baseline justify-between gap-2">
@@ -155,35 +164,34 @@ function SubChart({
           {label} · {trades.length}건
         </p>
         <p className={`font-mono text-xs ${palette.accent}`}>
-          {formatAmount(yMin)} ~ {formatAmount(yMax)}
+          {formatAmount(dataYMin)} ~ {formatAmount(dataYMax)}
         </p>
       </div>
       <svg viewBox={`0 0 ${W} ${H}`} className="mt-2 block w-full" role="img" aria-label={`${label} 추이`}>
-        {[0, 1].map((r) => {
-          const y = PAD_TOP + chartH * r;
-          const v = yMax - yRange * r;
-          return (
-            <g key={r}>
-              <line
-                x1={PAD_L}
-                y1={y}
-                x2={W - PAD_R}
-                y2={y}
-                stroke="rgb(39, 39, 42)"
-                strokeDasharray="2 4"
-              />
-              <text
-                x={PAD_L - 6}
-                y={y + 3}
-                textAnchor="end"
-                className="fill-zinc-500 font-mono"
-                fontSize="9"
-              >
-                {formatAmount(Math.round(v))}
-              </text>
-            </g>
-          );
-        })}
+        {[
+          { y: gridYTop, v: dataYMax },
+          { y: gridYBot, v: dataYMin },
+        ].map((g, idx) => (
+          <g key={idx}>
+            <line
+              x1={PAD_L}
+              y1={g.y}
+              x2={W - PAD_R}
+              y2={g.y}
+              stroke="rgb(39, 39, 42)"
+              strokeDasharray="2 4"
+            />
+            <text
+              x={PAD_L - 6}
+              y={g.y + 3}
+              textAnchor="end"
+              className="fill-zinc-500 font-mono"
+              fontSize="9"
+            >
+              {formatAmount(Math.round(g.v))}
+            </text>
+          </g>
+        ))}
         <path
           d={linePath}
           fill="none"

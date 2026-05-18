@@ -53,7 +53,12 @@ export function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
         <NavSection items={widgetItems} onNavigate={onNavigate} />
       </nav>
 
-      <div className="border-t border-zinc-800/80 px-2.5 py-2.5">
+      {/*
+        하단 footer. 일부 브라우저 확장(Notion AI Smart Sources 등)이 페이지
+        좌하단 fixed로 떠 있어 sidebar 영역과 시각 겹침이 보고됨 — pb를 늘려
+        외부 위젯 자리(약 56px)를 양보. 우리 코드 자체 침범은 아님.
+      */}
+      <div className="border-t border-zinc-800/80 px-2.5 pb-14 pt-2.5">
         <NavSection items={SECONDARY} onNavigate={onNavigate} />
         <DataSourceStatus />
       </div>

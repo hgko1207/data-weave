@@ -30,12 +30,16 @@ export function ApartmentTrendChart({
     );
   }
 
-  const min = Math.min(...valid.map((p) => p.avg));
-  const max = Math.max(...valid.map((p) => p.avg));
-  const range = Math.max(max - min, 1);
+  const dataMin = Math.min(...valid.map((p) => p.avg));
+  const dataMax = Math.max(...valid.map((p) => p.avg));
+  const dataRange = Math.max(dataMax - dataMin, 1);
+  // 점이 chart 가장자리에 닿으면 점 위 값 라벨이 y축 그리드 라벨과 같은 영역에서 겹쳐
+  // 가독성↓. 위·아래 8% 패딩으로 점을 plot area 안쪽에만 두기.
+  const yPad = dataRange * 0.08;
+  const min = dataMin - yPad;
+  const max = dataMax + yPad;
+  const range = max - min;
 
-  // SVG viewBox — viewBox를 키워서 컨테이너 width 대비 비례 확대를 줄여 텍스트
-  // 상대 크기를 줄인다. PAD_TOP은 위쪽 값 라벨, PAD_BOTTOM은 x축 월 라벨 공간.
   const W = 800;
   const H = 260;
   const PAD_X = 52;

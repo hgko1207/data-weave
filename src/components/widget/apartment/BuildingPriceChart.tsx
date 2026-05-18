@@ -30,15 +30,20 @@ export function BuildingPriceChart({ trades }: Props) {
   const chartW = W - PAD_L - PAD_R;
   const chartH = H - PAD_TOP - PAD_BOTTOM;
 
-  // 전체 거래 기준 x/y 범위
+  // 전체 거래 기준 x/y 범위. y는 위·아래 8% 패딩 — 점이 plot edge에 닿아
+  // 점 위 가격 라벨이 grid 라벨과 겹치는 것 방지.
   const allX = trades.map((t) => Date.parse(t.dealDate));
   const allY = trades.map((t) => t.dealAmount);
   const xMin = Math.min(...allX);
   const xMax = Math.max(...allX);
   const xRange = Math.max(xMax - xMin, 1);
-  const yMin = Math.min(...allY);
-  const yMax = Math.max(...allY);
-  const yRange = Math.max(yMax - yMin, 1);
+  const dataYMin = Math.min(...allY);
+  const dataYMax = Math.max(...allY);
+  const dataYRange = Math.max(dataYMax - dataYMin, 1);
+  const yPad = dataYRange * 0.08;
+  const yMin = dataYMin - yPad;
+  const yMax = dataYMax + yPad;
+  const yRange = yMax - yMin;
 
   const xOf = (ts: number) => PAD_L + (chartW * (ts - xMin)) / xRange;
   const yOf = (v: number) => PAD_TOP + chartH * (1 - (v - yMin) / yRange);
@@ -63,12 +68,15 @@ export function BuildingPriceChart({ trades }: Props) {
           role="img"
           aria-label="단지 시간순 거래가 추이"
         >
-          {/* y축 가로 그리드 */}
-          {[0, 0.5, 1].map((r) => {
-            const y = PAD_TOP + chartH * r;
-            const v = yMax - yRange * r;
+          {/* y축 가로 그리드 — 실제 데이터값(min/mid/max) 위치에 그려서 라벨이 의미 있게 */}
+          {[
+            { v: dataYMax },
+            { v: (dataYMax + dataYMin) / 2 },
+            { v: dataYMin },
+          ].map((g, idx) => {
+            const y = yOf(g.v);
             return (
-              <g key={r}>
+              <g key={idx}>
                 <line
                   x1={PAD_L}
                   y1={y}
@@ -84,7 +92,7 @@ export function BuildingPriceChart({ trades }: Props) {
                   className="fill-zinc-500 font-mono"
                   fontSize="10"
                 >
-                  {formatAmount(Math.round(v))}
+                  {formatAmount(Math.round(g.v))}
                 </text>
               </g>
             );

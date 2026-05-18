@@ -39,12 +39,16 @@ export function RentTrendChart({ points, region }: Props) {
   }
 
   const allValues = [...validJ.map((p) => p.avg), ...validM.map((p) => p.avg)];
-  const yMin = Math.min(...allValues);
-  const yMax = Math.max(...allValues);
-  const yRange = Math.max(yMax - yMin, 1);
+  const dataMin = Math.min(...allValues);
+  const dataMax = Math.max(...allValues);
+  const dataRange = Math.max(dataMax - dataMin, 1);
+  // 점이 chart 위/아래 가장자리에 닿으면 y축 그리드 라벨·점 위 값 라벨이 같은 영역에서
+  // 겹쳐 가독성↓. yRange에 위·아래 8% 패딩을 줘서 점이 plot area 안쪽에만 위치.
+  const yPad = dataRange * 0.08;
+  const yMin = dataMin - yPad;
+  const yMax = dataMax + yPad;
+  const yRange = yMax - yMin;
 
-  // viewBox를 키워서 컨테이너 width 대비 비례 확대를 줄임 → 텍스트 상대 크기↓.
-  // PAD_BOTTOM은 amber 값 라벨(점 아래 +16) + x축 월 라벨 두 줄을 모두 담아야 한다.
   const W = 800;
   const H = 300;
   const PAD_L = 64;
@@ -113,12 +117,15 @@ export function RentTrendChart({ points, region }: Props) {
           role="img"
           aria-label={`${region} 전월세 월별 평균 보증금 추이`}
         >
-          {/* y축 가로 그리드 */}
-          {[0, 0.5, 1].map((r) => {
-            const y = PAD_TOP + chartH * r;
-            const v = yMax - yRange * r;
+          {/* y축 가로 그리드 — 실제 데이터값(min/mid/max) 위치 */}
+          {[
+            { v: dataMax },
+            { v: (dataMax + dataMin) / 2 },
+            { v: dataMin },
+          ].map((g, idx) => {
+            const y = yOf(g.v);
             return (
-              <g key={r}>
+              <g key={idx}>
                 <line
                   x1={PAD_L}
                   y1={y}
@@ -134,7 +141,7 @@ export function RentTrendChart({ points, region }: Props) {
                   className="fill-zinc-500 font-mono"
                   fontSize="10"
                 >
-                  {formatAmount(Math.round(v))}
+                  {formatAmount(Math.round(g.v))}
                 </text>
               </g>
             );
