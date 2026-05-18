@@ -132,6 +132,8 @@ function assertApiOk(node: unknown): void {
     }
     throw new Error("RTMS rent API error: service response without items");
   }
+  // fast-xml-parser가 '<resultCode>00</resultCode>'를 숫자 0으로 변환 — '0'도 정상 코드.
+  const VALID_CODES = new Set(["00", "000", "0"]);
   const resp = root["response"];
   if (resp && typeof resp === "object") {
     const header = (resp as Record<string, unknown>)["header"];
@@ -139,7 +141,7 @@ function assertApiOk(node: unknown): void {
       const code = (header as Record<string, unknown>)["resultCode"];
       const msg = (header as Record<string, unknown>)["resultMsg"];
       const codeStr = String(code ?? "");
-      if (codeStr && codeStr !== "00" && codeStr !== "000") {
+      if (codeStr && !VALID_CODES.has(codeStr)) {
         throw new Error(`RTMS rent API error: ${String(msg ?? "unknown")} (code ${codeStr})`);
       }
     }

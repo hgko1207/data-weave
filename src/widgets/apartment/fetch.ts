@@ -130,7 +130,10 @@ function assertApiOk(node: unknown): void {
     }
     throw new Error("RTMS API error: service response without items");
   }
-  // 2) 정상 response 안의 header.resultCode가 '00' 외이면 실패
+  // 2) 정상 response 안의 header.resultCode가 정상 코드 아니면 실패.
+  // fast-xml-parser가 '<resultCode>00</resultCode>' 를 숫자 0으로 자동 변환해서
+  // 'codeStr === "0"' 인 케이스가 정상 응답 — Set 검사로 잡는다.
+  const VALID_CODES = new Set(["00", "000", "0"]);
   const resp = root["response"];
   if (resp && typeof resp === "object") {
     const header = (resp as Record<string, unknown>)["header"];
@@ -138,8 +141,7 @@ function assertApiOk(node: unknown): void {
       const code = (header as Record<string, unknown>)["resultCode"];
       const msg = (header as Record<string, unknown>)["resultMsg"];
       const codeStr = String(code ?? "");
-      // 정상이면 '00', 일부 시스템은 '000' — 'NORMAL_SERVICE' 메시지로 정상 식별 가능
-      if (codeStr && codeStr !== "00" && codeStr !== "000") {
+      if (codeStr && !VALID_CODES.has(codeStr)) {
         throw new Error(`RTMS API error: ${String(msg ?? "unknown")} (code ${codeStr})`);
       }
     }

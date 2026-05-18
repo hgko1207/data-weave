@@ -1,5 +1,7 @@
 import type { RentTrade, RentData } from "./schema";
 
+// region을 모르는 generic 단지명. region prefix를 붙이면 시·군·구가 실제 분포와
+// 어긋날 때 어색해지므로 일반화. mock 배지로 데이터 출처는 명시됨.
 const APT_NAMES = [
   "스카이뷰",
   "SK뷰",
@@ -11,18 +13,6 @@ const APT_NAMES = [
   "LG빌리지",
 ];
 
-const DONG_POOL = [
-  "봉명동",
-  "도룡동",
-  "노은동",
-  "관평동",
-  "지족동",
-  "전민동",
-  "갑동",
-  "구즉동",
-];
-
-// djb2 hash — region별 결정적 시드.
 function regionSeed(s: string): number {
   let h = 5381;
   for (let i = 0; i < s.length; i++) {
@@ -34,16 +24,13 @@ function regionSeed(s: string): number {
 export function buildMockRent(region: string, dealYm: string): RentData {
   const seed = regionSeed(region);
   const aptRotate = seed % APT_NAMES.length;
-  const dongRotate = seed % DONG_POOL.length;
   const depositShift = ((seed % 12000) | 0) - 6000; // ±6000만원
-  const sidoShort =
-    region.split(" ")[0]?.replace(/(특별시|광역시|특별자치시|특별자치도|도)$/, "") ?? "";
 
   const now = new Date();
   const trades: RentTrade[] = Array.from({ length: 12 }, (_, i) => {
-    const aptName = `${sidoShort}${APT_NAMES[(i + aptRotate) % APT_NAMES.length]}`;
+    const aptName = APT_NAMES[(i + aptRotate) % APT_NAMES.length];
     const area = 59 + (i % 4) * 17;
-    const isJeonse = i % 3 !== 0; // 2/3는 전세
+    const isJeonse = i % 3 !== 0;
     const baseDeposit = isJeonse
       ? 20000 + depositShift + (i % 5) * 4000
       : 3000 + Math.round(depositShift / 4) + (i % 4) * 2000;
@@ -54,8 +41,8 @@ export function buildMockRent(region: string, dealYm: string): RentData {
     return {
       id: `mock-${i}-${aptName}`,
       aptName,
-      dong: DONG_POOL[(i + dongRotate) % DONG_POOL.length],
-      jibun: `${100 + i * 13}`,
+      dong: `${((i + (seed % 6)) % 6) + 1}동`,
+      jibun: null,
       dealDate: `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`,
       type: isJeonse ? "jeonse" : "monthly",
       deposit,
