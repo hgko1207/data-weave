@@ -34,13 +34,13 @@ export function ApartmentTrendChart({
   const max = Math.max(...valid.map((p) => p.avg));
   const range = Math.max(max - min, 1);
 
-  // SVG viewBox — PAD_TOP은 위쪽 값 라벨('4.8억' 등) 헤드룸 확보용,
-  // PAD_X는 좌우 끝 포인트 라벨이 SVG 경계에 닿지 않도록.
-  const W = 600;
-  const H = 200;
-  const PAD_X = 44;
-  const PAD_TOP = 36;
-  const PAD_BOTTOM = 36;
+  // SVG viewBox — viewBox를 키워서 컨테이너 width 대비 비례 확대를 줄여 텍스트
+  // 상대 크기를 줄인다. PAD_TOP은 위쪽 값 라벨, PAD_BOTTOM은 x축 월 라벨 공간.
+  const W = 800;
+  const H = 260;
+  const PAD_X = 52;
+  const PAD_TOP = 40;
+  const PAD_BOTTOM = 48;
   const chartW = W - PAD_X * 2;
   const chartH = H - PAD_TOP - PAD_BOTTOM;
   const stepX = points.length > 1 ? chartW / (points.length - 1) : chartW / 2;

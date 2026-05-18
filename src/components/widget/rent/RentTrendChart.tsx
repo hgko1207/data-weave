@@ -43,12 +43,14 @@ export function RentTrendChart({ points, region }: Props) {
   const yMax = Math.max(...allValues);
   const yRange = Math.max(yMax - yMin, 1);
 
-  const W = 600;
-  const H = 200;
-  const PAD_L = 56;
-  const PAD_R = 24;
-  const PAD_TOP = 36;
-  const PAD_BOTTOM = 36;
+  // viewBox를 키워서 컨테이너 width 대비 비례 확대를 줄임 → 텍스트 상대 크기↓.
+  // PAD_BOTTOM은 amber 값 라벨(점 아래 +16) + x축 월 라벨 두 줄을 모두 담아야 한다.
+  const W = 800;
+  const H = 300;
+  const PAD_L = 64;
+  const PAD_R = 32;
+  const PAD_TOP = 44;
+  const PAD_BOTTOM = 64;
   const chartW = W - PAD_L - PAD_R;
   const chartH = H - PAD_TOP - PAD_BOTTOM;
   const stepX = points.length > 1 ? chartW / (points.length - 1) : chartW / 2;
