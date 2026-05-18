@@ -4,11 +4,16 @@
 
 ## SSOT 문서
 
-- [docs/PLAN.md](docs/PLAN.md) — Phase 1 차터·위젯 인터페이스·구현 단계 (Step 0~6)
+- [docs/PLAN.md](docs/PLAN.md) — 차터·위젯 인터페이스·공통 골격(사이드바·즐겨찾기·라우트 규약)
+- [docs/widgets/](docs/widgets/) — **위젯별 화면 문서** (apartment / rent / weather / pharmacy / food-recall). 페이지 구조, 데이터 소스, 진화 이력, TODO를 위젯 단위로 분리.
 - [docs/DESIGN.md](docs/DESIGN.md) — 컬러/타이포/스페이싱 토큰, 디자인 원칙
 - [docs/TODOS.md](docs/TODOS.md) — Phase 2+ 의식적으로 deferred한 항목
 
-새 기능 들어오면 위 셋 중 어느 쪽에 속하는지 먼저 판단. 새 결정은 PLAN/DESIGN/TODOS의 적절한 곳에 변경 이력과 함께 기록.
+새 기능이 들어오면:
+- 위젯 화면별 변경 → `docs/widgets/<id>.md`에 진화 이력 한 줄 + 필요 시 섹션 추가
+- 위젯 인터페이스·라우트 규약 등 공통 골격 변경 → `docs/PLAN.md` 변경 이력 + §14
+- 디자인 토큰 변경 → `docs/DESIGN.md`
+- 의식적으로 미루는 항목 → `docs/TODOS.md`
 
 ## 기술 스택
 

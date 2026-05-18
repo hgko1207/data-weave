@@ -16,6 +16,7 @@
 | 2026-05-16 | v3 | **Phase 1 + 1.5 완성 반영.** Step 0~6 완료 마킹. 위젯 4개로 확장 (아파트 실거래가 추가). 사이드바 네비, 위젯별 상세 페이지(URL `searchParams`), 즐겨찾기, 위젯별 강화 기능 (등급/영업중/정렬/추이 차트) §14에 정리. Aurora bg는 §7 deprecated 표시 (solid surface로 교체 — [DESIGN.md](DESIGN.md) §14 참조). | 실제 구현 진화 반영, 사용자 요청 |
 | 2026-05-17 | v3.1 | **Phase A — 아파트 단지 상세 페이지** (`/w/apartment/building`) 추가. 거래 목록에서 아파트명 클릭 → 최근 6개월 거래 집계 + 평형별 그룹 + 카카오맵 외부 링크. 평수 표시는 공급평(33평형) 기준으로 통일. §14.8 추가. | 사용자 요청 (지도 + 단지 상세) |
 | 2026-05-18 | v3.2 | **Phase A 가독성 폴리시 + 전월세 미러.** 매매 단지 페이지 카카오맵을 헤더 우측 액션으로 이동, 통계에 아이콘+accent, 거래 행 컬럼 재배치(면적→가격→날짜). 동일 골격을 전월세에 미러링 — `/w/rent/building` + `fetchRentBuilding` + `RentBuildingDetail`. RentDetail 자체도 column header / row index / sort badge / aptName Link 적용해 매매 톤과 통일. §14.8 확장. | 사용자 요청 (가독성 + 매매↔전월세 일관) |
+| 2026-05-18 | v3.3 | **매매↔전월세 cross-link + 단지별 가격 추이 + 전월세 시·군·구 추이.** 단지 페이지 사이를 한 클릭으로 이동. 단지 페이지에 시간순 거래가 산점도(매매) / 전세·월세 sub-chart(전월세). 전월세 메인 페이지에 시·군·구 평균 보증금 추이 차트 (매매 차트 미러). **PLAN.md §14의 위젯별 디테일을 `docs/widgets/*.md`로 분리** — PLAN.md는 차터·공통 골격만, 위젯별은 화면 단위 문서로. | 사용자 요청 |
 
 ---
 
@@ -475,63 +476,21 @@ type Bookmark = {
 - 사이드바 "즐겨찾기" 섹션 (대시보드 ↔ 공공데이터 사이) — 저장된 항목을 별표 + 라벨로 표시, 클릭 시 URL 복귀.
 - 동기화: 같은 탭은 custom event(`dataweave-bookmarks-changed`), 다른 탭은 `storage` event.
 
-### 14.5 위젯별 강화 (v3)
+### 14.5 위젯별 화면 문서
 
-| 위젯 | 강화 |
-|------|------|
-| 날씨 | 시간대별 24h 카드 strip + 주간 8일 예보 (단기 3 + 중기 5, KMA 중기예보 별도 활용신청 필요) |
-| SOS | 시·도→시·군·구 cascade select (235개 매핑) + "전체" 옵션 + 종류 필터 + **지금 영업중 토글** (KST 기준 운영시간 파싱) |
-| 식품 리콜 | 키워드 chip + 기간 chip + **등급 필터** (1=rose / 2=amber / 3=zinc 톤) |
-| 아파트 | 시·도→시·군·구 cascade + 월 stepper + **정렬 chip** (최신/가격↓↑/면적/평당가) + **6개월 평균가 추이 SVG 차트** |
+위젯별 상세 페이지 구조, 데이터 소스, 강화 이력, TODO는 [`docs/widgets/`](widgets/)로 분리:
 
-### 14.6 새 위젯: 아파트 실거래가
+- [매매 실거래가 (apartment)](widgets/apartment.md) — `/w/apartment` + `/w/apartment/building`
+- [전월세 실거래가 (rent)](widgets/rent.md) — `/w/rent` + `/w/rent/building`
+- [날씨 (weather)](widgets/weather.md) — `/w/weather`
+- [SOS 약국·응급실 (pharmacy)](widgets/pharmacy.md) — `/w/pharmacy`
+- [식품 리콜 (food-recall)](widgets/food-recall.md) — `/w/food-recall`
 
-- **데이터**: 국토교통부 RTMS 매매 실거래가 (15126469)
-- **법정동 코드 매핑**: `src/widgets/apartment/lawd-codes.ts` — 229개 시·군·구 5자리 코드 (군위군 → 대구 27720 반영)
-- **응답 포맷**: XML only → `fast-xml-parser`로 파싱
-- **상세 페이지**: 시·도/시·군·구 cascade + 월 stepper + 정렬 chip + 추이 차트 + 거래 내역 리스트
+새 위젯 추가는 [src/widgets/README.md](../src/widgets/README.md) 참조 (코드 가이드).
 
-### 14.7 디자인 토큰 진화 (Aurora → Solid)
+### 14.6 디자인 토큰 진화 (Aurora → Solid)
 
 Phase 1엔 Aurora gradient + 반투명 surface, Phase 1.5에서 **솔리드 surface로 교체** ([DESIGN.md §14](DESIGN.md) 참조). 사용자 피드백: "사이드바와 메인 구분 안 됨" → opaque chrome (zinc-900) + 명확한 border (zinc-800) 도입. Aurora bg는 `src/components/aurora-bg.tsx`에 남아있으나 root layout에서 제거됨.
-
----
-
-### 14.8 Phase A — 아파트 단지 상세 페이지 (v3.1)
-
-> 거래 행에서 아파트명을 클릭하면 그 단지의 종합 정보로 진입. 사용자 요청: "상세 정보 페이지를 만들어서 뭔가 아파트 정보나 아니면 지도 까지 있으면 좋을거같은데."
-
-**라우트**: `/w/apartment/building?sido=&sigungu=&lawdCd=&apt=<aptName>&dong=<법정동>`
-
-- 같은 시·군·구 내에 동일 단지명이 다른 법정동에 존재할 수 있어 `(aptName, dong)` 페어를 단지 식별자로 사용. RTMS는 고유 building_id 미제공.
-- `[id]` 동적 세그먼트 대신 query string — URL=진실 원칙 유지 + 즐겨찾기/공유 가능.
-
-**데이터**: `fetchBuilding(cfg, months=6)` — 시·군·구 RTMS API를 최근 6개월 분 병렬 호출 → `aptName + dong` 일치만 추려 시간 역순 정렬.
-- 6 API call (월별). 키 없으면 mock 폴백.
-- 좌표가 없어 카카오맵 좌표 임베드 X. 도로명/지번 검색 외부 링크(`https://map.kakao.com/?q=...`)로 폴백.
-
-**페이지 구성**:
-1. 단지 헤더 (아파트명 h1, 법정동·도로명·건축년도, 거래 N건, 집계 범위)
-2. 통계 4-up (평균가 / 최저 / 최고 / 평당 평균 + 최근 거래일)
-3. **평형별 거래** 카드 — 공급평 round (33평형/26평형 등) 그룹별 평균/최저/최고 + 면적 범위
-4. 거래 내역 (최신순)
-5. 카카오맵 외부 링크 버튼 (도로명 우선, 폴백: `region + dong + aptName + jibun`)
-
-**진입점**: `ApartmentTradesList` 거래 행의 아파트명을 `<Link>`로. 외부 링크 아이콘으로 affordance. 클릭 시 `e.stopPropagation()` → 행 확장과 별개 동작.
-- 행 자체는 `<button>` → `<div role="button" tabIndex={0}>`로 전환 (a/button nesting 회피, 키보드 접근성 onKeyDown 처리).
-- 확장 패널에도 "단지 종합 정보 보기" emerald 버튼 중복 배치 (확장 후에도 빠른 진입).
-
-**즐겨찾기 호환**: 단지 페이지 헤더에 `BookmarkButton` 동일하게 배치. 라벨 예: `단지 · 삼성푸른아파트 (대전 유성구 봉명동)`.
-
-**향후 (TODO)**:
-- 단지별 시간순 가격 추이 차트 (현재는 거래 리스트만)
-- 좌표 매핑(법정동 → 위경도) 확보 시 카카오맵 임베드 인라인 — 현재 외부 링크
-- 단지 정보 캐싱 (RTMS 6회 호출 비용 절감)
-
-**v3.2 — 가독성 폴리시 + 전월세 미러**:
-- 매매 단지 페이지 가독성: 카카오맵 → 헤더 우측 액션, 통계 4-up 아이콘+accent, 거래 행 컬럼 `면적·평형 → 거래가 → 날짜·평당가`, EmptyState에 백 링크.
-- 전월세 미러: `/w/rent/building`, `fetchRentBuilding`, `RentBuildingDetail` — 같은 단지의 전세·월세 거래를 한 페이지에서 평형별 그룹(전세/월세 가격 동시 표시), 거래 내역, 카카오맵.
-- RentDetail 폴리시: column header, row index, sort badge, hover bg, aptName Link.
 
 ---
 
