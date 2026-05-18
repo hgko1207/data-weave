@@ -49,9 +49,10 @@ export function RentTrendChart({ points, region }: Props) {
   const yMax = dataMax + yPad;
   const yRange = yMax - yMin;
 
+  // y축 그리드 라벨을 제거(아파트 트렌드 차트 톤과 통일) — 좌측 padding 축소.
   const W = 800;
   const H = 300;
-  const PAD_L = 64;
+  const PAD_L = 32;
   const PAD_R = 32;
   const PAD_TOP = 44;
   const PAD_BOTTOM = 64;
@@ -117,36 +118,6 @@ export function RentTrendChart({ points, region }: Props) {
           role="img"
           aria-label={`${region} 전월세 월별 평균 보증금 추이`}
         >
-          {/* y축 가로 그리드 — 실제 데이터값(min/mid/max) 위치 */}
-          {[
-            { v: dataMax },
-            { v: (dataMax + dataMin) / 2 },
-            { v: dataMin },
-          ].map((g, idx) => {
-            const y = yOf(g.v);
-            return (
-              <g key={idx}>
-                <line
-                  x1={PAD_L}
-                  y1={y}
-                  x2={W - PAD_R}
-                  y2={y}
-                  stroke="rgb(39, 39, 42)"
-                  strokeDasharray="2 4"
-                />
-                <text
-                  x={PAD_L - 8}
-                  y={y + 4}
-                  textAnchor="end"
-                  className="fill-zinc-500 font-mono"
-                  fontSize="10"
-                >
-                  {formatAmount(Math.round(g.v))}
-                </text>
-              </g>
-            );
-          })}
-
           {/* 전세 선 + 점 */}
           {jPath ? (
             <path
