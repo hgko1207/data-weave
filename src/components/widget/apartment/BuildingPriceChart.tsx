@@ -1,113 +1,69 @@
 import { LineChart } from "lucide-react";
-import { formatAmount } from "@/widgets/apartment/format";
+import { formatAmount, supplyPyeong } from "@/widgets/apartment/format";
 import type { ApartmentTrade } from "@/widgets/apartment/schema";
 
 type Props = {
   trades: ApartmentTrade[];
 };
 
-// 단지의 시간순 거래가 산점도(점) + 추세 라인.
-// fetchBuilding에서 받은 trades는 최신순 정렬되어 있어 차트 그릴 때 역순으로 뒤집어 시간 흐름순으로.
+// 같은 단지여도 평형이 다르면 가격이 1.5~2배 차이가 나기 때문에 단일 series로
+// 그리면 들쭉날쭉해 가독성↓. 평형별로 series 분리 → 각 평형의 시간 흐름 가격 변화가 명확.
 export function BuildingPriceChart({ trades }: Props) {
   if (trades.length < 2) {
     return (
-      <article className="rounded-xl border border-zinc-800/80 bg-zinc-900 p-6">
-        <header className="flex items-center gap-2.5">
-          <span className="flex h-9 w-9 items-center justify-center rounded-md bg-emerald-500/15 text-emerald-400">
-            <LineChart className="h-4 w-4" aria-hidden />
-          </span>
-          <div>
-            <p className="font-mono text-xs font-semibold uppercase tracking-[0.14em] text-zinc-500">
-              가격 추이
-            </p>
-            <p className="text-sm font-medium text-zinc-100">단지 시간순 거래</p>
-          </div>
-        </header>
+      <ChartCard>
         <p className="mt-6 text-sm text-zinc-500">
           거래가 2건 이상이어야 추이를 그릴 수 있어요.
         </p>
-      </article>
+      </ChartCard>
     );
   }
 
-  const ordered = [...trades].sort((a, b) => a.dealDate.localeCompare(b.dealDate));
-  const xs = ordered.map((t) => Date.parse(t.dealDate));
-  const ys = ordered.map((t) => t.dealAmount);
-  const xMin = xs[0];
-  const xMax = xs[xs.length - 1];
-  const xRange = Math.max(xMax - xMin, 1);
-  const yMin = Math.min(...ys);
-  const yMax = Math.max(...ys);
-  const yRange = Math.max(yMax - yMin, 1);
+  const groups = buildPyeongGroups(trades);
 
   const W = 600;
-  const H = 200;
+  const H = 220;
   const PAD_L = 56;
   const PAD_R = 24;
-  const PAD_TOP = 28;
+  const PAD_TOP = 32;
   const PAD_BOTTOM = 36;
   const chartW = W - PAD_L - PAD_R;
   const chartH = H - PAD_TOP - PAD_BOTTOM;
 
-  const pts = ordered.map((t, i) => {
-    const x = PAD_L + (chartW * (xs[i] - xMin)) / xRange;
-    const y = PAD_TOP + chartH * (1 - (ys[i] - yMin) / yRange);
-    return { x, y, t };
-  });
+  // 전체 거래 기준 x/y 범위
+  const allX = trades.map((t) => Date.parse(t.dealDate));
+  const allY = trades.map((t) => t.dealAmount);
+  const xMin = Math.min(...allX);
+  const xMax = Math.max(...allX);
+  const xRange = Math.max(xMax - xMin, 1);
+  const yMin = Math.min(...allY);
+  const yMax = Math.max(...allY);
+  const yRange = Math.max(yMax - yMin, 1);
 
-  const linePath = pts.map((p, i) => (i === 0 ? `M ${p.x} ${p.y}` : `L ${p.x} ${p.y}`)).join(" ");
+  const xOf = (ts: number) => PAD_L + (chartW * (ts - xMin)) / xRange;
+  const yOf = (v: number) => PAD_TOP + chartH * (1 - (v - yMin) / yRange);
 
-  // 추세선 — 선형 회귀
-  const n = pts.length;
-  const sumX = xs.reduce((a, b) => a + b, 0);
-  const sumY = ys.reduce((a, b) => a + b, 0);
-  const sumXY = xs.reduce((acc, x, i) => acc + x * ys[i], 0);
-  const sumX2 = xs.reduce((acc, x) => acc + x * x, 0);
-  const slope = (n * sumXY - sumX * sumY) / Math.max(n * sumX2 - sumX * sumX, 1);
-  const intercept = (sumY - slope * sumX) / n;
-  const trendY1 = slope * xMin + intercept;
-  const trendY2 = slope * xMax + intercept;
-  const ty1 = PAD_TOP + chartH * (1 - (trendY1 - yMin) / yRange);
-  const ty2 = PAD_TOP + chartH * (1 - (trendY2 - yMin) / yRange);
-
-  const trend = trendY2 - trendY1;
-  const trendPct = trendY1 > 0 ? (trend / trendY1) * 100 : 0;
-  const trendColor =
-    Math.abs(trendPct) < 0.5 ? "text-zinc-400" : trend > 0 ? "text-rose-300" : "text-cyan-300";
-  const trendLabel =
-    Math.abs(trendPct) < 0.5 ? "보합" : `${trend > 0 ? "▲" : "▼"} ${Math.abs(trendPct).toFixed(1)}%`;
+  const trade0 = sortedAsc(trades)[0];
+  const tradeN = sortedAsc(trades)[trades.length - 1];
 
   return (
-    <article className="rounded-xl border border-zinc-800/80 bg-zinc-900 p-6">
-      <header className="flex items-start justify-between gap-3">
-        <div className="flex items-center gap-2.5">
-          <span className="flex h-9 w-9 items-center justify-center rounded-md bg-emerald-500/15 text-emerald-400">
-            <LineChart className="h-4 w-4" aria-hidden />
-          </span>
-          <div>
-            <p className="font-mono text-xs font-semibold uppercase tracking-[0.14em] text-zinc-500">
-              가격 추이
-            </p>
-            <p className="text-sm font-medium text-zinc-100">
-              단지 시간순 거래 · {trades.length}건
-            </p>
-          </div>
+    <ChartCard>
+      {groups.length > 1 ? (
+        <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1">
+          {groups.map((g) => (
+            <Legend key={g.pyeong} color={g.palette.dot} label={`${g.pyeong}평형 · ${g.trades.length}건`} />
+          ))}
         </div>
-        <span
-          className={`inline-flex items-baseline gap-1 rounded-md bg-zinc-800 px-2 py-0.5 font-mono text-xs ${trendColor}`}
-        >
-          {trendLabel}
-        </span>
-      </header>
+      ) : null}
 
-      <div className="mt-5">
+      <div className="mt-3">
         <svg
           viewBox={`0 0 ${W} ${H}`}
           className="block w-full"
           role="img"
           aria-label="단지 시간순 거래가 추이"
         >
-          {/* y축 가로 그리드 — min / mid / max */}
+          {/* y축 가로 그리드 */}
           {[0, 0.5, 1].map((r) => {
             const y = PAD_TOP + chartH * r;
             const v = yMax - yRange * r;
@@ -134,47 +90,62 @@ export function BuildingPriceChart({ trades }: Props) {
             );
           })}
 
-          {/* 추세선 */}
-          <line
-            x1={pts[0].x}
-            y1={ty1}
-            x2={pts[pts.length - 1].x}
-            y2={ty2}
-            stroke="rgb(82, 82, 91)"
-            strokeWidth="1.5"
-            strokeDasharray="4 4"
-          />
+          {/* 평형별 series — 선 + 점 + 점 위 가격 라벨 */}
+          {groups.map((g) => {
+            const orderedTrades = sortedAsc(g.trades);
+            const pts = orderedTrades.map((t) => ({
+              x: xOf(Date.parse(t.dealDate)),
+              y: yOf(t.dealAmount),
+              t,
+            }));
+            const linePath =
+              pts.length >= 2
+                ? pts.map((p, i) => (i === 0 ? `M ${p.x} ${p.y}` : `L ${p.x} ${p.y}`)).join(" ")
+                : null;
+            return (
+              <g key={g.pyeong}>
+                {linePath ? (
+                  <path
+                    d={linePath}
+                    fill="none"
+                    stroke={g.palette.stroke}
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    opacity="0.65"
+                  />
+                ) : null}
+                {pts.map((p, i) => (
+                  <g key={i}>
+                    <circle
+                      cx={p.x}
+                      cy={p.y}
+                      r="3.5"
+                      fill="rgb(20, 20, 23)"
+                      stroke={g.palette.stroke}
+                      strokeWidth="2"
+                    >
+                      <title>
+                        {formatShortDate(p.t.dealDate)} · {formatAmount(p.t.dealAmount)} ·{" "}
+                        {p.t.area.toFixed(1)}㎡ ({g.pyeong}평형)
+                      </title>
+                    </circle>
+                    <text
+                      x={p.x}
+                      y={p.y - 9}
+                      textAnchor="middle"
+                      className={`font-mono ${g.palette.text}`}
+                      fontSize="10"
+                    >
+                      {formatAmount(p.t.dealAmount)}
+                    </text>
+                  </g>
+                ))}
+              </g>
+            );
+          })}
 
-          {/* 거래 점 잇는 얇은 선 */}
-          <path
-            d={linePath}
-            fill="none"
-            stroke="rgb(52, 211, 153)"
-            strokeWidth="1"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            opacity="0.5"
-          />
-
-          {/* 거래 점 */}
-          {pts.map((p, i) => (
-            <circle
-              key={i}
-              cx={p.x}
-              cy={p.y}
-              r="3.5"
-              fill="rgb(20, 20, 23)"
-              stroke="rgb(52, 211, 153)"
-              strokeWidth="2"
-            >
-              <title>
-                {formatShortDate(p.t.dealDate)} · {formatAmount(p.t.dealAmount)}
-                {p.t.area ? ` · ${p.t.area.toFixed(1)}㎡` : ""}
-              </title>
-            </circle>
-          ))}
-
-          {/* x축 양끝 날짜 라벨 */}
+          {/* x축 양끝 날짜 */}
           <text
             x={PAD_L}
             y={H - 12}
@@ -182,7 +153,7 @@ export function BuildingPriceChart({ trades }: Props) {
             className="fill-zinc-500 font-mono"
             fontSize="10"
           >
-            {formatShortDate(ordered[0].dealDate)}
+            {formatShortDate(trade0.dealDate)}
           </text>
           <text
             x={W - PAD_R}
@@ -191,12 +162,79 @@ export function BuildingPriceChart({ trades }: Props) {
             className="fill-zinc-500 font-mono"
             fontSize="10"
           >
-            {formatShortDate(ordered[ordered.length - 1].dealDate)}
+            {formatShortDate(tradeN.dealDate)}
           </text>
         </svg>
       </div>
+    </ChartCard>
+  );
+}
+
+function ChartCard({ children }: { children: React.ReactNode }) {
+  return (
+    <article className="rounded-xl border border-zinc-800/80 bg-zinc-900 p-6">
+      <header className="flex items-center gap-2.5">
+        <span className="flex h-9 w-9 items-center justify-center rounded-md bg-emerald-500/15 text-emerald-400">
+          <LineChart className="h-4 w-4" aria-hidden />
+        </span>
+        <div>
+          <p className="font-mono text-xs font-semibold uppercase tracking-[0.14em] text-zinc-500">
+            가격 추이
+          </p>
+          <p className="text-sm font-medium text-zinc-100">단지 시간순 · 평형별</p>
+        </div>
+      </header>
+      {children}
     </article>
   );
+}
+
+function Legend({ color, label }: { color: string; label: string }) {
+  return (
+    <div className="flex items-center gap-1.5">
+      <span aria-hidden className={`h-2.5 w-2.5 rounded-full ${color}`} />
+      <span className="font-mono text-xs text-zinc-400">{label}</span>
+    </div>
+  );
+}
+
+// 거래량 많은 평형에 더 눈에 띄는 색을 줘서 dominant series가 emerald.
+const PALETTE = [
+  { stroke: "rgb(52, 211, 153)", text: "fill-emerald-200", dot: "bg-emerald-400" },
+  { stroke: "rgb(34, 211, 238)", text: "fill-cyan-200", dot: "bg-cyan-400" },
+  { stroke: "rgb(251, 191, 36)", text: "fill-amber-200", dot: "bg-amber-400" },
+  { stroke: "rgb(244, 114, 182)", text: "fill-pink-200", dot: "bg-pink-400" },
+  { stroke: "rgb(167, 139, 250)", text: "fill-violet-200", dot: "bg-violet-400" },
+] as const;
+
+type Palette = (typeof PALETTE)[number];
+
+type PyeongGroup = {
+  pyeong: number;
+  trades: ApartmentTrade[];
+  palette: Palette;
+};
+
+function buildPyeongGroups(trades: ApartmentTrade[]): PyeongGroup[] {
+  const byPyeong = new Map<number, ApartmentTrade[]>();
+  for (const t of trades) {
+    if (!Number.isFinite(t.area) || t.area <= 0) continue;
+    const p = Math.round(supplyPyeong(t.area));
+    const cur = byPyeong.get(p);
+    if (cur) cur.push(t);
+    else byPyeong.set(p, [t]);
+  }
+  // 거래 많은 평형부터 색상 우선 부여
+  const sorted = [...byPyeong.entries()].sort(([, a], [, b]) => b.length - a.length);
+  return sorted.map(([pyeong, ts], i) => ({
+    pyeong,
+    trades: ts,
+    palette: PALETTE[i % PALETTE.length],
+  }));
+}
+
+function sortedAsc(trades: ApartmentTrade[]): ApartmentTrade[] {
+  return [...trades].sort((a, b) => a.dealDate.localeCompare(b.dealDate));
 }
 
 function formatShortDate(iso: string): string {
