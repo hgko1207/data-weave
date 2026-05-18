@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { pyeongLabel, supplyPyeong, formatAmount } from "@/widgets/apartment/format";
 import type { RentTrade } from "@/widgets/rent/schema";
+import { RentBuildingPriceChart } from "./RentBuildingPriceChart";
 
 type Props = {
   aptName: string;
@@ -71,6 +72,8 @@ export function RentBuildingDetail({
       />
 
       <BuildingStats trades={trades} />
+
+      <RentBuildingPriceChart trades={trades} />
 
       <BuildingAreaGroups trades={trades} />
 
