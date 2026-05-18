@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Building2 } from "lucide-react";
 import { PageFrame } from "@/components/page-frame";
 import { BookmarkButton } from "@/components/bookmark/BookmarkButton";
 import { RentBuildingDetail } from "@/components/widget/rent/RentBuildingDetail";
@@ -42,6 +42,8 @@ export default async function RentBuildingDetailPage({ searchParams }: Props) {
   const region = `${sido} ${sigungu}`;
 
   const backHref = `/w/rent?sido=${encodeURIComponent(sido)}&sigungu=${encodeURIComponent(sigungu)}&lawdCd=${lawdCd}`;
+  // cross-link — 같은 단지의 매매 페이지로 이동
+  const tradeHref = `/w/apartment/building?sido=${encodeURIComponent(sido)}&sigungu=${encodeURIComponent(sigungu)}&lawdCd=${lawdCd}&apt=${encodeURIComponent(aptName)}&dong=${encodeURIComponent(dong)}`;
 
   if (!aptName || !dong) {
     return (
@@ -94,6 +96,13 @@ export default async function RentBuildingDetailPage({ searchParams }: Props) {
       description={`${region} ${dong} · 최근 ${MONTHS}개월 전월세 거래 집계`}
       actions={
         <>
+          <Link
+            href={tradeHref}
+            className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-3 text-xs font-medium text-emerald-200 transition hover:border-emerald-500/50 hover:bg-emerald-500/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
+          >
+            <Building2 className="h-3.5 w-3.5" aria-hidden />
+            매매 보기
+          </Link>
           <BookmarkButton
             label={`단지 전월세 · ${aptName} (${region} ${dong})`}
             widgetId="rent"
