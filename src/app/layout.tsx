@@ -42,7 +42,10 @@ export default function RootLayout({
       lang="ko"
       className={`dark ${inter.variable} ${jetbrainsMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-zinc-950 text-zinc-100">
+      <body
+        className="min-h-full flex flex-col bg-zinc-950 text-zinc-100"
+        suppressHydrationWarning
+      >
         {children}
         <ServiceWorkerRegister />
       </body>
