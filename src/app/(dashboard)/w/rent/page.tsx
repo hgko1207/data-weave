@@ -8,7 +8,12 @@ import {
   type RentTypeFilter,
 } from "@/components/widget/rent/RentFilters";
 import { RentDetail } from "@/components/widget/rent/RentDetail";
-import { fetchRent } from "@/widgets/rent/fetch";
+import { RentTrendChart } from "@/components/widget/rent/RentTrendChart";
+import {
+  fetchRent,
+  fetchRentMonthlyTrend,
+  type RentMonthlyTrendPoint,
+} from "@/widgets/rent/fetch";
 import { currentKstYmExport, formatYm } from "@/widgets/apartment/fetch";
 import { findLawdCode, LAWD_BY_SIDO } from "@/widgets/apartment/lawd-codes";
 import { rentDataSchema, type RentData } from "@/widgets/rent/schema";
@@ -61,14 +66,26 @@ export default async function RentDetailPage({ searchParams }: Props) {
   const sort: RentSort = ALLOWED_SORTS.has(sortRaw) ? sortRaw : "date-desc";
   const q = (params.q ?? "").slice(0, 60);
 
+  const now = new Date();
+  const abort = new AbortController().signal;
+  const serviceKey = process.env.MOLIT_API_KEY || process.env.DATA_GO_KR_KEY || "";
+
   let data: RentData;
+  let trend: RentMonthlyTrendPoint[] = [];
   let errorMessage: string | undefined;
   try {
-    data = await fetchRent({
-      config: { v: 1, sido, sigungu, lawdCd, dealYm },
-      abort: new AbortController().signal,
-      now: new Date(),
-    });
+    const [d, t] = await Promise.all([
+      fetchRent({
+        config: { v: 1, sido, sigungu, lawdCd, dealYm },
+        abort,
+        now,
+      }),
+      serviceKey
+        ? fetchRentMonthlyTrend(serviceKey, lawdCd, 6, now, abort).catch(() => [])
+        : Promise.resolve([] as RentMonthlyTrendPoint[]),
+    ]);
+    data = d;
+    trend = t;
   } catch (err) {
     logger.warn("rent detail page fetch failed", {
       error: err instanceof Error ? err.message : String(err),
@@ -115,6 +132,10 @@ export default async function RentDetailPage({ searchParams }: Props) {
         <div className="rounded-lg border border-amber-500/20 bg-amber-500/[0.06] px-4 py-3 text-xs text-amber-200">
           데이터를 불러오지 못했습니다: <span className="font-mono">{errorMessage}</span>
         </div>
+      ) : null}
+
+      {trend.length > 0 ? (
+        <RentTrendChart points={trend} region={`${sido} ${sigungu}`} />
       ) : null}
 
       <RentDetail

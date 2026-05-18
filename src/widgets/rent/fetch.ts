@@ -307,3 +307,67 @@ function recentYmList(months: number, now: Date): string[] {
   }
   return out;
 }
+
+export type RentMonthlyTrendPoint = {
+  ym: string;
+  label: string;
+  avgJeonse: number | null;
+  jeonseCount: number;
+  avgMonthly: number | null;
+  monthlyCount: number;
+};
+
+/**
+ * 최근 N개월 시·군·구 전월세 평균 보증금 추이.
+ * 전세 / 월세를 분리해서 각각 평균 + 거래 수.
+ */
+export async function fetchRentMonthlyTrend(
+  serviceKey: string,
+  lawdCd: string,
+  months: number,
+  now: Date,
+  abort: AbortSignal,
+): Promise<RentMonthlyTrendPoint[]> {
+  const ymList = recentYmList(months, now);
+  const results = await Promise.all(
+    ymList.map(async (ym) => {
+      try {
+        const rows = await fetchAllRents(serviceKey, lawdCd, ym, abort);
+        const trades = rows
+          .map((r, i) => normalizeTrade(r, i))
+          .filter((t): t is RentTrade => t !== null);
+        const jeonse = trades.filter((t) => t.type === "jeonse");
+        const monthly = trades.filter((t) => t.type === "monthly");
+        return {
+          ym,
+          label: monthLabel(ym),
+          avgJeonse:
+            jeonse.length > 0
+              ? Math.round(jeonse.reduce((a, t) => a + t.deposit, 0) / jeonse.length)
+              : null,
+          jeonseCount: jeonse.length,
+          avgMonthly:
+            monthly.length > 0
+              ? Math.round(monthly.reduce((a, t) => a + t.deposit, 0) / monthly.length)
+              : null,
+          monthlyCount: monthly.length,
+        };
+      } catch {
+        return {
+          ym,
+          label: monthLabel(ym),
+          avgJeonse: null,
+          jeonseCount: 0,
+          avgMonthly: null,
+          monthlyCount: 0,
+        };
+      }
+    }),
+  );
+  return results;
+}
+
+function monthLabel(ym: string): string {
+  if (!ym.match(/^\d{6}$/)) return ym;
+  return `${Number(ym.slice(4, 6))}월`;
+}
