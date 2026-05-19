@@ -21,12 +21,13 @@ export function BuildingPriceChart({ trades }: Props) {
 
   const groups = buildPyeongGroups(trades);
 
-  const W = 600;
-  const H = 220;
-  const PAD_L = 56;
-  const PAD_R = 24;
-  const PAD_TOP = 32;
-  const PAD_BOTTOM = 36;
+  // y축 그리드 라벨 제거 → 좌측 padding 축소. 점 위 가격 라벨이 정보 전달.
+  const W = 800;
+  const H = 280;
+  const PAD_L = 32;
+  const PAD_R = 32;
+  const PAD_TOP = 40;
+  const PAD_BOTTOM = 48;
   const chartW = W - PAD_L - PAD_R;
   const chartH = H - PAD_TOP - PAD_BOTTOM;
 
@@ -68,37 +69,7 @@ export function BuildingPriceChart({ trades }: Props) {
           role="img"
           aria-label="단지 시간순 거래가 추이"
         >
-          {/* y축 가로 그리드 — 실제 데이터값(min/mid/max) 위치에 그려서 라벨이 의미 있게 */}
-          {[
-            { v: dataYMax },
-            { v: (dataYMax + dataYMin) / 2 },
-            { v: dataYMin },
-          ].map((g, idx) => {
-            const y = yOf(g.v);
-            return (
-              <g key={idx}>
-                <line
-                  x1={PAD_L}
-                  y1={y}
-                  x2={W - PAD_R}
-                  y2={y}
-                  stroke="rgb(39, 39, 42)"
-                  strokeDasharray="2 4"
-                />
-                <text
-                  x={PAD_L - 8}
-                  y={y + 4}
-                  textAnchor="end"
-                  className="fill-zinc-500 font-mono"
-                  fontSize="10"
-                >
-                  {formatAmount(Math.round(g.v))}
-                </text>
-              </g>
-            );
-          })}
-
-          {/* 평형별 series — 선 + 점 + 점 위 가격 라벨 */}
+          {/* 평형별 series — 선 + 점. 가격 라벨은 인접 점이 가까우면 생략(thinning). */}
           {groups.map((g) => {
             const orderedTrades = sortedAsc(g.trades);
             const pts = orderedTrades.map((t) => ({
@@ -110,6 +81,24 @@ export function BuildingPriceChart({ trades }: Props) {
               pts.length >= 2
                 ? pts.map((p, i) => (i === 0 ? `M ${p.x} ${p.y}` : `L ${p.x} ${p.y}`)).join(" ")
                 : null;
+            // 라벨 thinning — 마지막으로 그린 라벨의 x와 60 미만이면 생략.
+            // 단, 시리즈의 첫 점, 마지막 점, 최저/최고 점은 우선 표시.
+            const minIdx = pts.reduce(
+              (acc, p, i) => (p.t.dealAmount < pts[acc].t.dealAmount ? i : acc),
+              0,
+            );
+            const maxIdx = pts.reduce(
+              (acc, p, i) => (p.t.dealAmount > pts[acc].t.dealAmount ? i : acc),
+              0,
+            );
+            const mustShow = new Set([0, pts.length - 1, minIdx, maxIdx]);
+            const MIN_GAP = 60;
+            let lastLabelX = -Infinity;
+            const labels = pts.map((p, i) => {
+              const show = mustShow.has(i) || p.x - lastLabelX > MIN_GAP;
+              if (show) lastLabelX = p.x;
+              return show;
+            });
             return (
               <g key={g.pyeong}>
                 {linePath ? (
@@ -138,15 +127,17 @@ export function BuildingPriceChart({ trades }: Props) {
                         {p.t.area.toFixed(1)}㎡ ({g.pyeong}평형)
                       </title>
                     </circle>
-                    <text
-                      x={p.x}
-                      y={p.y - 9}
-                      textAnchor="middle"
-                      className={`font-mono ${g.palette.text}`}
-                      fontSize="10"
-                    >
-                      {formatAmount(p.t.dealAmount)}
-                    </text>
+                    {labels[i] ? (
+                      <text
+                        x={p.x}
+                        y={p.y - 11}
+                        textAnchor="middle"
+                        className={`font-mono ${g.palette.text}`}
+                        fontSize="11"
+                      >
+                        {formatAmount(p.t.dealAmount)}
+                      </text>
+                    ) : null}
                   </g>
                 ))}
               </g>

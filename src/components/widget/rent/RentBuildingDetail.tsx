@@ -133,13 +133,13 @@ function BuildingHeader({
           <ExternalLink className="h-3 w-3 text-emerald-400" aria-hidden />
         </a>
       </div>
-      <dl className="mt-5 grid grid-cols-1 gap-x-8 gap-y-2 text-sm sm:grid-cols-2 lg:grid-cols-3">
-        <MetaRow
+      <dl className="mt-4 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm">
+        <MetaItem
           icon={<CalendarClock className="h-3.5 w-3.5" aria-hidden />}
           label="집계 범위"
           value={`최근 ${monthsScanned}개월`}
         />
-        <MetaRow
+        <MetaItem
           icon={<Building2 className="h-3.5 w-3.5" aria-hidden />}
           label="거래 수"
           value={`${tradeCount}건`}
@@ -149,7 +149,7 @@ function BuildingHeader({
   );
 }
 
-function MetaRow({
+function MetaItem({
   icon,
   label,
   value,
@@ -159,12 +159,12 @@ function MetaRow({
   value: string;
 }) {
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-1.5">
       <span className="text-zinc-500" aria-hidden>
         {icon}
       </span>
       <dt className="text-xs text-zinc-500">{label}</dt>
-      <dd className="ml-auto truncate font-mono text-sm tabular-nums text-zinc-200">{value}</dd>
+      <dd className="font-mono text-sm tabular-nums text-zinc-200">{value}</dd>
     </div>
   );
 }
