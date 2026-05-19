@@ -1,5 +1,5 @@
 import type { LucideIcon } from "lucide-react";
-import { Building2, CloudSun, Key, Pill, ShieldAlert } from "lucide-react";
+import { BookOpen, Building2, CloudSun, Key, Pill, ShieldAlert } from "lucide-react";
 
 export type WidgetMeta = {
   id: string;
@@ -38,5 +38,11 @@ export const WIDGET_META: WidgetMeta[] = [
     title: "전월세 실거래가",
     icon: Key,
     description: "국토교통부 시·군·구별 아파트 전세·월세 실거래가",
+  },
+  {
+    id: "library",
+    title: "공공도서관",
+    icon: BookOpen,
+    description: "전국 공공도서관 위치·운영시간 + 도서 보유 검색",
   },
 ];
