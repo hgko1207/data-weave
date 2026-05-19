@@ -313,27 +313,33 @@ function sortedAsc(trades: ApartmentTrade[]): ApartmentTrade[] {
   return [...trades].sort((a, b) => a.dealDate.localeCompare(b.dealDate));
 }
 
+// Date 객체의 local-timezone 생성자는 서버(UTC)와 클라이언트(KST)에서 다른
+// timestamp를 만들어 hydration mismatch를 일으킴. Date.UTC + getUTC* 사용해
+// timezone-independent하게 통일.
 function startOfMonth(ts: number): number {
   const d = new Date(ts);
-  return new Date(d.getFullYear(), d.getMonth(), 1).getTime();
+  return Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), 1);
 }
 
 function startOfNextMonth(ts: number): number {
   const d = new Date(ts);
-  return new Date(d.getFullYear(), d.getMonth() + 1, 1).getTime();
+  return Date.UTC(d.getUTCFullYear(), d.getUTCMonth() + 1, 1);
 }
 
 function collectMonthTicks(xMin: number, xMax: number): Array<{ ts: number; label: string }> {
   const ticks: Array<{ ts: number; label: string }> = [];
   const start = new Date(xMin);
-  const end = new Date(xMax);
-  let cur = new Date(start.getFullYear(), start.getMonth(), 1);
-  while (cur.getTime() <= end.getTime()) {
-    ticks.push({
-      ts: cur.getTime(),
-      label: `${cur.getMonth() + 1}월`,
-    });
-    cur = new Date(cur.getFullYear(), cur.getMonth() + 1, 1);
+  let y = start.getUTCFullYear();
+  let m = start.getUTCMonth();
+  while (true) {
+    const ts = Date.UTC(y, m, 1);
+    if (ts > xMax) break;
+    ticks.push({ ts, label: `${m + 1}월` });
+    m++;
+    if (m > 11) {
+      m = 0;
+      y++;
+    }
   }
   return ticks;
 }
