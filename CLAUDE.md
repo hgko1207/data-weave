@@ -5,7 +5,8 @@
 ## SSOT 문서
 
 - [docs/PLAN.md](docs/PLAN.md) — 차터·위젯 인터페이스·공통 골격(사이드바·즐겨찾기·라우트 규약)
-- [docs/widgets/](docs/widgets/) — **위젯별 화면 문서** (apartment / rent / weather / pharmacy / food-recall). 페이지 구조, 데이터 소스, 진화 이력, TODO를 위젯 단위로 분리.
+- [docs/widgets/](docs/widgets/) — **위젯별 화면 문서** (apartment / rent / weather / pharmacy / food-recall + 신규 위젯). 페이지 구조, 데이터 소스, 진화 이력, TODO를 위젯 단위로 분리.
+- [docs/plans/](docs/plans/) — **진행 트래킹용 로드맵** (예: `new-widgets.md` 신규 위젯 4종 우선순위 + spec)
 - [docs/DESIGN.md](docs/DESIGN.md) — 컬러/타이포/스페이싱 토큰, 디자인 원칙
 - [docs/TODOS.md](docs/TODOS.md) — Phase 2+ 의식적으로 deferred한 항목
 
