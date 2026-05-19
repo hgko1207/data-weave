@@ -7,11 +7,11 @@ type Props = {
 };
 
 // 같은 단지여도 평형이 다르면 가격이 1.5~2배 차이가 나기 때문에 단일 series로
-// 그리면 들쭉날쭉해 가독성↓. 평형별로 series 분리 → 각 평형의 시간 흐름 가격 변화가 명확.
+// 그리면 들쭉날쭉해 가독성↓. 평형별로 series 분리.
 export function BuildingPriceChart({ trades }: Props) {
   if (trades.length < 2) {
     return (
-      <ChartCard>
+      <ChartCard subLabel="">
         <p className="mt-6 text-sm text-zinc-500">
           거래가 2건 이상이어야 추이를 그릴 수 있어요.
         </p>
@@ -21,23 +21,25 @@ export function BuildingPriceChart({ trades }: Props) {
 
   const groups = buildPyeongGroups(trades);
 
-  // y축 그리드 라벨 제거 → 좌측 padding 축소. 점 위 가격 라벨이 정보 전달.
   const W = 800;
-  const H = 280;
+  const H = 300;
   const PAD_L = 32;
   const PAD_R = 32;
   const PAD_TOP = 40;
-  const PAD_BOTTOM = 48;
+  const PAD_BOTTOM = 62;
   const chartW = W - PAD_L - PAD_R;
   const chartH = H - PAD_TOP - PAD_BOTTOM;
 
-  // 전체 거래 기준 x/y 범위. y는 위·아래 8% 패딩 — 점이 plot edge에 닿아
-  // 점 위 가격 라벨이 grid 라벨과 겹치는 것 방지.
   const allX = trades.map((t) => Date.parse(t.dealDate));
   const allY = trades.map((t) => t.dealAmount);
-  const xMin = Math.min(...allX);
-  const xMax = Math.max(...allX);
+  const dataXMin = Math.min(...allX);
+  const dataXMax = Math.max(...allX);
+  // x range를 거래 첫 월의 1일부터 마지막 월의 다음 달 1일까지로 확장 →
+  // 월 grid를 자연스럽게 그릴 수 있고, 점이 좌우 가장자리에 닿지 않음.
+  const xMin = startOfMonth(dataXMin);
+  const xMax = startOfNextMonth(dataXMax);
   const xRange = Math.max(xMax - xMin, 1);
+
   const dataYMin = Math.min(...allY);
   const dataYMax = Math.max(...allY);
   const dataYRange = Math.max(dataYMax - dataYMin, 1);
@@ -49,15 +51,19 @@ export function BuildingPriceChart({ trades }: Props) {
   const xOf = (ts: number) => PAD_L + (chartW * (ts - xMin)) / xRange;
   const yOf = (v: number) => PAD_TOP + chartH * (1 - (v - yMin) / yRange);
 
-  const trade0 = sortedAsc(trades)[0];
-  const tradeN = sortedAsc(trades)[trades.length - 1];
+  // 월별 vertical tick (각 월의 1일)
+  const monthTicks = collectMonthTicks(xMin, xMax);
 
   return (
-    <ChartCard>
+    <ChartCard subLabel={`최근 거래 ${trades.length}건 · 평형별 가격`}>
       {groups.length > 1 ? (
         <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1">
           {groups.map((g) => (
-            <Legend key={g.pyeong} color={g.palette.dot} label={`${g.pyeong}평형 · ${g.trades.length}건`} />
+            <Legend
+              key={g.pyeong}
+              color={g.palette.dot}
+              label={`${g.pyeong}평형 · ${g.trades.length}건`}
+            />
           ))}
         </div>
       ) : null}
@@ -69,7 +75,33 @@ export function BuildingPriceChart({ trades }: Props) {
           role="img"
           aria-label="단지 시간순 거래가 추이"
         >
-          {/* 평형별 series — 선 + 점. 가격 라벨은 인접 점이 가까우면 생략(thinning). */}
+          {/* 월 단위 vertical grid + 월 라벨 */}
+          {monthTicks.map((tick) => {
+            const x = xOf(tick.ts);
+            return (
+              <g key={tick.ts}>
+                <line
+                  x1={x}
+                  y1={PAD_TOP}
+                  x2={x}
+                  y2={PAD_TOP + chartH}
+                  stroke="rgb(39, 39, 42)"
+                  strokeDasharray="2 4"
+                />
+                <text
+                  x={x}
+                  y={PAD_TOP + chartH + 16}
+                  textAnchor="middle"
+                  className="fill-zinc-500 font-mono"
+                  fontSize="10"
+                >
+                  {tick.label}
+                </text>
+              </g>
+            );
+          })}
+
+          {/* 평형별 series — 선 + 점 + 가격/날짜 라벨 */}
           {groups.map((g) => {
             const orderedTrades = sortedAsc(g.trades);
             const pts = orderedTrades.map((t) => ({
@@ -81,8 +113,8 @@ export function BuildingPriceChart({ trades }: Props) {
               pts.length >= 2
                 ? pts.map((p, i) => (i === 0 ? `M ${p.x} ${p.y}` : `L ${p.x} ${p.y}`)).join(" ")
                 : null;
-            // 라벨 thinning — 마지막으로 그린 라벨의 x와 60 미만이면 생략.
-            // 단, 시리즈의 첫 점, 마지막 점, 최저/최고 점은 우선 표시.
+
+            // 가격 라벨 thinning — 적극적(60 px gap). 첫·마지막·최저·최고 점은 우선.
             const minIdx = pts.reduce(
               (acc, p, i) => (p.t.dealAmount < pts[acc].t.dealAmount ? i : acc),
               0,
@@ -92,13 +124,10 @@ export function BuildingPriceChart({ trades }: Props) {
               0,
             );
             const mustShow = new Set([0, pts.length - 1, minIdx, maxIdx]);
-            const MIN_GAP = 60;
-            let lastLabelX = -Infinity;
-            const labels = pts.map((p, i) => {
-              const show = mustShow.has(i) || p.x - lastLabelX > MIN_GAP;
-              if (show) lastLabelX = p.x;
-              return show;
-            });
+            const priceLabels = thinByX(pts, 60, mustShow);
+            // 날짜 라벨 thinning — 약하게(38 px gap)로 더 많은 날짜 노출.
+            const dateLabels = thinByX(pts, 38, mustShow);
+
             return (
               <g key={g.pyeong}>
                 {linePath ? (
@@ -127,7 +156,7 @@ export function BuildingPriceChart({ trades }: Props) {
                         {p.t.area.toFixed(1)}㎡ ({g.pyeong}평형)
                       </title>
                     </circle>
-                    {labels[i] ? (
+                    {priceLabels[i] ? (
                       <text
                         x={p.x}
                         y={p.y - 11}
@@ -138,38 +167,29 @@ export function BuildingPriceChart({ trades }: Props) {
                         {formatAmount(p.t.dealAmount)}
                       </text>
                     ) : null}
+                    {dateLabels[i] ? (
+                      <text
+                        x={p.x}
+                        y={p.y + 16}
+                        textAnchor="middle"
+                        className="fill-zinc-600 font-mono"
+                        fontSize="9"
+                      >
+                        {formatMonthDay(p.t.dealDate)}
+                      </text>
+                    ) : null}
                   </g>
                 ))}
               </g>
             );
           })}
-
-          {/* x축 양끝 날짜 */}
-          <text
-            x={PAD_L}
-            y={H - 12}
-            textAnchor="start"
-            className="fill-zinc-500 font-mono"
-            fontSize="10"
-          >
-            {formatShortDate(trade0.dealDate)}
-          </text>
-          <text
-            x={W - PAD_R}
-            y={H - 12}
-            textAnchor="end"
-            className="fill-zinc-500 font-mono"
-            fontSize="10"
-          >
-            {formatShortDate(tradeN.dealDate)}
-          </text>
         </svg>
       </div>
     </ChartCard>
   );
 }
 
-function ChartCard({ children }: { children: React.ReactNode }) {
+function ChartCard({ subLabel, children }: { subLabel: string; children: React.ReactNode }) {
   return (
     <article className="rounded-xl border border-zinc-800/80 bg-zinc-900 p-6">
       <header className="flex items-center gap-2.5">
@@ -178,9 +198,11 @@ function ChartCard({ children }: { children: React.ReactNode }) {
         </span>
         <div>
           <p className="font-mono text-xs font-semibold uppercase tracking-[0.14em] text-zinc-500">
-            가격 추이
+            거래 가격 흐름
           </p>
-          <p className="text-sm font-medium text-zinc-100">단지 시간순 · 평형별</p>
+          {subLabel ? (
+            <p className="text-sm font-medium text-zinc-100">{subLabel}</p>
+          ) : null}
         </div>
       </header>
       {children}
@@ -223,7 +245,6 @@ function buildPyeongGroups(trades: ApartmentTrade[]): PyeongGroup[] {
     if (cur) cur.push(t);
     else byPyeong.set(p, [t]);
   }
-  // 거래 많은 평형부터 색상 우선 부여
   const sorted = [...byPyeong.entries()].sort(([, a], [, b]) => b.length - a.length);
   return sorted.map(([pyeong, ts], i) => ({
     pyeong,
@@ -236,8 +257,52 @@ function sortedAsc(trades: ApartmentTrade[]): ApartmentTrade[] {
   return [...trades].sort((a, b) => a.dealDate.localeCompare(b.dealDate));
 }
 
+function thinByX(
+  pts: Array<{ x: number }>,
+  minGap: number,
+  mustShow: Set<number>,
+): boolean[] {
+  let lastX = -Infinity;
+  return pts.map((p, i) => {
+    const show = mustShow.has(i) || p.x - lastX > minGap;
+    if (show) lastX = p.x;
+    return show;
+  });
+}
+
+function startOfMonth(ts: number): number {
+  const d = new Date(ts);
+  return new Date(d.getFullYear(), d.getMonth(), 1).getTime();
+}
+
+function startOfNextMonth(ts: number): number {
+  const d = new Date(ts);
+  return new Date(d.getFullYear(), d.getMonth() + 1, 1).getTime();
+}
+
+function collectMonthTicks(xMin: number, xMax: number): Array<{ ts: number; label: string }> {
+  const ticks: Array<{ ts: number; label: string }> = [];
+  const start = new Date(xMin);
+  const end = new Date(xMax);
+  let cur = new Date(start.getFullYear(), start.getMonth(), 1);
+  while (cur.getTime() <= end.getTime()) {
+    ticks.push({
+      ts: cur.getTime(),
+      label: `${cur.getMonth() + 1}월`,
+    });
+    cur = new Date(cur.getFullYear(), cur.getMonth() + 1, 1);
+  }
+  return ticks;
+}
+
 function formatShortDate(iso: string): string {
   const m = iso.match(/^(\d{4})-(\d{2})-(\d{2})$/);
   if (!m) return iso;
   return `${m[1].slice(2)}.${m[2]}.${m[3]}`;
+}
+
+function formatMonthDay(iso: string): string {
+  const m = iso.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!m) return iso;
+  return `${m[2]}.${m[3]}`;
 }
