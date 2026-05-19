@@ -1,5 +1,13 @@
 import type { LucideIcon } from "lucide-react";
-import { BookOpen, Building2, CloudSun, Key, Pill, ShieldAlert } from "lucide-react";
+import {
+  BookOpen,
+  Building2,
+  CloudSun,
+  Key,
+  MapPinned,
+  Pill,
+  ShieldAlert,
+} from "lucide-react";
 
 export type WidgetMeta = {
   id: string;
@@ -44,5 +52,11 @@ export const WIDGET_META: WidgetMeta[] = [
     title: "공공도서관",
     icon: BookOpen,
     description: "전국 공공도서관 위치·운영시간 + 도서 보유 검색",
+  },
+  {
+    id: "tour",
+    title: "관광·전시",
+    icon: MapPinned,
+    description: "한국관광공사 TourAPI 기반 지역 명소·축제·문화시설",
   },
 ];
