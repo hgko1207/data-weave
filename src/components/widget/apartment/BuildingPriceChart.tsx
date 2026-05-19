@@ -43,7 +43,8 @@ export function BuildingPriceChart({ trades }: Props) {
   const dataYMin = Math.min(...allY);
   const dataYMax = Math.max(...allY);
   const dataYRange = Math.max(dataYMax - dataYMin, 1);
-  const yPad = dataYRange * 0.08;
+  // 위·아래 12% 패딩 — 점이 plot edge에서 더 떨어져 가격/날짜 라벨 공간 확보.
+  const yPad = dataYRange * 0.12;
   const yMin = dataYMin - yPad;
   const yMax = dataYMax + yPad;
   const yRange = yMax - yMin;
@@ -54,8 +55,14 @@ export function BuildingPriceChart({ trades }: Props) {
   // 월별 vertical tick (각 월의 1일)
   const monthTicks = collectMonthTicks(xMin, xMax);
 
+  // 헤더 trend — 거래 가장 많은 평형(=groups[0])의 첫·마지막 가격 변화율
+  const trend = computeTrend(groups[0].trades);
+
   return (
-    <ChartCard subLabel={`최근 거래 ${trades.length}건 · 평형별 가격`}>
+    <ChartCard
+      subLabel={`최근 거래 ${trades.length}건 · 평형별 가격`}
+      trend={trend}
+    >
       {groups.length > 1 ? (
         <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1">
           {groups.map((g) => (
@@ -101,7 +108,11 @@ export function BuildingPriceChart({ trades }: Props) {
             );
           })}
 
-          {/* 평형별 series — 선 + 점 + 가격/날짜 라벨 */}
+          {/* 평형별 series. 정보 위계:
+              - 점 = 데이터 (강조)
+              - 선 = 트렌드 가이드 (약화, opacity 0.4)
+              - 라벨 = 핵심 점에만 (첫·마지막·최저·최고). 나머지는 hover로.
+              핵심만 라벨링해서 시각적 noise↓, 트렌드는 라인이 보여줌. */}
           {groups.map((g) => {
             const orderedTrades = sortedAsc(g.trades);
             const pts = orderedTrades.map((t) => ({
@@ -114,7 +125,7 @@ export function BuildingPriceChart({ trades }: Props) {
                 ? pts.map((p, i) => (i === 0 ? `M ${p.x} ${p.y}` : `L ${p.x} ${p.y}`)).join(" ")
                 : null;
 
-            // 가격 라벨 thinning — 적극적(60 px gap). 첫·마지막·최저·최고 점은 우선.
+            // 라벨 대상 — 핵심 점만. 단, 핵심 점끼리도 너무 가까우면 안 그림.
             const minIdx = pts.reduce(
               (acc, p, i) => (p.t.dealAmount < pts[acc].t.dealAmount ? i : acc),
               0,
@@ -123,10 +134,16 @@ export function BuildingPriceChart({ trades }: Props) {
               (acc, p, i) => (p.t.dealAmount > pts[acc].t.dealAmount ? i : acc),
               0,
             );
-            const mustShow = new Set([0, pts.length - 1, minIdx, maxIdx]);
-            const priceLabels = thinByX(pts, 60, mustShow);
-            // 날짜 라벨 thinning — 약하게(38 px gap)로 더 많은 날짜 노출.
-            const dateLabels = thinByX(pts, 38, mustShow);
+            const keySet = new Set([0, pts.length - 1, minIdx, maxIdx]);
+            const keyIdxs = [...keySet].sort((a, b) => a - b);
+            const showLabel = pts.map(() => false);
+            let lastLabelX = -Infinity;
+            for (const i of keyIdxs) {
+              if (pts[i].x - lastLabelX > 56) {
+                showLabel[i] = true;
+                lastLabelX = pts[i].x;
+              }
+            }
 
             return (
               <g key={g.pyeong}>
@@ -138,48 +155,52 @@ export function BuildingPriceChart({ trades }: Props) {
                     strokeWidth="1.5"
                     strokeLinecap="round"
                     strokeLinejoin="round"
-                    opacity="0.65"
+                    opacity="0.4"
                   />
                 ) : null}
-                {pts.map((p, i) => (
-                  <g key={i}>
-                    <circle
-                      cx={p.x}
-                      cy={p.y}
-                      r="3.5"
-                      fill="rgb(20, 20, 23)"
-                      stroke={g.palette.stroke}
-                      strokeWidth="2"
-                    >
-                      <title>
-                        {formatShortDate(p.t.dealDate)} · {formatAmount(p.t.dealAmount)} ·{" "}
-                        {p.t.area.toFixed(1)}㎡ ({g.pyeong}평형)
-                      </title>
-                    </circle>
-                    {priceLabels[i] ? (
-                      <text
-                        x={p.x}
-                        y={p.y - 11}
-                        textAnchor="middle"
-                        className={`font-mono ${g.palette.text}`}
-                        fontSize="11"
+                {pts.map((p, i) => {
+                  const isKey = showLabel[i];
+                  return (
+                    <g key={i}>
+                      <circle
+                        cx={p.x}
+                        cy={p.y}
+                        r={isKey ? 4 : 3}
+                        fill={isKey ? g.palette.stroke : "rgb(20, 20, 23)"}
+                        stroke={g.palette.stroke}
+                        strokeWidth={isKey ? 2 : 1.5}
+                        opacity={isKey ? 1 : 0.75}
                       >
-                        {formatAmount(p.t.dealAmount)}
-                      </text>
-                    ) : null}
-                    {dateLabels[i] ? (
-                      <text
-                        x={p.x}
-                        y={p.y + 16}
-                        textAnchor="middle"
-                        className="fill-zinc-600 font-mono"
-                        fontSize="9"
-                      >
-                        {formatMonthDay(p.t.dealDate)}
-                      </text>
-                    ) : null}
-                  </g>
-                ))}
+                        <title>
+                          {formatShortDate(p.t.dealDate)} · {formatAmount(p.t.dealAmount)} ·{" "}
+                          {p.t.area.toFixed(1)}㎡ ({g.pyeong}평형)
+                        </title>
+                      </circle>
+                      {isKey ? (
+                        <>
+                          <text
+                            x={p.x}
+                            y={p.y - 12}
+                            textAnchor="middle"
+                            className={`font-mono ${g.palette.text}`}
+                            fontSize="11"
+                          >
+                            {formatAmount(p.t.dealAmount)}
+                          </text>
+                          <text
+                            x={p.x}
+                            y={p.y + 16}
+                            textAnchor="middle"
+                            className="fill-zinc-500 font-mono"
+                            fontSize="9"
+                          >
+                            {formatMonthDay(p.t.dealDate)}
+                          </text>
+                        </>
+                      ) : null}
+                    </g>
+                  );
+                })}
               </g>
             );
           })}
@@ -189,25 +210,60 @@ export function BuildingPriceChart({ trades }: Props) {
   );
 }
 
-function ChartCard({ subLabel, children }: { subLabel: string; children: React.ReactNode }) {
+function ChartCard({
+  subLabel,
+  trend,
+  children,
+}: {
+  subLabel: string;
+  trend?: TrendResult;
+  children: React.ReactNode;
+}) {
   return (
     <article className="rounded-xl border border-zinc-800/80 bg-zinc-900 p-6">
-      <header className="flex items-center gap-2.5">
-        <span className="flex h-9 w-9 items-center justify-center rounded-md bg-emerald-500/15 text-emerald-400">
-          <LineChart className="h-4 w-4" aria-hidden />
-        </span>
-        <div>
-          <p className="font-mono text-xs font-semibold uppercase tracking-[0.14em] text-zinc-500">
-            거래 가격 흐름
-          </p>
-          {subLabel ? (
-            <p className="text-sm font-medium text-zinc-100">{subLabel}</p>
-          ) : null}
+      <header className="flex items-start justify-between gap-3">
+        <div className="flex items-center gap-2.5">
+          <span className="flex h-9 w-9 items-center justify-center rounded-md bg-emerald-500/15 text-emerald-400">
+            <LineChart className="h-4 w-4" aria-hidden />
+          </span>
+          <div>
+            <p className="font-mono text-xs font-semibold uppercase tracking-[0.14em] text-zinc-500">
+              거래 가격 흐름
+            </p>
+            {subLabel ? (
+              <p className="text-sm font-medium text-zinc-100">{subLabel}</p>
+            ) : null}
+          </div>
         </div>
+        {trend ? (
+          <span
+            className={`inline-flex items-baseline gap-1 rounded-md bg-zinc-800 px-2 py-0.5 font-mono text-xs ${trend.color}`}
+          >
+            {trend.label}
+          </span>
+        ) : null}
       </header>
       {children}
     </article>
   );
+}
+
+type TrendResult = { label: string; color: string };
+
+function computeTrend(trades: ApartmentTrade[]): TrendResult | undefined {
+  if (trades.length < 2) return undefined;
+  const ordered = sortedAsc(trades);
+  const first = ordered[0].dealAmount;
+  const last = ordered[ordered.length - 1].dealAmount;
+  if (first <= 0) return undefined;
+  const pct = ((last - first) / first) * 100;
+  if (Math.abs(pct) < 0.5) {
+    return { label: "보합", color: "text-zinc-400" };
+  }
+  return {
+    label: `${pct > 0 ? "▲" : "▼"} ${Math.abs(pct).toFixed(1)}%`,
+    color: pct > 0 ? "text-rose-300" : "text-cyan-300",
+  };
 }
 
 function Legend({ color, label }: { color: string; label: string }) {
@@ -255,19 +311,6 @@ function buildPyeongGroups(trades: ApartmentTrade[]): PyeongGroup[] {
 
 function sortedAsc(trades: ApartmentTrade[]): ApartmentTrade[] {
   return [...trades].sort((a, b) => a.dealDate.localeCompare(b.dealDate));
-}
-
-function thinByX(
-  pts: Array<{ x: number }>,
-  minGap: number,
-  mustShow: Set<number>,
-): boolean[] {
-  let lastX = -Infinity;
-  return pts.map((p, i) => {
-    const show = mustShow.has(i) || p.x - lastX > minGap;
-    if (show) lastX = p.x;
-    return show;
-  });
 }
 
 function startOfMonth(ts: number): number {

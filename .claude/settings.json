@@ -36,7 +36,9 @@
       "Bash(curl -s \"http://localhost:3000/w/apartment?sido=%EB%8C%80%EC%A0%84%EA%B4%91%EC%97%AD%EC%8B%9C&sigungu=%EC%9C%A0%EC%84%B1%EA%B5%AC&lawdCd=30200&dealYm=202605&sort=amount-desc\")",
       "Bash(node debug-sort.mjs)",
       "Bash(curl -s \"http://localhost:3000/w/apartment?sort=amount-desc\")",
-      "Bash(node check-dupes.mjs)"
+      "Bash(node check-dupes.mjs)",
+      "Skill(frontend-design)",
+      "Skill(frontend-design:*)"
     ]
   }
 }
