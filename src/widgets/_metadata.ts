@@ -7,6 +7,7 @@ import {
   MapPinned,
   Pill,
   ShieldAlert,
+  ShoppingCart,
   Ticket,
 } from "lucide-react";
 
@@ -65,5 +66,11 @@ export const WIDGET_META: WidgetMeta[] = [
     title: "로또",
     icon: Ticket,
     description: "동행복권 회차별 당첨번호 + 1등 배출점",
+  },
+  {
+    id: "price",
+    title: "농수산물 시세",
+    icon: ShoppingCart,
+    description: "KAMIS 농산물유통정보 — 카테고리·품목별 시·도 가격 + 추이",
   },
 ];

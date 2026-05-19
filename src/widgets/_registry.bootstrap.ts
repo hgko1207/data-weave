@@ -7,6 +7,7 @@ import { rentWidget } from "./rent";
 import { libraryWidget } from "./library";
 import { tourWidget } from "./tour";
 import { lottoWidget } from "./lotto";
+import { priceWidget } from "./price";
 
 export function bootstrapWidgets(): void {
   if (!getWidget(weatherWidget.id)) registerWidget(weatherWidget);
@@ -17,4 +18,5 @@ export function bootstrapWidgets(): void {
   if (!getWidget(libraryWidget.id)) registerWidget(libraryWidget);
   if (!getWidget(tourWidget.id)) registerWidget(tourWidget);
   if (!getWidget(lottoWidget.id)) registerWidget(lottoWidget);
+  if (!getWidget(priceWidget.id)) registerWidget(priceWidget);
 }
