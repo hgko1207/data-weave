@@ -171,10 +171,9 @@ export function BuildingPriceChart({ trades }: Props) {
                         strokeWidth={isKey ? 2 : 1.5}
                         opacity={isKey ? 1 : 0.75}
                       >
-                        <title>
-                          {formatShortDate(p.t.dealDate)} · {formatAmount(p.t.dealAmount)} ·{" "}
-                          {p.t.area.toFixed(1)}㎡ ({g.pyeong}평형)
-                        </title>
+                        {/* multi-children JSX는 서버/클라이언트 whitespace 처리 차이로
+                            hydration mismatch 위험. 단일 template literal로 안전하게. */}
+                        <title>{`${formatShortDate(p.t.dealDate)} · ${formatAmount(p.t.dealAmount)} · ${p.t.area.toFixed(1)}㎡ (${g.pyeong}평형)`}</title>
                       </circle>
                       {isKey ? (
                         <>
