@@ -7,6 +7,7 @@ import {
   MapPinned,
   Pill,
   ShieldAlert,
+  Ticket,
 } from "lucide-react";
 
 export type WidgetMeta = {
@@ -58,5 +59,11 @@ export const WIDGET_META: WidgetMeta[] = [
     title: "관광·전시",
     icon: MapPinned,
     description: "한국관광공사 TourAPI 기반 지역 명소·축제·문화시설",
+  },
+  {
+    id: "lotto",
+    title: "로또",
+    icon: Ticket,
+    description: "동행복권 회차별 당첨번호 + 1등 배출점",
   },
 ];
