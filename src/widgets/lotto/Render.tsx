@@ -1,5 +1,6 @@
 "use client";
 
+import { LottoBall } from "@/components/widget/lotto/LottoBall";
 import type { LottoData } from "./schema";
 
 export function LottoRender({ data }: { data: LottoData }) {
@@ -27,26 +28,5 @@ export function LottoRender({ data }: { data: LottoData }) {
         </p>
       ) : null}
     </div>
-  );
-}
-
-function LottoBall({ num, size }: { num: number; size: "sm" | "md" }) {
-  const palette =
-    num <= 10
-      ? "bg-yellow-500 text-yellow-950"
-      : num <= 20
-        ? "bg-blue-500 text-white"
-        : num <= 30
-          ? "bg-red-500 text-white"
-          : num <= 40
-            ? "bg-zinc-500 text-white"
-            : "bg-emerald-500 text-emerald-950";
-  const sizeCls = size === "sm" ? "h-7 w-7 text-xs" : "h-10 w-10 text-base";
-  return (
-    <span
-      className={`inline-flex items-center justify-center rounded-full font-mono font-bold tabular-nums ${palette} ${sizeCls}`}
-    >
-      {num}
-    </span>
   );
 }

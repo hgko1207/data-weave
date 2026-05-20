@@ -74,6 +74,118 @@ async function fetchDraw(round: number, abort: AbortSignal): Promise<RawDraw | n
   }
 }
 
+// 회차 데이터는 불변이므로 force-cache로 캐싱 — 통계용 다회차 호출 비용 절감.
+async function fetchDrawCached(round: number, abort: AbortSignal): Promise<RawDraw | null> {
+  const url = `${LOTTO_NUMBER_BASE}?method=getLottoNumber&drwNo=${round}`;
+  const res = await fetch(url, { signal: abort, headers: BROWSER_HEADERS, cache: "force-cache" });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  const text = await res.text();
+  try {
+    return JSON.parse(text) as RawDraw;
+  } catch {
+    return null;
+  }
+}
+
+export type LottoStats = {
+  fromRound: number;
+  toRound: number;
+  count: number; // 실제 집계된 회차 수
+  frequency: number[]; // [0..45], index가 번호. frequency[n] = 출현 횟수
+  hot: number[]; // 최다 출현 6개
+  cold: number[]; // 최소 출현 6개
+  source: "live" | "mock";
+};
+
+/**
+ * 최근 sample 회차의 당첨번호(보너스 제외) 출현 빈도 통계.
+ * 회차 데이터는 불변이라 force-cache로 캐싱 — 첫 호출만 느림.
+ * 동행복권 차단(해외 IP)·실패 시 mock.
+ */
+export async function fetchLottoStats(
+  latest: number,
+  sample: number,
+  now: Date,
+  abort: AbortSignal,
+): Promise<LottoStats> {
+  const fromRound = Math.max(1, latest - sample + 1);
+  const rounds: number[] = [];
+  for (let r = fromRound; r <= latest; r++) rounds.push(r);
+
+  try {
+    const results = await Promise.all(
+      rounds.map(async (r) => {
+        try {
+          const raw = await fetchDrawCached(r, abort);
+          if (!raw || raw.returnValue !== "success") return null;
+          const nums = [
+            raw.drwtNo1,
+            raw.drwtNo2,
+            raw.drwtNo3,
+            raw.drwtNo4,
+            raw.drwtNo5,
+            raw.drwtNo6,
+          ].filter((n): n is number => typeof n === "number");
+          return nums.length === 6 ? nums : null;
+        } catch {
+          return null;
+        }
+      }),
+    );
+    const draws = results.filter((d): d is number[] => d !== null);
+    if (draws.length === 0) {
+      return buildMockStats(latest, sample, now);
+    }
+    return buildStats(draws, fromRound, latest, "live");
+  } catch {
+    return buildMockStats(latest, sample, now);
+  }
+}
+
+function buildStats(
+  draws: number[][],
+  fromRound: number,
+  toRound: number,
+  source: "live" | "mock",
+): LottoStats {
+  const frequency = new Array(46).fill(0);
+  for (const nums of draws) {
+    for (const n of nums) {
+      if (n >= 1 && n <= 45) frequency[n]++;
+    }
+  }
+  const ranked = Array.from({ length: 45 }, (_, i) => i + 1).sort(
+    (a, b) => frequency[b] - frequency[a] || a - b,
+  );
+  return {
+    fromRound,
+    toRound,
+    count: draws.length,
+    frequency,
+    hot: ranked.slice(0, 6).sort((a, b) => a - b),
+    cold: ranked.slice(-6).sort((a, b) => a - b),
+    source,
+  };
+}
+
+function buildMockStats(latest: number, sample: number, now: Date): LottoStats {
+  const fromRound = Math.max(1, latest - sample + 1);
+  // 회차 시드로 결정적 mock draws 생성 (mock.ts와 동일 로직 재현 대신 간단 무작위).
+  const draws: number[][] = [];
+  for (let r = fromRound; r <= latest; r++) {
+    let s = (r * 2654435761) >>> 0;
+    const pool = Array.from({ length: 45 }, (_, i) => i + 1);
+    for (let i = pool.length - 1; i > 0; i--) {
+      s = (s * 1103515245 + 12345) >>> 0;
+      const j = s % (i + 1);
+      [pool[i], pool[j]] = [pool[j], pool[i]];
+    }
+    draws.push(pool.slice(0, 6));
+  }
+  void now;
+  return buildStats(draws, fromRound, latest, "mock");
+}
+
 function normalize(
   raw: RawDraw,
   round: number,

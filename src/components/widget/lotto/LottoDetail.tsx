@@ -9,6 +9,7 @@ import {
   Trophy,
 } from "lucide-react";
 import type { LottoData, TopStore } from "@/widgets/lotto/schema";
+import { LottoBall } from "./LottoBall";
 
 type Props = {
   data: LottoData;
@@ -146,35 +147,15 @@ function DrawCard({
 
       <div className="mt-6 flex flex-wrap items-center gap-2.5">
         {data.numbers.map((n) => (
-          <LottoBall key={n} num={n} />
+          <LottoBall key={n} num={n} size="lg" />
         ))}
         <span className="mx-1 font-mono text-2xl text-zinc-600">+</span>
-        <LottoBall num={data.bonus} />
+        <LottoBall num={data.bonus} size="lg" />
         <span className="ml-1 inline-flex items-center rounded-md bg-zinc-800 px-2 py-0.5 font-mono text-[11px] text-zinc-400">
           보너스
         </span>
       </div>
     </article>
-  );
-}
-
-function LottoBall({ num }: { num: number }) {
-  const palette =
-    num <= 10
-      ? "bg-yellow-500 text-yellow-950"
-      : num <= 20
-        ? "bg-blue-500 text-white"
-        : num <= 30
-          ? "bg-red-500 text-white"
-          : num <= 40
-            ? "bg-zinc-500 text-white"
-            : "bg-emerald-500 text-emerald-950";
-  return (
-    <span
-      className={`inline-flex h-12 w-12 items-center justify-center rounded-full font-mono text-lg font-bold tabular-nums shadow-sm ${palette}`}
-    >
-      {num}
-    </span>
   );
 }
 

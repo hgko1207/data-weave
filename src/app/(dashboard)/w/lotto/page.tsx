@@ -3,11 +3,15 @@ import { ArrowLeft } from "lucide-react";
 import { PageFrame } from "@/components/page-frame";
 import { BookmarkButton } from "@/components/bookmark/BookmarkButton";
 import { LottoDetail } from "@/components/widget/lotto/LottoDetail";
-import { fetchLotto } from "@/widgets/lotto/fetch";
+import { LottoStats } from "@/components/widget/lotto/LottoStats";
+import { LottoTools } from "@/components/widget/lotto/LottoTools";
+import { fetchLotto, fetchLottoStats, type LottoStats as Stats } from "@/widgets/lotto/fetch";
 import { lottoDataSchema, type LottoData } from "@/widgets/lotto/schema";
 import { logger } from "@/lib/logger";
 
 export const dynamic = "force-dynamic";
+
+const STATS_SAMPLE = 30; // 최근 30회 통계
 
 type Props = {
   searchParams: Promise<{
@@ -20,14 +24,15 @@ export default async function LottoPage({ searchParams }: Props) {
   const roundNum = params.round ? Number(params.round) : null;
   const round = Number.isFinite(roundNum) && roundNum && roundNum > 0 ? roundNum : null;
 
+  const now = new Date();
+  const abort = new AbortController().signal;
+
   let data: LottoData;
+  let stats: Stats | null = null;
   let errorMessage: string | undefined;
   try {
-    data = await fetchLotto({
-      config: { v: 1, round },
-      abort: new AbortController().signal,
-      now: new Date(),
-    });
+    data = await fetchLotto({ config: { v: 1, round }, abort, now });
+    stats = await fetchLottoStats(data.latestRound, STATS_SAMPLE, now, abort).catch(() => null);
   } catch (err) {
     logger.warn("lotto page fetch failed", {
       error: err instanceof Error ? err.message : String(err),
@@ -71,6 +76,10 @@ export default async function LottoPage({ searchParams }: Props) {
       ) : null}
 
       <LottoDetail data={data} />
+
+      <LottoTools round={data.round} winNumbers={data.numbers} bonus={data.bonus} />
+
+      {stats ? <LottoStats stats={stats} /> : null}
     </PageFrame>
   );
 }
