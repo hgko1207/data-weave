@@ -1,5 +1,13 @@
 import Link from "next/link";
-import { ChevronLeft, ChevronRight, MapPin, Ticket, Trophy } from "lucide-react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  ExternalLink,
+  MapPin,
+  Store,
+  Ticket,
+  Trophy,
+} from "lucide-react";
 import type { LottoData, TopStore } from "@/widgets/lotto/schema";
 
 type Props = {
@@ -26,14 +34,50 @@ export function LottoDetail({ data }: Props) {
     <div className="space-y-5">
       <DrawCard data={data} prevRound={prevRound} nextRound={nextRound} />
       <PrizeCard data={data} />
-      <TopStoresCard stores={data.topStores} />
+      {data.topStores.length > 0 ? (
+        <TopStoresCard stores={data.topStores} />
+      ) : (
+        <TopStoresExternal round={data.round} />
+      )}
 
       {data.source === "mock" ? (
         <p className="font-mono text-xs uppercase tracking-wider text-zinc-500">
-          mock · API 연동 시 실 데이터로 전환
+          mock · 한국에서 접속 시 동행복권 실 데이터로 전환
         </p>
       ) : null}
     </div>
+  );
+}
+
+function TopStoresExternal({ round }: { round: number }) {
+  const href = `https://dhlottery.co.kr/store.do?method=topStore&pageGubun=L645&drwNo=${round}`;
+  return (
+    <article className="rounded-xl border border-zinc-800/80 bg-zinc-900 p-6">
+      <header className="flex items-center gap-2.5">
+        <span className="flex h-9 w-9 items-center justify-center rounded-md bg-amber-500/15 text-amber-400">
+          <Store className="h-4 w-4" aria-hidden />
+        </span>
+        <div>
+          <p className="font-mono text-xs font-semibold uppercase tracking-[0.14em] text-zinc-500">
+            1등 배출점
+          </p>
+          <p className="text-sm font-medium text-zinc-100">동행복권에서 확인</p>
+        </div>
+      </header>
+      <p className="mt-3 text-sm text-zinc-400">
+        배출점 데이터는 동행복권 공식 페이지에서 제공됩니다.
+      </p>
+      <a
+        href={href}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="mt-4 inline-flex h-9 items-center gap-2 rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 text-xs font-medium text-amber-200 transition hover:border-amber-500/50 hover:bg-amber-500/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/50"
+      >
+        <Store className="h-3.5 w-3.5" aria-hidden />
+        {round}회 1등 배출점 보기
+        <ExternalLink className="h-3 w-3 text-amber-400" aria-hidden />
+      </a>
+    </article>
   );
 }
 
