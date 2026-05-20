@@ -12,14 +12,16 @@
 
 ## 데이터 소스
 
-- API: 한국관광공사 TourAPI 4.0 (`apis.data.go.kr/B551011/...`)
-- data.go.kr 통합 키 또는 `TOUR_API_KEY` 별도
-- 알려진 엔드포인트 (활용신청 + spec 확정 후 연동):
-  - `areaBasedList2` — 지역 기반 관광 정보
-  - `searchKeyword2` — 키워드 검색
-  - `searchFestival2` — 축제 검색
-  - `contentTypeId`: 12(관광지) / 14(문화시설) / 15(축제·공연·행사) / 28(레저) / 38(쇼핑)
-- 현재는 **mock 우선**. 활용신청 후 실 endpoint 연동.
+- API: 한국관광공사 TourAPI 4.0 **KorService2** `areaBasedList2`
+  - `apis.data.go.kr/B551011/KorService2/areaBasedList2?serviceKey&areaCode&contentTypeId&_type=json`
+- `TOUR_API_KEY` (없으면 `DATA_GO_KR_KEY` 폴백)
+- 매핑: [area-codes.ts](../../src/widgets/tour/area-codes.ts)
+  - 시·도명 → areaCode (대전 3 등)
+  - 카테고리 → contentTypeId: nature 12 / culture 14 / festival 15 / leisure 28 / shopping 38 / all 미지정
+- 응답 `response.body.items.item[]` = `{ contentid, contenttypeid, title, addr1, addr2, firstimage, tel, mapx, mapy }`. 결과 없으면 `items=""` (방어 처리)
+- 시·군·구는 sigungucode 매핑이 없어 `addr1` 매칭으로 client 필터
+- 키 없거나 실패 시 mock 폴백
+- ⚠️ 사용자가 활용신청한 서비스가 KorService1이면 엔드포인트 조정 필요 (현재 KorService2 기준)
 
 ## 페이지 구성
 
@@ -37,11 +39,12 @@
 
 | 시점 | 변경 |
 |------|------|
-| v3.4 (2026-05-19) | 위젯 신규. mock 우선 — 활용신청 후 TourAPI 4.0 연동 예정. |
+| v3.4 (2026-05-19) | 위젯 신규. mock 우선. |
+| v3.5 (2026-05-20) | **실 연동** — KorService2 `areaBasedList2`. areaCode/contentTypeId 매핑, 시·군·구 addr 매칭, firstimage 카드. overview/홈페이지/축제 기간은 areaBasedList2에 없어 null (detailCommon/searchFestival 별도). |
 
 ## TODO
 
-- TourAPI 실 연동 (활용신청 후) — `areaBasedList2` 우선
-- 상세 페이지 `/w/tour/[contentId]` — 큰 이미지 + 전체 설명 + 운영시간
-- 키워드 검색 input 추가 (`searchKeyword2`)
-- 좌표 기반 카카오맵 임베드
+- 상세 페이지 `/w/tour/[contentId]` — `detailCommon2`로 큰 이미지 + 전체 설명 + 운영시간 + 홈페이지
+- 축제는 `searchFestival2`로 기간(startDate/endDate) 채우기
+- 키워드 검색 (`searchKeyword2`)
+- 좌표(mapx/mapy) 기반 카카오맵 핀 (현재 q 검색)
