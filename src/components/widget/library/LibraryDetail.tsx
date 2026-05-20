@@ -186,68 +186,62 @@ function LibraryRow({
     lib.latitude != null && lib.longitude != null
       ? `https://map.kakao.com/link/map/${encodeURIComponent(lib.name)},${lib.latitude},${lib.longitude}`
       : `https://map.kakao.com/?q=${encodeURIComponent(`${lib.name} ${lib.address}`)}`;
+  const hours = summarizeHours(lib.openHours);
+  const closed = summarizeClosed(lib.closedDays);
   return (
-    <li
-      className={`grid grid-cols-[40px_1fr_auto] items-start gap-4 px-6 py-4 transition hover:bg-zinc-800/40 md:grid-cols-[40px_1fr_180px_120px]`}
-    >
-      <span className="text-right font-mono text-xs tabular-nums text-zinc-600">
-        {String(index).padStart(2, "0")}
-      </span>
-
-      <div className="min-w-0">
+    <li className="flex flex-col gap-3 px-6 py-4 transition hover:bg-zinc-800/40 md:flex-row md:items-start md:justify-between md:gap-6">
+      <div className="min-w-0 flex-1">
         <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
+          <span className="font-mono text-xs tabular-nums text-zinc-600">
+            {String(index).padStart(2, "0")}
+          </span>
           <h3 className="text-base font-medium text-zinc-100">{lib.name}</h3>
-          {isBookMode ? (
-            lib.holdsBook ? (
-              lib.bookAvailable ? (
-                <span className="inline-flex items-center rounded bg-emerald-500/15 px-1.5 py-0.5 font-mono text-[11px] font-semibold text-emerald-300">
-                  대출 가능
-                </span>
-              ) : (
-                <span className="inline-flex items-center rounded bg-amber-500/15 px-1.5 py-0.5 font-mono text-[11px] font-semibold text-amber-300">
-                  대출 중
-                </span>
-              )
+          {lib.bookCount != null ? (
+            <span className="font-mono text-xs tabular-nums text-zinc-500">
+              장서 {lib.bookCount.toLocaleString()}권
+            </span>
+          ) : null}
+          {isBookMode && lib.holdsBook ? (
+            lib.bookAvailable ? (
+              <span className="inline-flex items-center rounded bg-emerald-500/15 px-1.5 py-0.5 font-mono text-[11px] font-semibold text-emerald-300">
+                대출 가능
+              </span>
             ) : (
-              <span className="inline-flex items-center gap-1 rounded bg-zinc-800 px-1.5 py-0.5 font-mono text-[11px] text-zinc-500">
-                <XCircle className="h-3 w-3" aria-hidden />
-                미소장
+              <span className="inline-flex items-center rounded bg-amber-500/15 px-1.5 py-0.5 font-mono text-[11px] font-semibold text-amber-300">
+                대출 중
               </span>
             )
+          ) : isBookMode ? (
+            <span className="inline-flex items-center gap-1 rounded bg-zinc-800 px-1.5 py-0.5 font-mono text-[11px] text-zinc-500">
+              <XCircle className="h-3 w-3" aria-hidden />
+              미소장
+            </span>
           ) : null}
         </div>
         <p className="mt-0.5 truncate text-xs text-zinc-500">{lib.address}</p>
-        {/* 모바일: 운영시간 + 휴관일 인라인 */}
-        <p className="mt-1 flex flex-wrap items-baseline gap-x-2 gap-y-0.5 text-xs text-zinc-500 md:hidden">
-          {lib.openHours ? (
-            <span className="inline-flex items-center gap-1">
-              <Clock className="h-3 w-3" aria-hidden />
-              {lib.openHours}
+        {/* 운영시간·휴관 요약 한 줄 (전체는 title 툴팁) */}
+        <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs">
+          {hours ? (
+            <span
+              className="inline-flex max-w-full items-center gap-1 text-zinc-400"
+              title={lib.openHours ?? undefined}
+            >
+              <Clock className="h-3 w-3 shrink-0 text-zinc-500" aria-hidden />
+              <span className="truncate">{hours}</span>
             </span>
           ) : null}
-          {lib.closedDays ? <span className="text-rose-300">· 휴관 {lib.closedDays}</span> : null}
-        </p>
+          {closed ? (
+            <span className="text-rose-300" title={lib.closedDays ?? undefined}>
+              휴관 {closed}
+            </span>
+          ) : (
+            <span className="text-emerald-300">연중무휴</span>
+          )}
+        </div>
       </div>
 
-      {/* 데스크탑: 운영시간 / 휴관 */}
-      <div className="hidden flex-col gap-0.5 font-mono text-xs text-zinc-400 md:flex">
-        {lib.openHours ? (
-          <p className="inline-flex items-center gap-1">
-            <Clock className="h-3 w-3 text-zinc-500" aria-hidden />
-            {lib.openHours}
-          </p>
-        ) : null}
-        {lib.closedDays ? (
-          <p className="text-rose-300">휴관 · {lib.closedDays}</p>
-        ) : (
-          <p className="text-emerald-300">연중무휴</p>
-        )}
-        {!isBookMode && lib.bookCount != null ? (
-          <p className="text-zinc-500 tabular-nums">장서 {lib.bookCount.toLocaleString()}권</p>
-        ) : null}
-      </div>
-
-      <div className="col-span-3 mt-1 flex items-center gap-2 md:col-span-1 md:mt-0 md:flex-col md:items-end md:gap-1.5">
+      {/* 액션 — 가로 배치 */}
+      <div className="flex shrink-0 flex-wrap items-center gap-1.5">
         {lib.tel ? (
           <a
             href={`tel:${lib.tel}`}
@@ -281,4 +275,22 @@ function LibraryRow({
       </div>
     </li>
   );
+}
+
+// 정보나루 운영시간은 자료실별로 길게 옴 — 대표 시간 한 토막만 노출 (전체는 title).
+function summarizeHours(hours: string | null): string | null {
+  if (!hours) return null;
+  const cleaned = hours.replace(/\s+/g, " ").trim();
+  if (!cleaned || cleaned === "-") return null;
+  // 첫 구분(쉼표/슬래시) 앞 또는 28자 제한
+  const firstSeg = cleaned.split(/[,/]/)[0].trim();
+  const base = firstSeg.length >= 6 ? firstSeg : cleaned;
+  return base.length > 30 ? `${base.slice(0, 30)}…` : base;
+}
+
+// "매주 월요일 / 국경일, 정부에서..." → "매주 월요일"
+function summarizeClosed(closed: string | null): string | null {
+  if (!closed) return null;
+  const first = closed.split("/")[0].trim();
+  return first || null;
 }

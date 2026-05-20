@@ -1,10 +1,11 @@
 "use client";
 
+import { Fragment } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { LucideIcon } from "lucide-react";
 import { LayoutDashboard, Settings, Activity } from "lucide-react";
-import { WIDGET_META } from "@/widgets/_metadata";
+import { WIDGET_META, GROUP_ORDER, GROUP_LABEL } from "@/widgets/_metadata";
 import { SidebarBookmarks } from "./SidebarBookmarks";
 
 type NavItem = { href: string; icon: LucideIcon; label: string };
@@ -18,11 +19,16 @@ const SECONDARY: NavItem[] = [
 ];
 
 export function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
-  const widgetItems: NavItem[] = WIDGET_META.map((w) => ({
-    href: `/w/${w.id}`,
-    icon: w.icon,
-    label: w.title,
-  }));
+  // 위젯을 그룹별로 묶어 사이드바 섹션 렌더 (생활·안전 / 부동산 / 문화·여가).
+  const groups = GROUP_ORDER.map((group) => ({
+    group,
+    label: GROUP_LABEL[group],
+    items: WIDGET_META.filter((w) => w.group === group).map<NavItem>((w) => ({
+      href: `/w/${w.id}`,
+      icon: w.icon,
+      label: w.title,
+    })),
+  })).filter((g) => g.items.length > 0);
 
   return (
     <div className="flex h-full flex-col">
@@ -49,8 +55,12 @@ export function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
       <nav className="flex flex-1 flex-col overflow-y-auto px-2.5 py-4">
         <NavSection items={PRIMARY} onNavigate={onNavigate} />
         <SidebarBookmarks onNavigate={onNavigate} />
-        <SectionLabel title="공공데이터" />
-        <NavSection items={widgetItems} onNavigate={onNavigate} />
+        {groups.map((g) => (
+          <Fragment key={g.group}>
+            <SectionLabel title={g.label} />
+            <NavSection items={g.items} onNavigate={onNavigate} />
+          </Fragment>
+        ))}
       </nav>
 
       {/*

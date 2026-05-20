@@ -68,43 +68,44 @@ export function LibraryFilters({ current }: { current: LibraryFilterValues }) {
         검색 조건
       </p>
 
-      <form onSubmit={onSubmit} className="mt-4 space-y-3">
-        {/* row 1: 시·도 + 시·군·구 — 2분할 */}
-        <div className="grid gap-3 md:grid-cols-2">
-          <label className="flex flex-col gap-1.5">
-            <span className="text-xs text-zinc-400">시·도</span>
-            <select
-              value={sido}
-              onChange={(e) => onSidoChange(e.target.value)}
-              className="h-10 rounded-lg border border-zinc-800 bg-zinc-950/60 px-3 text-sm text-zinc-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
-            >
-              {SIDOS.map((s) => (
-                <option key={s} value={s} className="bg-zinc-900">
-                  {s}
-                </option>
-              ))}
-            </select>
-          </label>
+      {/* 시·도/시·군·구는 고정폭, 검색 input이 나머지를 차지 — 한 줄로 컴팩트 */}
+      <form
+        onSubmit={onSubmit}
+        className="mt-4 grid gap-3 md:grid-cols-[minmax(0,180px)_minmax(0,180px)_1fr_auto] md:items-end"
+      >
+        <label className="flex flex-col gap-1.5">
+          <span className="text-xs text-zinc-400">시·도</span>
+          <select
+            value={sido}
+            onChange={(e) => onSidoChange(e.target.value)}
+            className="h-10 rounded-lg border border-zinc-800 bg-zinc-950/60 px-3 text-sm text-zinc-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
+          >
+            {SIDOS.map((s) => (
+              <option key={s} value={s} className="bg-zinc-900">
+                {s}
+              </option>
+            ))}
+          </select>
+        </label>
 
-          <label className="flex flex-col gap-1.5">
-            <span className="text-xs text-zinc-400">시·군·구</span>
-            <select
-              value={sigungu}
-              onChange={(e) => setSigungu(e.target.value)}
-              className="h-10 rounded-lg border border-zinc-800 bg-zinc-950/60 px-3 text-sm text-zinc-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
-            >
-              {sigunguOptions.map((sg) => (
-                <option key={sg.code} value={sg.name} className="bg-zinc-900">
-                  {sg.name}
-                </option>
-              ))}
-            </select>
-          </label>
-        </div>
+        <label className="flex flex-col gap-1.5">
+          <span className="text-xs text-zinc-400">시·군·구</span>
+          <select
+            value={sigungu}
+            onChange={(e) => setSigungu(e.target.value)}
+            className="h-10 rounded-lg border border-zinc-800 bg-zinc-950/60 px-3 text-sm text-zinc-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
+          >
+            {sigunguOptions.map((sg) => (
+              <option key={sg.code} value={sg.name} className="bg-zinc-900">
+                {sg.name}
+              </option>
+            ))}
+          </select>
+        </label>
 
-        {/* row 2: 키워드 input + 검색 버튼 */}
-        <div className="flex gap-2">
-          <div className="relative flex-1">
+        <label className="flex flex-col gap-1.5">
+          <span className="text-xs text-zinc-400">검색</span>
+          <div className="relative">
             <Search
               className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-zinc-500"
               aria-hidden
@@ -117,14 +118,15 @@ export function LibraryFilters({ current }: { current: LibraryFilterValues }) {
               className="h-10 w-full rounded-lg border border-zinc-800 bg-zinc-950/60 pl-9 pr-3 text-sm text-zinc-100 placeholder:text-zinc-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
             />
           </div>
-          <button
-            type="submit"
-            className="inline-flex h-10 shrink-0 items-center justify-center gap-1.5 rounded-lg bg-emerald-500 px-4 text-sm font-medium text-zinc-950 transition hover:bg-emerald-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
-          >
-            <Search className="h-4 w-4" aria-hidden />
-            검색
-          </button>
-        </div>
+        </label>
+
+        <button
+          type="submit"
+          className="inline-flex h-10 shrink-0 items-center justify-center gap-1.5 rounded-lg bg-emerald-500 px-4 text-sm font-medium text-zinc-950 transition hover:bg-emerald-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
+        >
+          <Search className="h-4 w-4" aria-hidden />
+          검색
+        </button>
       </form>
 
       {/* mode chips */}
