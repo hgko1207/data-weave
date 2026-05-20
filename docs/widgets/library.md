@@ -24,7 +24,8 @@
   1. `srchBooks?keyword=&pageSize=30` → **도서 목록**. 정보나루는 `loan_count`(대출순) 정렬이라 제목에 검색어 포함된 책을 client에서 우선 재정렬. URL에 `isbn` 없으면 도서 목록 그리드(표지+제목+저자) 표시.
   2. 사용자가 책 선택(URL `isbn=` 추가) → `libSrchByBook?isbn13=&region=` → 소장 도서관 (libSrch와 동일 구조, `holdsBook=true`)
   - 검색어 없으면 안내, 키 없거나 실패 시 mock
-  - 대출 가능 여부는 `bookExist` 미호출 → "소장" chip만 (대출중/가능 구분 X)
+  3. 소장 도서관 상위 25곳에 `bookExist?libCode=&isbn13=` 병렬 호출 → 대출 가능 여부(`loanAvailable` Y/N) → "대출 가능"/"대출 중"/"소장" chip. 응답 형식 안 맞으면 null=소장만.
+  - ⚠️ 정보나루는 실시간이 아니라 각 도서관 동기화 데이터 — 최종 대출 상태는 도서관 통합 홈페이지에서 확인 권장
 - 키 없거나 호출 실패 시 mock 폴백, `source='mock'` 배지
 
 ## 페이지 구성

@@ -183,16 +183,24 @@ function SelectedBookCard({ book, backHref }: { book: MatchedBook; backHref: str
 function StatsRow({ data }: { data: LibraryData }) {
   const isBookMode = data.mode === "book";
 
-  // book mode: 소장 도서관 수 + 조회 지역 (대출 가능 여부는 미조회).
+  // book mode: 소장 도서관 + 지금 대출 가능 + 조회 지역.
   if (isBookMode) {
+    const availableCount = data.libraries.filter((l) => l.bookAvailable === true).length;
     return (
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
         <StatCard
           icon={<LibraryIcon className="h-4 w-4" aria-hidden />}
           label="소장 도서관"
           value={`${data.libraries.length}곳`}
           accent="bg-emerald-500/15 text-emerald-400"
           valueClass="text-emerald-200"
+        />
+        <StatCard
+          icon={<BookOpen className="h-4 w-4" aria-hidden />}
+          label="지금 대출 가능"
+          value={`${availableCount}곳`}
+          accent="bg-cyan-500/15 text-cyan-400"
+          valueClass="text-cyan-200"
         />
         <StatCard
           icon={<Building2 className="h-4 w-4" aria-hidden />}
@@ -330,9 +338,19 @@ function LibraryRow({
             </span>
           ) : null}
           {isBookMode && lib.holdsBook ? (
-            <span className="inline-flex items-center rounded bg-emerald-500/15 px-1.5 py-0.5 font-mono text-[11px] font-semibold text-emerald-300">
-              소장
-            </span>
+            lib.bookAvailable === true ? (
+              <span className="inline-flex items-center rounded bg-emerald-500/15 px-1.5 py-0.5 font-mono text-[11px] font-semibold text-emerald-300">
+                대출 가능
+              </span>
+            ) : lib.bookAvailable === false ? (
+              <span className="inline-flex items-center rounded bg-amber-500/15 px-1.5 py-0.5 font-mono text-[11px] font-semibold text-amber-300">
+                대출 중
+              </span>
+            ) : (
+              <span className="inline-flex items-center rounded bg-zinc-800 px-1.5 py-0.5 font-mono text-[11px] text-zinc-400">
+                소장
+              </span>
+            )
           ) : null}
         </div>
         <p className="mt-0.5 truncate text-xs text-zinc-500">{lib.address}</p>

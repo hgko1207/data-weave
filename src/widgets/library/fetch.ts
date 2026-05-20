@@ -21,6 +21,9 @@ import { logger } from "@/lib/logger";
 const LIB_SRCH_BASE = "https://data4library.kr/api/libSrch";
 const SRCH_BOOKS_BASE = "https://data4library.kr/api/srchBooks";
 const LIB_BY_BOOK_BASE = "https://data4library.kr/api/libSrchByBook";
+const BOOK_EXIST_BASE = "https://data4library.kr/api/bookExist";
+// bookExist는 도서관별 호출이라 부담 — 대출가능 표시는 상위 N곳만.
+const LOAN_CHECK_LIMIT = 25;
 
 type RawLibEntry = { lib?: RawLib };
 type RawLib = {
@@ -203,12 +206,22 @@ async function fetchByBook(
       const matched = libraries.filter((l) => l.address.includes(sigungu));
       if (matched.length > 0) libraries = matched;
     }
+    libraries = libraries.slice(0, 50);
+
+    // 대출 가능 여부 — 상위 N곳만 bookExist 병렬 조회. 실패하면 bookAvailable=null(소장만).
+    const checked = await Promise.all(
+      libraries.slice(0, LOAN_CHECK_LIMIT).map(async (lib) => {
+        const avail = await checkLoan(key, lib.id, isbn, abort).catch(() => null);
+        return { ...lib, bookAvailable: avail };
+      }),
+    );
+    libraries = [...checked, ...libraries.slice(LOAN_CHECK_LIMIT)];
 
     return libraryDataSchema.parse({
       region,
       mode: "book",
       query,
-      libraries: libraries.slice(0, 50),
+      libraries,
       total: libraries.length,
       books: books.slice(0, 20),
       matchedBook: selected,
@@ -269,6 +282,33 @@ async function searchBooks(
 // "종의 기원 =정유정 장편소설 /The origin of species " → "종의 기원"
 function cleanTitle(raw: string): string {
   return raw.split(/[=/]/)[0].replace(/\s+/g, " ").trim() || raw.trim();
+}
+
+// 도서관별 소장+대출가능 조회. response.result.loanAvailable Y/N.
+// bookExist 파라미터는 isbn13 + libCode (libSrchByBook은 isbn였는데 API마다 다름).
+// 응답 형식이 안 맞으면 null 반환 → UI는 '소장'만 표시.
+async function checkLoan(
+  key: string,
+  libCode: string,
+  isbn: string,
+  abort: AbortSignal,
+): Promise<boolean | null> {
+  const params = new URLSearchParams({
+    authKey: key,
+    libCode,
+    isbn13: isbn,
+    format: "json",
+  });
+  const res = await fetch(`${BOOK_EXIST_BASE}?${params.toString()}`, { signal: abort });
+  if (!res.ok) return null;
+  const text = await res.text();
+  const parsed = JSON.parse(text) as {
+    response?: { result?: { hasBook?: string; loanAvailable?: string } };
+  };
+  const loan = parsed.response?.result?.loanAvailable;
+  if (loan === "Y") return true;
+  if (loan === "N") return false;
+  return null;
 }
 
 function normalize(lib: RawLib | undefined): Library | null {
