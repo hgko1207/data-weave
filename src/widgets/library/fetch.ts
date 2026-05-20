@@ -184,8 +184,9 @@ async function fetchByBook(
     }
 
     // 2단계 — 선택된 isbn 소장 도서관.
+    // ⚠️ libSrchByBook 파라미터는 'isbn'(NOT isbn13) + region(필수).
     const selected = books.find((b) => b.isbn === isbn) ?? null;
-    const params = new URLSearchParams({ authKey: key, isbn13: isbn, format: "json" });
+    const params = new URLSearchParams({ authKey: key, isbn, format: "json" });
     if (regionCode) params.set("region", regionCode);
     const res = await fetch(`${LIB_BY_BOOK_BASE}?${params.toString()}`, { signal: abort });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
