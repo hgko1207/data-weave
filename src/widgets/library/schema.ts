@@ -22,6 +22,8 @@ export const librarySchema = z
     openHours: z.string().nullable(), // 평일 09:00~22:00
     closedDays: z.string().nullable(), // 매주 월요일 등
     bookCount: z.number().nullable(), // 장서 수
+    latitude: z.number().nullable(), // 카카오맵 핀용
+    longitude: z.number().nullable(),
     // book mode일 때만 채워짐
     holdsBook: z.boolean().nullable(),
     bookAvailable: z.boolean().nullable(),

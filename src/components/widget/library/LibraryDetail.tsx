@@ -182,7 +182,10 @@ function LibraryRow({
   lib: Library;
   isBookMode: boolean;
 }) {
-  const mapHref = `https://map.kakao.com/?q=${encodeURIComponent(`${lib.name} ${lib.address}`)}`;
+  const mapHref =
+    lib.latitude != null && lib.longitude != null
+      ? `https://map.kakao.com/link/map/${encodeURIComponent(lib.name)},${lib.latitude},${lib.longitude}`
+      : `https://map.kakao.com/?q=${encodeURIComponent(`${lib.name} ${lib.address}`)}`;
   return (
     <li
       className={`grid grid-cols-[40px_1fr_auto] items-start gap-4 px-6 py-4 transition hover:bg-zinc-800/40 md:grid-cols-[40px_1fr_180px_120px]`}

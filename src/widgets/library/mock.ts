@@ -54,6 +54,8 @@ export function buildMockLibrary(
           : "평일 09:00~18:00 · 주말 휴관",
       closedDays: closed,
       bookCount: 8000 + (seed % 50000) + i * 1500,
+      latitude: null,
+      longitude: null,
       holdsBook,
       bookAvailable,
     };

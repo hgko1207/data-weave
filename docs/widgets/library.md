@@ -13,13 +13,15 @@
 
 ## 데이터 소스
 
-- API: **정보나루** (`https://data4library.kr/api/...`)
-- data.go.kr 통합 키 또는 별도 인증키(`LIBRARY_API_KEY`)
-- 알려진 엔드포인트 (활용신청 + spec 확정 후 연동):
-  - `libSrch` — 도서관 검색
-  - `srchBooks` — 도서 검색
-  - `libSrchByBook` — 책 소장 도서관
-- 현재는 **mock 우선** — region 시드 기반 결정적 목 데이터. `LIBRARY_API_KEY` 또는 `DATA_GO_KR_KEY` 활용신청 후 실 endpoint 연동.
+- API: **정보나루** (`https://data4library.kr/api/libSrch`)
+- 인증키 `LIBRARY_API_KEY` (없으면 `DATA_GO_KR_KEY` 폴백)
+- **location mode 실 연동 완료** — `libSrch?authKey=KEY&region=<코드>&format=json`
+  - region(시·도) 코드 매핑: [region-codes.ts](../../src/widgets/library/region-codes.ts) (대전 25 등)
+  - 시·군·구는 응답에 없어 `address` 문자열 매칭으로 client 필터
+  - 응답 `response.libs[].lib` = `{ libCode, libName, address, tel, homepage, operatingTime, closed, BookCount, latitude, longitude }`
+  - 좌표(latitude/longitude)로 카카오맵 핀 정확하게 (`map.kakao.com/link/map/이름,위도,경도`)
+- **book mode(도서명→소장 도서관)는 아직 mock** — `srchBooks`+`libSrchByBook` 2단계 연동 TODO
+- 키 없거나 호출 실패 시 mock 폴백, `source='mock'` 배지
 
 ## 페이지 구성
 
@@ -39,11 +41,11 @@
 
 | 시점 | 변경 |
 |------|------|
-| v3.4 (2026-05-19) | 위젯 신규. mock 우선 — 활용신청 후 정보나루 API 연동 예정. |
+| v3.4 (2026-05-19) | 위젯 신규. mock 우선. |
+| v3.5 (2026-05-20) | **location mode 실 연동** — 정보나루 `libSrch`. region 코드 매핑, 시·군·구·키워드 client 필터, 좌표 기반 카카오맵 핀. book mode는 mock 유지. |
 
 ## TODO
 
-- 정보나루 실 API 연동 (활용신청 후)
-- 도서관 상세 페이지 `/w/library/[id]` — 보유 도서 목록, 좌석 현황
-- 도서 검색 자동완성 (debounce)
+- **book mode 실 연동** — `srchBooks`(도서 검색) → `libSrchByBook`(소장 도서관) 2단계
+- 도서관 상세 페이지 `/w/library/[libCode]` — 보유 도서 목록, 좌석 현황
 - 좌표 기반 인근 도서관 (현재 사용자 위치 활용)
