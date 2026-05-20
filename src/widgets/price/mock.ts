@@ -1,118 +1,52 @@
-import type { PriceData, PriceItem, RegionPrice, TrendPoint } from "./schema";
-import { CATALOG } from "./catalog";
+import type { PriceCategory, PriceCls, PriceData, PriceItem } from "./schema";
 
-const SIDOS = [
-  "서울특별시",
-  "부산광역시",
-  "대전광역시",
-  "대구광역시",
-  "인천광역시",
-  "광주광역시",
-  "경기도",
-  "강원특별자치도",
-];
+// 부류별 대표 품목 (실데이터 형태를 흉내). 실 API 연동 시 응답으로 대체됨.
+const MOCK_ITEMS: Record<PriceCategory, Array<Omit<PriceItem, "id">>> = {
+  vegetable: [
+    { itemName: "배추", kindName: "봄(1포기)", rank: "상품", unit: "1포기", today: 3032, prevDay: 2615, prevWeek: 2715 },
+    { itemName: "양배추", kindName: "양배추(1포기)", rank: "상품", unit: "1포기", today: 2635, prevDay: 2668, prevWeek: 2942 },
+    { itemName: "무", kindName: "월동(1개)", rank: "상품", unit: "1개", today: 2272, prevDay: 2266, prevWeek: 2192 },
+    { itemName: "오이", kindName: "다다기계통(10개)", rank: "상품", unit: "10개", today: 5176, prevDay: 5209, prevWeek: 5936 },
+    { itemName: "양파", kindName: "양파(1kg)", rank: "상품", unit: "1kg", today: 1893, prevDay: 1880, prevWeek: 1853 },
+    { itemName: "대파", kindName: "대파(1kg)", rank: "상품", unit: "1kg", today: 2619, prevDay: 2633, prevWeek: 2573 },
+  ],
+  fruit: [
+    { itemName: "사과", kindName: "후지(10개)", rank: "상품", unit: "10개", today: 28140, prevDay: 27800, prevWeek: 29010 },
+    { itemName: "배", kindName: "신고(10개)", rank: "상품", unit: "10개", today: 41200, prevDay: 41000, prevWeek: 42300 },
+    { itemName: "감귤", kindName: "노지(1kg)", rank: "상품", unit: "1kg", today: 5300, prevDay: 5280, prevWeek: 5510 },
+  ],
+  meat: [
+    { itemName: "쇠고기", kindName: "한우 등심 1등급(100g)", rank: "상품", unit: "100g", today: 9800, prevDay: 9750, prevWeek: 9900 },
+    { itemName: "돼지고기", kindName: "삼겹살(100g)", rank: "상품", unit: "100g", today: 2400, prevDay: 2380, prevWeek: 2450 },
+    { itemName: "닭고기", kindName: "닭(1kg)", rank: "상품", unit: "1kg", today: 6500, prevDay: 6480, prevWeek: 6550 },
+    { itemName: "계란", kindName: "특란(30개)", rank: "상품", unit: "30개", today: 6800, prevDay: 6790, prevWeek: 6900 },
+  ],
+  seafood: [
+    { itemName: "고등어", kindName: "냉동(1마리)", rank: "상품", unit: "1마리", today: 3200, prevDay: 3180, prevWeek: 3300 },
+    { itemName: "오징어", kindName: "냉동(1마리)", rank: "상품", unit: "1마리", today: 4500, prevDay: 4480, prevWeek: 4600 },
+    { itemName: "마른멸치", kindName: "중멸(1kg)", rank: "상품", unit: "1kg", today: 35000, prevDay: 35000, prevWeek: 34800 },
+  ],
+  grain: [
+    { itemName: "쌀", kindName: "일반계(20kg)", rank: "상품", unit: "20kg", today: 58000, prevDay: 57900, prevWeek: 58200 },
+    { itemName: "콩", kindName: "백태(1kg)", rank: "상품", unit: "1kg", today: 9500, prevDay: 9480, prevWeek: 9550 },
+  ],
+};
 
-function itemSeed(item: PriceItem): number {
-  let h = 5381;
-  const s = item.id;
-  for (let i = 0; i < s.length; i++) h = ((h << 5) + h + s.charCodeAt(i)) >>> 0;
-  return h;
-}
-
-// 품목별 base 가격 추정 (mock 시각화용 — 실제와 다를 수 있음)
-function basePriceFor(item: PriceItem): number {
-  const map: Record<string, number> = {
-    "veg-cabbage": 4500,
-    "veg-radish": 2200,
-    "veg-onion": 2800,
-    "veg-garlic": 12000,
-    "veg-pepper": 9500,
-    "veg-spinach": 6000,
-    "veg-lettuce": 1500,
-    "fruit-apple": 28000,
-    "fruit-pear": 32000,
-    "fruit-mandarin": 7800,
-    "fruit-grape": 9500,
-    "fruit-peach": 12000,
-    "fruit-strawberry": 18000,
-    "meat-pork": 2400,
-    "meat-beef": 9800,
-    "meat-chicken": 6500,
-    "meat-egg": 6800,
-    "sea-mackerel": 3200,
-    "sea-squid": 4500,
-    "sea-laver": 9800,
-    "sea-anchovy": 35000,
-    "grain-rice": 58000,
-    "grain-bean": 9500,
-    "grain-flour": 2300,
-  };
-  return map[item.id] ?? 5000;
-}
-
-function currentYmList(now: Date, months: number): Array<{ ym: string; label: string }> {
-  const y = now.getUTCFullYear();
-  const m = now.getUTCMonth();
-  const out: Array<{ ym: string; label: string }> = [];
-  for (let i = months - 1; i >= 0; i--) {
-    const t = new Date(Date.UTC(y, m - i, 1));
-    const yy = t.getUTCFullYear();
-    const mm = t.getUTCMonth() + 1;
-    out.push({
-      ym: `${yy}${String(mm).padStart(2, "0")}`,
-      label: `${mm}월`,
-    });
-  }
-  return out;
-}
-
-export function buildMockPrice(item: PriceItem, now: Date): PriceData {
-  const seed = itemSeed(item);
-  const base = basePriceFor(item);
-
-  // 시·도별 가격 — base 대비 ±15%
-  const regionPrices: RegionPrice[] = SIDOS.map((sido, i) => {
-    const s = seed + i * 31;
-    const variance = ((s % 30) - 15) / 100; // -0.15 ~ +0.15
-    const price = Math.round(base * (1 + variance));
-    const prevMonthV = ((s >> 4) % 20 - 10) / 100;
-    const prevYearV = ((s >> 8) % 40 - 20) / 100;
-    return {
-      sido,
-      price,
-      prevMonth: Math.round(price * (1 - prevMonthV)),
-      prevYear: Math.round(price * (1 - prevYearV)),
-    };
-  });
-
-  // 최근 6개월 전국 평균 추이
-  const ymList = currentYmList(now, 6);
-  const trend: TrendPoint[] = ymList.map(({ ym, label }, i) => {
-    const s = seed + i * 13;
-    const variance = ((s % 24) - 12) / 100;
-    return {
-      ym,
-      label,
-      avg: Math.round(base * (1 + variance)),
-    };
-  });
-
-  // 전국 평균
-  const sum = regionPrices.reduce((a, r) => a + r.price, 0);
-  const nationwideAvg = Math.round(sum / regionPrices.length);
-  const prevMonthSum = regionPrices.reduce((a, r) => a + (r.prevMonth ?? r.price), 0);
-  const prevYearSum = regionPrices.reduce((a, r) => a + (r.prevYear ?? r.price), 0);
-  const nationwidePrevMonth = Math.round(prevMonthSum / regionPrices.length);
-  const nationwidePrevYear = Math.round(prevYearSum / regionPrices.length);
-
+export function buildMockPrice(
+  category: PriceCategory,
+  cls: PriceCls,
+  regday: string,
+): PriceData {
+  const rows = MOCK_ITEMS[category] ?? [];
+  const items: PriceItem[] = rows.map((r, i) => ({
+    id: `mock-${category}-${i}`,
+    ...r,
+  }));
   return {
-    item,
-    nationwideAvg,
-    nationwidePrevMonth,
-    nationwidePrevYear,
-    regionPrices,
-    trend,
-    catalog: CATALOG[item.category],
+    category,
+    cls,
+    regday,
+    items,
     source: "mock",
   };
 }

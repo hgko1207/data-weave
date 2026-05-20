@@ -1,272 +1,117 @@
-import { LineChart, ShoppingCart, TrendingDown, TrendingUp } from "lucide-react";
-import type { PriceData, RegionPrice, TrendPoint } from "@/widgets/price/schema";
+import { ShoppingCart } from "lucide-react";
+import { CATEGORY_LABEL } from "@/widgets/price/catalog";
+import type { PriceData, PriceItem } from "@/widgets/price/schema";
 
 export function PriceDetail({ data }: { data: PriceData }) {
   return (
     <div className="space-y-5">
-      <StatsRow data={data} />
-      <PriceTrendChart points={data.trend} item={data.item.name} unit={data.item.unit} />
-      <RegionPriceGrid prices={data.regionPrices} unit={data.item.unit} />
+      <article className="rounded-xl border border-zinc-800/80 bg-zinc-900">
+        <header className="flex flex-wrap items-baseline justify-between gap-3 border-b border-zinc-800/80 px-6 py-4">
+          <div className="flex flex-wrap items-baseline gap-3">
+            <h2 className="text-base font-semibold text-zinc-100">
+              {CATEGORY_LABEL[data.category]} {data.cls === "wholesale" ? "도매" : "소매"}가
+            </h2>
+            <span className="inline-flex items-center gap-1 rounded-md bg-zinc-800 px-2 py-0.5 font-mono text-[11px] text-zinc-400">
+              {data.regday} 기준
+            </span>
+          </div>
+          <p className="font-mono text-xs uppercase tracking-[0.14em] text-zinc-500">
+            {data.items.length}품목
+          </p>
+        </header>
+
+        {data.items.length === 0 ? (
+          <div className="p-12 text-center">
+            <ShoppingCart className="mx-auto h-7 w-7 text-zinc-500" aria-hidden />
+            <p className="mt-3 text-base font-medium text-zinc-100">가격 정보가 없어요</p>
+            <p className="mt-1 text-xs text-zinc-500">
+              주말·공휴일은 데이터가 없을 수 있어요. 다른 부류를 선택해보세요.
+            </p>
+          </div>
+        ) : (
+          <>
+            {/* 컬럼 헤더 — 데스크탑 */}
+            <div className="hidden grid-cols-[1fr_90px_110px_90px_90px] items-center gap-4 border-b border-zinc-800/80 px-6 py-2.5 text-[11px] font-medium uppercase tracking-wider text-zinc-500 md:grid">
+              <span>품목·품종</span>
+              <span className="text-right">단위</span>
+              <span className="text-right">당일가</span>
+              <span className="text-right">전일比</span>
+              <span className="text-right">1주前比</span>
+            </div>
+            <ul className="divide-y divide-zinc-800/60">
+              {data.items.map((it) => (
+                <PriceRow key={it.id} item={it} />
+              ))}
+            </ul>
+          </>
+        )}
+      </article>
 
       {data.source === "mock" ? (
         <p className="font-mono text-xs uppercase tracking-wider text-zinc-500">
-          mock · API 키 등록 시 실 데이터로 전환
+          mock · 한국에서 접속 시 KAMIS 실 데이터로 전환
         </p>
       ) : null}
     </div>
   );
 }
 
-function StatsRow({ data }: { data: PriceData }) {
-  const yoy = computeChangePct(data.nationwideAvg, data.nationwidePrevYear);
-  const mom = computeChangePct(data.nationwideAvg, data.nationwidePrevMonth);
+function PriceRow({ item }: { item: PriceItem }) {
+  const vsDay = changePct(item.today, item.prevDay);
+  const vsWeek = changePct(item.today, item.prevWeek);
   return (
-    <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
-      <StatCard
-        icon={<ShoppingCart className="h-4 w-4" aria-hidden />}
-        label={`전국 평균 / ${data.item.unit}`}
-        value={`${data.nationwideAvg.toLocaleString()}원`}
-        accent="bg-emerald-500/15 text-emerald-400"
-        valueClass="text-emerald-200"
-      />
-      <StatCard
-        icon={<TrendingUp className="h-4 w-4" aria-hidden />}
-        label="전월 대비"
-        value={mom.label}
-        accent={mom.accent}
-        valueClass={mom.valueClass}
-      />
-      <StatCard
-        icon={<TrendingDown className="h-4 w-4" aria-hidden />}
-        label="전년 동월 대비"
-        value={yoy.label}
-        accent={yoy.accent}
-        valueClass={yoy.valueClass}
-      />
-    </div>
-  );
-}
-
-function computeChangePct(current: number, prev: number | null): {
-  label: string;
-  accent: string;
-  valueClass: string;
-} {
-  if (prev == null || prev <= 0) {
-    return { label: "—", accent: "bg-zinc-800 text-zinc-300", valueClass: "text-zinc-300" };
-  }
-  const pct = ((current - prev) / prev) * 100;
-  if (Math.abs(pct) < 0.5) {
-    return {
-      label: "보합",
-      accent: "bg-zinc-800 text-zinc-300",
-      valueClass: "text-zinc-300",
-    };
-  }
-  return pct > 0
-    ? {
-        label: `▲ ${pct.toFixed(1)}%`,
-        accent: "bg-rose-500/15 text-rose-400",
-        valueClass: "text-rose-200",
-      }
-    : {
-        label: `▼ ${Math.abs(pct).toFixed(1)}%`,
-        accent: "bg-cyan-500/15 text-cyan-400",
-        valueClass: "text-cyan-200",
-      };
-}
-
-function StatCard({
-  icon,
-  label,
-  value,
-  accent,
-  valueClass,
-}: {
-  icon: React.ReactNode;
-  label: string;
-  value: string;
-  accent: string;
-  valueClass?: string;
-}) {
-  return (
-    <article className="rounded-xl border border-zinc-800/80 bg-zinc-900 p-4">
-      <div className="flex items-center gap-2.5">
-        <span
-          aria-hidden
-          className={`flex h-9 w-9 items-center justify-center rounded-md ${accent}`}
-        >
-          {icon}
-        </span>
-        <span className="text-sm font-medium text-zinc-300">{label}</span>
-      </div>
-      <p
-        className={`mt-3 font-mono text-2xl font-semibold tracking-tight ${
-          valueClass ?? "text-zinc-100"
-        }`}
-      >
-        {value}
-      </p>
-    </article>
-  );
-}
-
-function PriceTrendChart({
-  points,
-  item,
-  unit,
-}: {
-  points: TrendPoint[];
-  item: string;
-  unit: string;
-}) {
-  if (points.length < 2) return null;
-
-  const dataMin = Math.min(...points.map((p) => p.avg));
-  const dataMax = Math.max(...points.map((p) => p.avg));
-  const dataRange = Math.max(dataMax - dataMin, 1);
-  const yPad = dataRange * 0.12;
-  const yMin = dataMin - yPad;
-  const yMax = dataMax + yPad;
-  const yRange = yMax - yMin;
-
-  const W = 800;
-  const H = 260;
-  const PAD_X = 52;
-  const PAD_TOP = 44;
-  const PAD_BOTTOM = 48;
-  const chartW = W - PAD_X * 2;
-  const chartH = H - PAD_TOP - PAD_BOTTOM;
-  const stepX = chartW / (points.length - 1);
-
-  const xy = points.map((p, i) => ({
-    x: PAD_X + stepX * i,
-    y: PAD_TOP + chartH * (1 - (p.avg - yMin) / yRange),
-    p,
-  }));
-  const path = xy.map((q, i) => (i === 0 ? `M ${q.x} ${q.y}` : `L ${q.x} ${q.y}`)).join(" ");
-
-  const first = points[0].avg;
-  const last = points[points.length - 1].avg;
-  const trendPct = first > 0 ? ((last - first) / first) * 100 : 0;
-  const trendColor =
-    Math.abs(trendPct) < 0.5 ? "text-zinc-400" : trendPct > 0 ? "text-rose-300" : "text-cyan-300";
-  const trendLabel =
-    Math.abs(trendPct) < 0.5
-      ? "보합"
-      : `${trendPct > 0 ? "▲" : "▼"} ${Math.abs(trendPct).toFixed(1)}%`;
-
-  return (
-    <article className="rounded-xl border border-zinc-800/80 bg-zinc-900 p-6">
-      <header className="flex items-start justify-between gap-3">
-        <div className="flex items-center gap-2.5">
-          <span className="flex h-9 w-9 items-center justify-center rounded-md bg-emerald-500/15 text-emerald-400">
-            <LineChart className="h-4 w-4" aria-hidden />
-          </span>
-          <div>
-            <p className="font-mono text-xs font-semibold uppercase tracking-[0.14em] text-zinc-500">
-              월별 가격 추이
-            </p>
-            <p className="text-sm font-medium text-zinc-100">
-              {item} · 최근 {points.length}개월 · /{unit}
-            </p>
-          </div>
+    <li className="grid grid-cols-[1fr_auto] items-center gap-3 px-6 py-3.5 transition hover:bg-zinc-800/40 md:grid-cols-[1fr_90px_110px_90px_90px] md:gap-4">
+      <div className="min-w-0">
+        <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
+          <h3 className="text-base font-medium text-zinc-100">{item.itemName}</h3>
+          <span className="font-mono text-xs text-zinc-500">{item.kindName}</span>
+          {item.rank !== "상품" ? (
+            <span className="rounded bg-zinc-800 px-1.5 py-0.5 font-mono text-[11px] text-zinc-400">
+              {item.rank}
+            </span>
+          ) : null}
         </div>
-        <span
-          className={`inline-flex items-baseline gap-1 rounded-md bg-zinc-800 px-2 py-0.5 font-mono text-xs ${trendColor}`}
-        >
-          {trendLabel}
-        </span>
-      </header>
-
-      <div className="mt-4">
-        <svg viewBox={`0 0 ${W} ${H}`} className="block w-full" role="img" aria-label="가격 추이">
-          <path
-            d={path}
-            fill="none"
-            stroke="rgb(52, 211, 153)"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-          {xy.map((q, i) => (
-            <g key={i}>
-              <circle
-                cx={q.x}
-                cy={q.y}
-                r="3.5"
-                fill="rgb(20, 20, 23)"
-                stroke="rgb(52, 211, 153)"
-                strokeWidth="2"
-              />
-              <text
-                x={q.x}
-                y={q.y - 10}
-                textAnchor="middle"
-                className="fill-zinc-300 font-mono"
-                fontSize="11"
-              >
-                {q.p.avg.toLocaleString()}
-              </text>
-              <text
-                x={q.x}
-                y={H - 12}
-                textAnchor="middle"
-                className="fill-zinc-500 font-mono"
-                fontSize="11"
-              >
-                {q.p.label}
-              </text>
-            </g>
-          ))}
-        </svg>
+        {/* 모바일: 단위 + 변동 인라인 */}
+        <p className="mt-0.5 flex flex-wrap items-baseline gap-x-2 font-mono text-[11px] tabular-nums text-zinc-500 md:hidden">
+          <span>/{item.unit}</span>
+          {vsDay ? (
+            <>
+              <span className="text-zinc-700">·</span>
+              <span className={vsDay.tone}>전일 {vsDay.label}</span>
+            </>
+          ) : null}
+        </p>
       </div>
-    </article>
+
+      <span className="hidden text-right font-mono text-xs text-zinc-500 md:block">
+        {item.unit}
+      </span>
+
+      <p className="text-right font-mono text-base font-semibold tabular-nums text-zinc-100">
+        {item.today != null ? `${item.today.toLocaleString()}` : "—"}
+        <span className="ml-0.5 text-[11px] font-normal text-zinc-500">
+          {item.today != null ? "원" : ""}
+        </span>
+      </p>
+
+      <p className={`hidden text-right font-mono text-xs tabular-nums md:block ${vsDay?.tone ?? "text-zinc-600"}`}>
+        {vsDay ? vsDay.label : "—"}
+      </p>
+      <p className={`hidden text-right font-mono text-xs tabular-nums md:block ${vsWeek?.tone ?? "text-zinc-600"}`}>
+        {vsWeek ? vsWeek.label : "—"}
+      </p>
+    </li>
   );
 }
 
-function RegionPriceGrid({ prices, unit }: { prices: RegionPrice[]; unit: string }) {
-  if (prices.length === 0) return null;
-  const overallAvg = prices.reduce((a, r) => a + r.price, 0) / prices.length;
-
-  return (
-    <article className="rounded-xl border border-zinc-800/80 bg-zinc-900">
-      <header className="flex flex-wrap items-baseline justify-between gap-3 border-b border-zinc-800/80 px-6 py-4">
-        <h2 className="text-base font-semibold text-zinc-100">시·도별 가격</h2>
-        <p className="font-mono text-xs uppercase tracking-[0.14em] text-zinc-500">
-          {prices.length}개 지역
-        </p>
-      </header>
-      <ul className="grid gap-3 p-4 sm:grid-cols-2 lg:grid-cols-4">
-        {prices.map((r) => {
-          const vsAvgPct = ((r.price - overallAvg) / overallAvg) * 100;
-          const isAbove = vsAvgPct > 0.5;
-          const isBelow = vsAvgPct < -0.5;
-          const tone = isAbove
-            ? "text-rose-300"
-            : isBelow
-              ? "text-cyan-300"
-              : "text-zinc-400";
-          return (
-            <li
-              key={r.sido}
-              className="rounded-lg border border-zinc-800/80 bg-zinc-950/40 p-3"
-            >
-              <p className="truncate text-xs font-medium text-zinc-400">{r.sido}</p>
-              <p className="mt-1 font-mono text-xl font-semibold tabular-nums text-zinc-100">
-                {r.price.toLocaleString()}
-                <span className="ml-1 text-xs text-zinc-500">원</span>
-              </p>
-              <p className={`mt-0.5 font-mono text-[11px] tabular-nums ${tone}`}>
-                전국 평균 대비 {isAbove ? "▲" : isBelow ? "▼" : "·"} {Math.abs(vsAvgPct).toFixed(1)}%
-              </p>
-              <p className="mt-0.5 font-mono text-[10px] text-zinc-600">
-                / {unit}
-              </p>
-            </li>
-          );
-        })}
-      </ul>
-    </article>
-  );
+function changePct(
+  current: number | null,
+  prev: number | null,
+): { label: string; tone: string } | null {
+  if (current == null || prev == null || prev <= 0) return null;
+  const pct = ((current - prev) / prev) * 100;
+  if (Math.abs(pct) < 0.05) return { label: "0.0%", tone: "text-zinc-400" };
+  return pct > 0
+    ? { label: `▲${pct.toFixed(1)}%`, tone: "text-rose-300" }
+    : { label: `▼${Math.abs(pct).toFixed(1)}%`, tone: "text-cyan-300" };
 }

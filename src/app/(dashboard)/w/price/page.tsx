@@ -5,11 +5,13 @@ import { BookmarkButton } from "@/components/bookmark/BookmarkButton";
 import { PriceFilters } from "@/components/widget/price/PriceFilters";
 import { PriceDetail } from "@/components/widget/price/PriceDetail";
 import { fetchPrice } from "@/widgets/price/fetch";
-import { CATALOG, defaultItem } from "@/widgets/price/catalog";
+import { CATEGORY_LABEL } from "@/widgets/price/catalog";
 import {
   PRICE_CATEGORIES,
+  PRICE_CLS,
   priceDataSchema,
   type PriceCategory,
+  type PriceCls,
   type PriceData,
 } from "@/widgets/price/schema";
 import { logger } from "@/lib/logger";
@@ -17,11 +19,12 @@ import { logger } from "@/lib/logger";
 export const dynamic = "force-dynamic";
 
 const ALLOWED_CATS = new Set<PriceCategory>(PRICE_CATEGORIES);
+const ALLOWED_CLS = new Set<PriceCls>(PRICE_CLS);
 
 type Props = {
   searchParams: Promise<{
     category?: string;
-    item?: string;
+    cls?: string;
   }>;
 };
 
@@ -29,13 +32,14 @@ export default async function PricePage({ searchParams }: Props) {
   const params = await searchParams;
   const catRaw = (params.category ?? "vegetable") as PriceCategory;
   const category: PriceCategory = ALLOWED_CATS.has(catRaw) ? catRaw : "vegetable";
-  const itemId = params.item ?? "";
+  const clsRaw = (params.cls ?? "retail") as PriceCls;
+  const cls: PriceCls = ALLOWED_CLS.has(clsRaw) ? clsRaw : "retail";
 
   let data: PriceData;
   let errorMessage: string | undefined;
   try {
     data = await fetchPrice({
-      config: { v: 1, category, item: itemId },
+      config: { v: 1, category, cls },
       abort: new AbortController().signal,
       now: new Date(),
     });
@@ -44,15 +48,11 @@ export default async function PricePage({ searchParams }: Props) {
       error: err instanceof Error ? err.message : String(err),
     });
     errorMessage = err instanceof Error ? err.message : "알 수 없는 오류";
-    const fb = defaultItem(category);
     data = priceDataSchema.parse({
-      item: fb,
-      nationwideAvg: 0,
-      nationwidePrevMonth: null,
-      nationwidePrevYear: null,
-      regionPrices: [],
-      trend: [],
-      catalog: CATALOG[category],
+      category,
+      cls,
+      regday: "",
+      items: [],
       source: "mock",
     });
   }
@@ -61,11 +61,11 @@ export default async function PricePage({ searchParams }: Props) {
     <PageFrame
       eyebrow="widget · price"
       title="농수산물 시세"
-      description="농산물유통정보(KAMIS) 기반 카테고리·품목별 시·도 평균가 + 월별 추이."
+      description="농산물유통정보(KAMIS) 부류별 일일 도소매 가격. 당일가 + 전일·1주일 대비 변동."
       actions={
         <>
           <BookmarkButton
-            label={`시세 · ${data.item.name}`}
+            label={`시세 · ${CATEGORY_LABEL[category]} ${cls === "wholesale" ? "도매" : "소매"}`}
             widgetId="price"
           />
           <Link
@@ -78,10 +78,7 @@ export default async function PricePage({ searchParams }: Props) {
         </>
       }
     >
-      <PriceFilters
-        current={{ category, itemId: data.item.id }}
-        catalog={data.catalog}
-      />
+      <PriceFilters current={{ category, cls }} />
 
       {errorMessage ? (
         <div className="rounded-lg border border-amber-500/20 bg-amber-500/[0.06] px-4 py-3 text-xs text-amber-200">
