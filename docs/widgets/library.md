@@ -20,7 +20,10 @@
   - 시·군·구는 응답에 없어 `address` 문자열 매칭으로 client 필터
   - 응답 `response.libs[].lib` = `{ libCode, libName, address, tel, homepage, operatingTime, closed, BookCount, latitude, longitude }`
   - 좌표(latitude/longitude)로 카카오맵 핀 정확하게 (`map.kakao.com/link/map/이름,위도,경도`)
-- **book mode(도서명→소장 도서관)는 아직 mock** — `srchBooks`+`libSrchByBook` 2단계 연동 TODO
+- **book mode(도서명→소장 도서관) 실 연동** — 2단계:
+  1. `srchBooks?keyword=` → 첫 매칭 도서 + `isbn13` (+ bookname/authors/publisher)
+  2. `libSrchByBook?isbn13=&region=` → 소장 도서관 (libSrch와 동일 구조, `holdsBook=true`)
+  - 검색어 없으면 빈 결과(live), 키 없거나 실패 시 mock
 - 키 없거나 호출 실패 시 mock 폴백, `source='mock'` 배지
 
 ## 페이지 구성
@@ -42,10 +45,11 @@
 | 시점 | 변경 |
 |------|------|
 | v3.4 (2026-05-19) | 위젯 신규. mock 우선. |
-| v3.5 (2026-05-20) | **location mode 실 연동** — 정보나루 `libSrch`. region 코드 매핑, 시·군·구·키워드 client 필터, 좌표 기반 카카오맵 핀. book mode는 mock 유지. |
+| v3.5 (2026-05-20) | **location mode 실 연동** — 정보나루 `libSrch`. region 코드 매핑, 시·군·구·키워드 client 필터, 좌표 기반 카카오맵 핀. |
+| v3.5 (2026-05-20) | **book mode 실 연동** — `srchBooks` → `libSrchByBook` 2단계. 매칭 도서 카드 + 소장 도서관. |
 
 ## TODO
 
-- **book mode 실 연동** — `srchBooks`(도서 검색) → `libSrchByBook`(소장 도서관) 2단계
 - 도서관 상세 페이지 `/w/library/[libCode]` — 보유 도서 목록, 좌석 현황
+- 대출 가능 여부 — `bookExist`(libCode+isbn) 추가 호출 (현재 소장 여부만)
 - 좌표 기반 인근 도서관 (현재 사용자 위치 활용)

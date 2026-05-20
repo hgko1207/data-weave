@@ -4,18 +4,23 @@ import {
   libraryDataSchema,
   type Library,
   type LibraryData,
+  type MatchedBook,
 } from "./schema";
 import { buildMockLibrary } from "./mock";
 import { SIDO_REGION_CODE } from "./region-codes";
 import { logger } from "@/lib/logger";
 
 // 정보나루 (data4library.kr) OpenAPI.
-//   도서관 검색: https://data4library.kr/api/libSrch?authKey=KEY&region=25&format=json
-//   응답: response.libs[].lib = { libCode, libName, address, tel, homepage,
-//          operatingTime, closed, BookCount, latitude, longitude }
+//   도서관 검색: libSrch?authKey&region&format=json
+//     → response.libs[].lib = { libCode, libName, address, tel, homepage,
+//        operatingTime, closed, BookCount, latitude, longitude }
+//   도서 검색: srchBooks?authKey&keyword&format=json
+//     → response.docs[].doc = { bookname, authors, publisher, isbn13, ... }
+//   소장 도서관: libSrchByBook?authKey&isbn13&region&format=json (libSrch와 동일 구조)
 // region(시·도) 코드로 조회 → 시·군·구는 address 매칭으로 client 필터.
-// book mode(도서명→소장 도서관)는 srchBooks/libSrchByBook 2단계라 우선 mock.
 const LIB_SRCH_BASE = "https://data4library.kr/api/libSrch";
+const SRCH_BOOKS_BASE = "https://data4library.kr/api/srchBooks";
+const LIB_BY_BOOK_BASE = "https://data4library.kr/api/libSrchByBook";
 
 type RawLibEntry = { lib?: RawLib };
 type RawLib = {
@@ -35,13 +40,13 @@ export async function fetchLibrary(ctx: WidgetContext): Promise<LibraryData> {
   const cfg = libraryConfigSchema.parse(ctx.config);
   const key = process.env.LIBRARY_API_KEY || process.env.DATA_GO_KR_KEY;
   const region = `${cfg.sido} ${cfg.sigungu}`;
+  const regionCode = SIDO_REGION_CODE[cfg.sido];
 
-  // book mode는 정보나루 도서검색 API(2단계) 연동 전까지 mock.
+  // 도서명 검색 — srchBooks → libSrchByBook 2단계.
   if (cfg.mode === "book") {
-    return libraryDataSchema.parse(buildMockLibrary(cfg.sido, cfg.sigungu, cfg.mode, cfg.q));
+    return fetchByBook(cfg.sido, cfg.sigungu, cfg.q, key, regionCode, region, ctx.abort);
   }
 
-  const regionCode = SIDO_REGION_CODE[cfg.sido];
   if (!key || !regionCode) {
     logger.info("library.fetch fallback to mock", {
       reason: !key ? "no LIBRARY/DATA_GO_KR key" : "no region code",
@@ -110,6 +115,125 @@ export async function fetchLibrary(ctx: WidgetContext): Promise<LibraryData> {
     });
     return libraryDataSchema.parse(buildMockLibrary(cfg.sido, cfg.sigungu, cfg.mode, cfg.q));
   }
+}
+
+type RawBookEntry = { doc?: RawBook };
+type RawBook = {
+  bookname?: string;
+  authors?: string;
+  publisher?: string;
+  isbn13?: string | number;
+  publication_year?: string | number;
+};
+
+// 도서명 검색: srchBooks(keyword) → 첫 매칭 도서 isbn → libSrchByBook(isbn, region).
+async function fetchByBook(
+  sido: string,
+  sigungu: string,
+  q: string,
+  key: string | undefined,
+  regionCode: string | undefined,
+  region: string,
+  abort: AbortSignal,
+): Promise<LibraryData> {
+  const query = q.trim();
+
+  // 키 없으면 mock. 검색어 없으면 빈 결과 안내(live).
+  if (!key) {
+    return libraryDataSchema.parse(buildMockLibrary(sido, sigungu, "book", q));
+  }
+  if (!query) {
+    return libraryDataSchema.parse({
+      region,
+      mode: "book",
+      query: "",
+      libraries: [],
+      total: 0,
+      matchedBook: null,
+      source: "live",
+    });
+  }
+
+  try {
+    // 1단계 — 도서 검색
+    const book = await searchBook(key, query, abort);
+    if (!book || !book.isbn) {
+      return libraryDataSchema.parse({
+        region,
+        mode: "book",
+        query,
+        libraries: [],
+        total: 0,
+        matchedBook: book,
+        source: "live",
+      });
+    }
+
+    // 2단계 — 소장 도서관 검색 (region 있으면 그 시·도로 좁힘)
+    const params = new URLSearchParams({
+      authKey: key,
+      isbn13: book.isbn,
+      format: "json",
+    });
+    if (regionCode) params.set("region", regionCode);
+    const res = await fetch(`${LIB_BY_BOOK_BASE}?${params.toString()}`, { signal: abort });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const text = await res.text();
+    const parsed = JSON.parse(text) as { response?: { libs?: RawLibEntry[] } };
+    const entries = parsed.response?.libs ?? [];
+
+    let libraries = entries
+      .map((e) => normalize(e.lib))
+      .filter((l): l is Library => l !== null)
+      // libSrchByBook 결과 = 소장 도서관
+      .map((l) => ({ ...l, holdsBook: true }));
+
+    if (sigungu) {
+      const matched = libraries.filter((l) => l.address.includes(sigungu));
+      if (matched.length > 0) libraries = matched;
+    }
+
+    return libraryDataSchema.parse({
+      region,
+      mode: "book",
+      query,
+      libraries: libraries.slice(0, 50),
+      total: libraries.length,
+      matchedBook: book,
+      source: "live",
+    });
+  } catch (err) {
+    logger.warn("library.fetchByBook failed, using mock", {
+      query,
+      error: err instanceof Error ? err.message : String(err),
+    });
+    return libraryDataSchema.parse(buildMockLibrary(sido, sigungu, "book", q));
+  }
+}
+
+async function searchBook(
+  key: string,
+  keyword: string,
+  abort: AbortSignal,
+): Promise<MatchedBook | null> {
+  const params = new URLSearchParams({
+    authKey: key,
+    keyword,
+    pageSize: "1",
+    format: "json",
+  });
+  const res = await fetch(`${SRCH_BOOKS_BASE}?${params.toString()}`, { signal: abort });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  const text = await res.text();
+  const parsed = JSON.parse(text) as { response?: { docs?: RawBookEntry[] } };
+  const doc = parsed.response?.docs?.[0]?.doc;
+  if (!doc || !doc.bookname) return null;
+  return {
+    title: doc.bookname.trim(),
+    author: doc.authors?.trim() || null,
+    publisher: doc.publisher?.trim() || null,
+    isbn: doc.isbn13 != null ? String(doc.isbn13).trim() : null,
+  };
 }
 
 function normalize(lib: RawLib | undefined): Library | null {
