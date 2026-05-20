@@ -7,6 +7,7 @@ export const libraryConfigSchema = z.object({
   sigungu: z.string().default("유성구"),
   mode: z.enum(["location", "book"]).default("location"),
   q: z.string().default(""),
+  isbn: z.string().default(""), // book mode: 선택된 도서 ISBN (소장 도서관 조회)
 });
 
 export type LibraryConfig = z.infer<typeof libraryConfigSchema>;
@@ -38,6 +39,8 @@ export const matchedBookSchema = z
     author: z.string().nullable(),
     publisher: z.string().nullable(),
     isbn: z.string().nullable(),
+    imageUrl: z.string().nullable(),
+    year: z.string().nullable(),
   })
   .strict();
 
@@ -50,7 +53,8 @@ export const libraryDataSchema = z
     query: z.string(),
     libraries: z.array(librarySchema).max(50),
     total: z.number(),
-    matchedBook: matchedBookSchema.nullable(),
+    books: z.array(matchedBookSchema).max(20), // book mode: 검색 결과 도서 목록
+    matchedBook: matchedBookSchema.nullable(), // book mode: 선택된 도서(소장 도서관 조회 대상)
     source: z.enum(["live", "mock"]),
   })
   .strict();

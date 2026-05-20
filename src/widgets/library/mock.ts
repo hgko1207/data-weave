@@ -68,8 +68,11 @@ export function buildMockLibrary(
           author: ["김영하", "한강", "정세랑", "박완서"][seed % 4],
           publisher: ["문학동네", "창비", "민음사", "은행나무"][(seed >> 4) % 4],
           isbn: `9788${String(seed % 1_000_000_000).padStart(9, "0")}`,
+          imageUrl: null,
+          year: `${2010 + (seed % 15)}`,
         }
       : null;
+  const books: MatchedBook[] = matchedBook ? [matchedBook] : [];
 
   return {
     region: `${region} ${sigungu}`,
@@ -77,7 +80,8 @@ export function buildMockLibrary(
     query,
     libraries,
     total: count,
-    matchedBook,
+    books,
+    matchedBook: mode === "book" ? matchedBook : null,
     source: "mock",
   };
 }

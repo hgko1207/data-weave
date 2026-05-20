@@ -21,6 +21,7 @@ type Props = {
     sigungu?: string;
     mode?: string;
     q?: string;
+    isbn?: string;
   }>;
 };
 
@@ -37,12 +38,13 @@ export default async function LibraryDetailPage({ searchParams }: Props) {
   const modeRaw = (params.mode ?? "location") as LibraryMode;
   const mode: LibraryMode = ALLOWED_MODES.has(modeRaw) ? modeRaw : "location";
   const q = (params.q ?? "").slice(0, 60);
+  const isbn = (params.isbn ?? "").slice(0, 20);
 
   let data: LibraryData;
   let errorMessage: string | undefined;
   try {
     data = await fetchLibrary({
-      config: { v: 1, sido, sigungu, mode, q },
+      config: { v: 1, sido, sigungu, mode, q, isbn },
       abort: new AbortController().signal,
       now: new Date(),
     });
@@ -57,6 +59,7 @@ export default async function LibraryDetailPage({ searchParams }: Props) {
       query: q,
       libraries: [],
       total: 0,
+      books: [],
       matchedBook: null,
       source: "mock",
     });
@@ -93,7 +96,7 @@ export default async function LibraryDetailPage({ searchParams }: Props) {
         </div>
       ) : null}
 
-      <LibraryDetail data={data} />
+      <LibraryDetail data={data} ctx={{ sido, sigungu, q }} />
     </PageFrame>
   );
 }
