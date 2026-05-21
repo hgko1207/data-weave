@@ -142,7 +142,7 @@ function TourCard({ item }: { item: TourItem }) {
             href={mapHref}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex h-8 items-center gap-1.5 rounded-md border border-emerald-500/30 bg-emerald-500/10 px-2.5 font-mono text-xs text-emerald-200 transition hover:border-emerald-500/50 hover:bg-emerald-500/15"
+            className="inline-flex h-8 items-center gap-1.5 rounded-md border border-emerald-500/30 bg-emerald-500/10 px-2.5 font-mono text-xs text-emerald-200 transition hover:border-emerald-500/50 hover:bg-emerald-500/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
           >
             <MapPin className="h-3 w-3" aria-hidden />
             카카오맵
@@ -151,7 +151,7 @@ function TourCard({ item }: { item: TourItem }) {
           {item.tel ? (
             <a
               href={`tel:${item.tel}`}
-              className="inline-flex h-8 items-center gap-1.5 rounded-md border border-zinc-800 bg-zinc-950/60 px-2.5 font-mono text-xs text-zinc-300 transition hover:border-zinc-700 hover:bg-zinc-800"
+              className="inline-flex h-8 items-center gap-1.5 rounded-md border border-zinc-800 bg-zinc-950/60 px-2.5 font-mono text-xs text-zinc-300 transition hover:border-zinc-700 hover:bg-zinc-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
             >
               <Phone className="h-3 w-3" aria-hidden />
               {item.tel}
@@ -162,7 +162,7 @@ function TourCard({ item }: { item: TourItem }) {
               href={item.homepage}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex h-8 items-center gap-1 rounded-md border border-zinc-800 bg-zinc-950/60 px-2.5 font-mono text-xs text-zinc-300 transition hover:border-zinc-700 hover:bg-zinc-800"
+              className="inline-flex h-8 items-center gap-1 rounded-md border border-zinc-800 bg-zinc-950/60 px-2.5 font-mono text-xs text-zinc-300 transition hover:border-zinc-700 hover:bg-zinc-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
             >
               홈페이지
               <ExternalLink className="h-3 w-3 text-zinc-500" aria-hidden />

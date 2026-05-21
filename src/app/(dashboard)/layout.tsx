@@ -64,7 +64,7 @@ function Breadcrumb({ eyebrow, title }: { eyebrow?: string; title: string }) {
           <span aria-hidden className="hidden text-zinc-700 md:inline">/</span>
         </>
       ) : null}
-      <h2 className="truncate text-base font-semibold text-zinc-100">{title}</h2>
+      <p className="truncate text-base font-semibold text-zinc-100">{title}</p>
     </nav>
   );
 }

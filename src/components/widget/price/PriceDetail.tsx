@@ -94,10 +94,10 @@ function PriceRow({ item }: { item: PriceItem }) {
         </span>
       </p>
 
-      <p className={`hidden text-right font-mono text-xs tabular-nums md:block ${vsDay?.tone ?? "text-zinc-600"}`}>
+      <p className={`hidden text-right font-mono text-xs tabular-nums md:block ${vsDay?.tone ?? "text-zinc-500"}`}>
         {vsDay ? vsDay.label : "—"}
       </p>
-      <p className={`hidden text-right font-mono text-xs tabular-nums md:block ${vsWeek?.tone ?? "text-zinc-600"}`}>
+      <p className={`hidden text-right font-mono text-xs tabular-nums md:block ${vsWeek?.tone ?? "text-zinc-500"}`}>
         {vsWeek ? vsWeek.label : "—"}
       </p>
     </li>

@@ -131,7 +131,7 @@ function BookGrid({ books, query, ctx }: { books: MatchedBook[]; query: string; 
                 <span className="mt-1 line-clamp-1 block text-xs text-zinc-500">
                   {book.author ?? ""}
                 </span>
-                <span className="mt-0.5 block text-[11px] text-zinc-600">
+                <span className="mt-0.5 block text-xs text-zinc-500">
                   {[book.publisher, book.year].filter(Boolean).join(" · ")}
                 </span>
               </span>
@@ -328,7 +328,7 @@ function LibraryRow({
     <li className="flex flex-col gap-3 px-6 py-4 transition hover:bg-zinc-800/40 md:flex-row md:items-start md:justify-between md:gap-6">
       <div className="min-w-0 flex-1">
         <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
-          <span className="font-mono text-xs tabular-nums text-zinc-600">
+          <span className="font-mono text-xs tabular-nums text-zinc-500">
             {String(index).padStart(2, "0")}
           </span>
           <h3 className="text-base font-medium text-zinc-100">{lib.name}</h3>

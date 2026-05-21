@@ -124,7 +124,7 @@ export function ApartmentFilters({ current }: { current: ApartmentFilterValues }
               <Link
                 href={buildHref({ dealYm: previousMonth(current.dealYm) })}
                 aria-label="이전 달"
-                className="inline-flex h-7 w-7 items-center justify-center rounded-md text-zinc-400 transition hover:bg-zinc-800 hover:text-zinc-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
+                className="inline-flex h-8 w-8 items-center justify-center rounded-md text-zinc-400 transition hover:bg-zinc-800 hover:text-zinc-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
               >
                 <ChevronLeft className="h-4 w-4" aria-hidden />
               </Link>
@@ -134,7 +134,7 @@ export function ApartmentFilters({ current }: { current: ApartmentFilterValues }
               <Link
                 href={buildHref({ dealYm: nextMonth(current.dealYm) })}
                 aria-label="다음 달"
-                className="inline-flex h-7 w-7 items-center justify-center rounded-md text-zinc-400 transition hover:bg-zinc-800 hover:text-zinc-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
+                className="inline-flex h-8 w-8 items-center justify-center rounded-md text-zinc-400 transition hover:bg-zinc-800 hover:text-zinc-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
               >
                 <ChevronRight className="h-4 w-4" aria-hidden />
               </Link>

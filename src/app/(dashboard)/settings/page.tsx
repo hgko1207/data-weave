@@ -45,7 +45,7 @@ export default function SettingsPage() {
       }
     >
       <section className="space-y-3">
-        <h2 className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
+        <h2 className="font-mono text-xs uppercase tracking-[0.18em] text-zinc-500">
           대시보드 위젯
         </h2>
         <ul className="overflow-hidden rounded-xl border border-zinc-800/80 bg-zinc-900 divide-y divide-zinc-800/80">

@@ -114,12 +114,12 @@ function DrawCard({
             <Link
               href={`/w/lotto?round=${prevRound}`}
               aria-label="이전 회차"
-              className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-zinc-800 bg-zinc-950/60 text-zinc-300 transition hover:border-zinc-700 hover:bg-zinc-800"
+              className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-zinc-800 bg-zinc-950/60 text-zinc-300 transition hover:border-zinc-700 hover:bg-zinc-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
             >
               <ChevronLeft className="h-4 w-4" aria-hidden />
             </Link>
           ) : (
-            <span className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-zinc-800 bg-zinc-950/60 text-zinc-700">
+            <span className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-zinc-800 bg-zinc-950/60 text-zinc-700">
               <ChevronLeft className="h-4 w-4" aria-hidden />
             </span>
           )}
@@ -127,18 +127,18 @@ function DrawCard({
             <Link
               href={`/w/lotto?round=${nextRound}`}
               aria-label="다음 회차"
-              className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-zinc-800 bg-zinc-950/60 text-zinc-300 transition hover:border-zinc-700 hover:bg-zinc-800"
+              className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-zinc-800 bg-zinc-950/60 text-zinc-300 transition hover:border-zinc-700 hover:bg-zinc-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
             >
               <ChevronRight className="h-4 w-4" aria-hidden />
             </Link>
           ) : (
-            <span className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-zinc-800 bg-zinc-950/60 text-zinc-700">
+            <span className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-zinc-800 bg-zinc-950/60 text-zinc-700">
               <ChevronRight className="h-4 w-4" aria-hidden />
             </span>
           )}
           <Link
             href="/w/lotto"
-            className="ml-1 inline-flex h-8 items-center rounded-md border border-zinc-800 bg-zinc-950/60 px-2.5 font-mono text-xs text-zinc-300 transition hover:border-zinc-700 hover:bg-zinc-800"
+            className="ml-1 inline-flex h-9 items-center rounded-md border border-zinc-800 bg-zinc-950/60 px-2.5 font-mono text-xs text-zinc-300 transition hover:border-zinc-700 hover:bg-zinc-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
           >
             최신 {data.latestRound}회
           </Link>
@@ -225,7 +225,7 @@ function TopStoresCard({ stores }: { stores: TopStore[] }) {
                       href={mapHref}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="ml-auto inline-flex items-center gap-1 font-mono text-[11px] text-emerald-300 hover:text-emerald-200"
+                      className="ml-auto inline-flex items-center gap-1 rounded font-mono text-xs text-emerald-300 hover:text-emerald-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
                     >
                       <MapPin className="h-3 w-3" aria-hidden />
                       지도

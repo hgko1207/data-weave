@@ -177,7 +177,7 @@ function MyNumbers({
                     type="button"
                     onClick={() => remove(s.id)}
                     aria-label="삭제"
-                    className="inline-flex h-7 w-7 items-center justify-center rounded-md text-zinc-500 transition hover:bg-zinc-800 hover:text-rose-300"
+                    className="inline-flex h-7 w-7 items-center justify-center rounded-md text-zinc-500 transition hover:bg-zinc-800 hover:text-rose-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
                   >
                     <Trash2 className="h-3.5 w-3.5" aria-hidden />
                   </button>
