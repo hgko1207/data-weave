@@ -71,6 +71,17 @@
 | 사라짐 | `line-through text-zinc-500` |
 | 수정됨 | `text-amber-400 bg-amber-950/20` |
 
+### 범주형 인코딩 색 (Phase 1.5+)
+
+> 위젯 데이터를 *카테고리*로 분류해 색으로 구분할 때 쓰는 팔레트. emerald/cyan/amber/rose 기본 액센트로 부족할 때(범주가 5개 이상)만 pink/violet/blue/yellow/red까지 확장한다. **새 범주 색이 필요하면 여기에 등록 후 재사용** — 위젯마다 즉흥적으로 새 색조를 만들지 말 것.
+
+| 도메인 | 범주 → 색 | 칩 클래스 패턴 |
+|--------|-----------|----------------|
+| 관광 (tour) | 자연=emerald · 문화=cyan · 축제=amber · 레저=pink · 쇼핑=violet | `bg-{hue}-500/15 text-{hue}-300` |
+| 로또 공 (lotto) | 1~10=yellow · 11~20=blue · 21~30=red · 31~40=zinc · 41~45=emerald | `bg-{hue}-500 text-{hue}-950` 또는 `text-zinc-50` (동행복권 공식 색 — 도메인 예외) |
+
+**원칙:** 범주형 색은 의미(분류)를 전달할 때만. 장식 목적의 색 추가 금지. 텍스트는 순백(`text-white`) 대신 `text-zinc-50`/`text-{hue}-950` 사용.
+
 ---
 
 ## 3. 타이포그래피

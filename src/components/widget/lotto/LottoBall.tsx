@@ -10,11 +10,11 @@ export function LottoBall({
     num <= 10
       ? "bg-yellow-500 text-yellow-950"
       : num <= 20
-        ? "bg-blue-500 text-white"
+        ? "bg-blue-500 text-zinc-50"
         : num <= 30
-          ? "bg-red-500 text-white"
+          ? "bg-red-500 text-zinc-50"
           : num <= 40
-            ? "bg-zinc-500 text-white"
+            ? "bg-zinc-500 text-zinc-50"
             : "bg-emerald-500 text-emerald-950";
   const sizeCls =
     size === "sm"

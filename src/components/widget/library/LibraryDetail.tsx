@@ -119,7 +119,7 @@ function BookGrid({ books, query, ctx }: { books: MatchedBook[]; query: string; 
               <span className="flex h-20 w-14 shrink-0 items-center justify-center overflow-hidden rounded bg-zinc-900">
                 {book.imageUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={book.imageUrl} alt="" className="h-full w-full object-cover" loading="lazy" />
+                  <img src={book.imageUrl} alt="" width={56} height={80} className="h-full w-full object-cover" loading="lazy" />
                 ) : (
                   <ImageIcon className="h-5 w-5 text-zinc-700" aria-hidden />
                 )}
@@ -151,7 +151,7 @@ function SelectedBookCard({ book, backHref }: { book: MatchedBook; backHref: str
         <span className="flex h-24 w-16 shrink-0 items-center justify-center overflow-hidden rounded bg-zinc-900">
           {book.imageUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={book.imageUrl} alt="" className="h-full w-full object-cover" loading="lazy" />
+            <img src={book.imageUrl} alt="" width={64} height={96} className="h-full w-full object-cover" loading="lazy" />
           ) : (
             <BookOpen className="h-6 w-6 text-emerald-400/60" aria-hidden />
           )}
