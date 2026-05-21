@@ -24,7 +24,7 @@ export function WeatherConfigForm({
           onChange={(e) =>
             onChange({ ...cfg, nickname: e.target.value || undefined })
           }
-          className="rounded-lg border border-white/5 bg-white/5 px-3 py-1.5 text-zinc-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
+          className="rounded-lg border border-zinc-800 bg-zinc-950/60 px-3 py-1.5 text-zinc-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
           placeholder="예: 출근길"
         />
       </label>
@@ -37,7 +37,7 @@ export function WeatherConfigForm({
             const r = REGIONS.find((it) => it.regionName === e.target.value);
             if (r) onChange({ ...cfg, ...r });
           }}
-          className="rounded-lg border border-white/5 bg-white/5 px-3 py-1.5 text-zinc-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
+          className="rounded-lg border border-zinc-800 bg-zinc-950/60 px-3 py-1.5 text-zinc-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
         >
           {REGIONS.map((r) => (
             <option key={r.regionName} value={r.regionName} className="bg-zinc-900">

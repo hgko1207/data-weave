@@ -33,7 +33,7 @@ export default function AppLayout({
             >
               <Search className="h-3.5 w-3.5" aria-hidden />
               <span className="flex-1 text-left">검색…</span>
-              <kbd className="hidden items-center gap-0.5 rounded border border-zinc-800 bg-zinc-950 px-1.5 py-0.5 font-mono text-[10px] text-zinc-400 sm:inline-flex">
+              <kbd className="hidden items-center gap-0.5 rounded border border-zinc-800 bg-zinc-950 px-1.5 py-0.5 font-mono text-xs text-zinc-400 sm:inline-flex">
                 ⌘K
               </kbd>
             </button>

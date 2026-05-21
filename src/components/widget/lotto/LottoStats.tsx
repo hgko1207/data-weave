@@ -72,7 +72,7 @@ export function LottoStats({ stats }: { stats: Stats }) {
                     style={{ height: `${Math.max(heightPct, 4)}%` }}
                   />
                 </div>
-                <span className="font-mono text-[9px] tabular-nums text-zinc-600">{n}</span>
+                <span className="font-mono text-xs tabular-nums text-zinc-500">{n}</span>
               </div>
             );
           })}

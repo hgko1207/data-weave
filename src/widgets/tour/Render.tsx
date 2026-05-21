@@ -23,7 +23,7 @@ export function TourRender({ data }: { data: TourData }) {
       </ul>
 
       {data.source === "mock" ? (
-        <p className="font-mono text-[10px] uppercase tracking-widest text-zinc-600">
+        <p className="font-mono text-xs uppercase tracking-widest text-zinc-500">
           mock · API 키 등록 시 실 데이터로 전환
         </p>
       ) : null}

@@ -146,7 +146,7 @@ function RecallRow({
           <div className="flex flex-wrap items-baseline gap-2">
             {grade ? (
               <span
-                className={`font-mono text-[11px] font-semibold uppercase tracking-wider ${gradeColor(
+                className={`font-mono text-xs font-semibold uppercase tracking-wider ${gradeColor(
                   grade,
                 )}`}
               >
@@ -158,7 +158,7 @@ function RecallRow({
           <p className="mt-1 flex items-center gap-1.5 text-sm text-zinc-400">
             <Building2 className="h-3.5 w-3.5 text-zinc-500" aria-hidden />
             <span className="truncate">{item.company || "회사 정보 없음"}</span>
-            <span aria-hidden className="text-zinc-700">·</span>
+            <span aria-hidden className="text-zinc-600">·</span>
             <span className="font-mono text-xs text-zinc-500">
               {formatDate(item.recallDate)}
             </span>

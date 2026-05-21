@@ -339,15 +339,15 @@ function LibraryRow({
           ) : null}
           {isBookMode && lib.holdsBook ? (
             lib.bookAvailable === true ? (
-              <span className="inline-flex items-center rounded bg-emerald-500/15 px-1.5 py-0.5 font-mono text-[11px] font-semibold text-emerald-300">
+              <span className="inline-flex items-center rounded bg-emerald-500/15 px-1.5 py-0.5 font-mono text-xs font-semibold text-emerald-300">
                 대출 가능
               </span>
             ) : lib.bookAvailable === false ? (
-              <span className="inline-flex items-center rounded bg-amber-500/15 px-1.5 py-0.5 font-mono text-[11px] font-semibold text-amber-300">
+              <span className="inline-flex items-center rounded bg-amber-500/15 px-1.5 py-0.5 font-mono text-xs font-semibold text-amber-300">
                 대출 중
               </span>
             ) : (
-              <span className="inline-flex items-center rounded bg-zinc-800 px-1.5 py-0.5 font-mono text-[11px] text-zinc-400">
+              <span className="inline-flex items-center rounded bg-zinc-800 px-1.5 py-0.5 font-mono text-xs text-zinc-400">
                 소장
               </span>
             )

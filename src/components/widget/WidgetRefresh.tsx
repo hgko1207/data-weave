@@ -34,7 +34,7 @@ export function WidgetRefresh({ onRefresh, spinning }: Props) {
       onClick={handle}
       disabled={isSpinning}
       aria-label="새로고침"
-      className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-zinc-500 transition hover:bg-white/5 hover:text-zinc-300 active:scale-95 disabled:cursor-not-allowed disabled:text-zinc-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
+      className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-zinc-500 transition hover:bg-zinc-800 hover:text-zinc-300 active:scale-95 disabled:cursor-not-allowed disabled:text-zinc-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
     >
       <RefreshCw
         className={`h-4 w-4 ${isSpinning ? "animate-spin text-emerald-400" : ""}`}

@@ -262,7 +262,7 @@ function StatCard({
       >
         {value}
       </p>
-      {sub ? <p className="mt-1 font-mono text-[11px] text-zinc-600">{sub}</p> : null}
+      {sub ? <p className="mt-1 font-mono text-xs text-zinc-500">{sub}</p> : null}
     </article>
   );
 }
@@ -310,7 +310,7 @@ function BuildingAreaGroups({ trades }: { trades: ApartmentTrade[] }) {
                 <p className="font-mono text-base font-semibold tabular-nums text-emerald-200">
                   {formatAmount(avg)}
                 </p>
-                <p className="mt-0.5 font-mono text-[11px] tabular-nums text-zinc-500">
+                <p className="mt-0.5 font-mono text-xs tabular-nums text-zinc-500">
                   {formatAmount(min)} ~ {formatAmount(max)}
                 </p>
               </div>
@@ -333,7 +333,7 @@ function BuildingTradeList({ trades }: { trades: ApartmentTrade[] }) {
       </header>
 
       {/* 컬럼 헤더 — 데스크탑만 */}
-      <div className="hidden grid-cols-[40px_1fr_140px_120px] items-center gap-4 border-b border-zinc-800/80 px-6 py-2.5 text-[11px] font-medium uppercase tracking-wider text-zinc-500 md:grid">
+      <div className="hidden grid-cols-[40px_1fr_140px_120px] items-center gap-4 border-b border-zinc-800/80 px-6 py-2.5 text-xs font-medium uppercase tracking-wider text-zinc-500 md:grid">
         <span className="text-right">#</span>
         <span>면적·평형</span>
         <span className="text-right">거래가</span>
@@ -346,7 +346,7 @@ function BuildingTradeList({ trades }: { trades: ApartmentTrade[] }) {
             key={t.id}
             className="grid grid-cols-[1fr_auto] items-center gap-3 px-6 py-3 md:grid-cols-[40px_1fr_140px_120px] md:gap-4"
           >
-            <span className="hidden text-right font-mono text-xs tabular-nums text-zinc-600 md:block">
+            <span className="hidden text-right font-mono text-xs tabular-nums text-zinc-500 md:block">
               {String(idx + 1).padStart(2, "0")}
             </span>
             <div className="min-w-0">
@@ -359,17 +359,17 @@ function BuildingTradeList({ trades }: { trades: ApartmentTrade[] }) {
                   <span className="font-mono text-xs text-zinc-500">· {t.floor}층</span>
                 ) : null}
                 {t.cancelDealDay ? (
-                  <span className="inline-flex items-center rounded bg-rose-500/15 px-1.5 py-0.5 font-mono text-[11px] text-rose-300">
+                  <span className="inline-flex items-center rounded bg-rose-500/15 px-1.5 py-0.5 font-mono text-xs text-rose-300">
                     해제 {t.cancelDealDay}
                   </span>
                 ) : null}
               </div>
               {/* 모바일: 날짜·평당가 행 아래 인라인 */}
-              <p className="mt-0.5 flex items-baseline gap-2 font-mono text-[11px] tabular-nums text-zinc-500 md:hidden">
+              <p className="mt-0.5 flex items-baseline gap-2 font-mono text-xs tabular-nums text-zinc-500 md:hidden">
                 <span>{formatShortDate(t.dealDate)}</span>
                 {t.pricePerPyeong != null ? (
                   <>
-                    <span className="text-zinc-700">·</span>
+                    <span className="text-zinc-600">·</span>
                     <span>평당 {formatAmount(Math.round(t.pricePerPyeong))}</span>
                   </>
                 ) : null}
@@ -380,7 +380,7 @@ function BuildingTradeList({ trades }: { trades: ApartmentTrade[] }) {
             </p>
             <div className="hidden text-right font-mono tabular-nums md:block">
               <p className="text-sm text-zinc-300">{formatShortDate(t.dealDate)}</p>
-              <p className="mt-0.5 text-[11px] text-zinc-500">
+              <p className="mt-0.5 text-xs text-zinc-500">
                 {t.pricePerPyeong != null
                   ? `평당 ${formatAmount(Math.round(t.pricePerPyeong))}`
                   : "—"}

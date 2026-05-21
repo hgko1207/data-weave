@@ -192,7 +192,7 @@ function TradesList({
             </p>
           )}
           {sortLabel ? (
-            <span className="inline-flex items-center gap-1 rounded-md bg-emerald-500/15 px-2 py-0.5 font-mono text-[11px] text-emerald-300">
+            <span className="inline-flex items-center gap-1 rounded-md bg-emerald-500/15 px-2 py-0.5 font-mono text-xs text-emerald-300">
               정렬 · {sortLabel}
             </span>
           ) : null}
@@ -200,7 +200,7 @@ function TradesList({
       </header>
 
       {/* 컬럼 헤더 — 데스크탑만 */}
-      <div className="hidden grid-cols-[40px_60px_1fr_120px_180px] items-center gap-4 border-b border-zinc-800/80 px-6 py-2.5 text-[11px] font-medium uppercase tracking-wider text-zinc-500 md:grid">
+      <div className="hidden grid-cols-[40px_60px_1fr_120px_180px] items-center gap-4 border-b border-zinc-800/80 px-6 py-2.5 text-xs font-medium uppercase tracking-wider text-zinc-500 md:grid">
         <span className="text-right">#</span>
         <span>종류</span>
         <span>단지·주소</span>
@@ -234,11 +234,11 @@ function TradeRow({
 
   return (
     <li className="grid grid-cols-[1fr_auto] items-start gap-3 px-6 py-3.5 transition hover:bg-zinc-800/40 md:grid-cols-[40px_60px_1fr_120px_180px] md:gap-4">
-      <span className="hidden text-right font-mono text-xs tabular-nums text-zinc-600 md:block">
+      <span className="hidden text-right font-mono text-xs tabular-nums text-zinc-500 md:block">
         {String(index).padStart(2, "0")}
       </span>
       <span
-        className={`hidden md:inline-flex items-center justify-center rounded px-1.5 py-0.5 font-mono text-[11px] font-semibold uppercase tracking-wider ${typeColor}`}
+        className={`hidden md:inline-flex items-center justify-center rounded px-1.5 py-0.5 font-mono text-xs font-semibold uppercase tracking-wider ${typeColor}`}
       >
         {isJeonse ? "전세" : "월세"}
       </span>
@@ -246,7 +246,7 @@ function TradeRow({
       <div className="min-w-0">
         <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
           <span
-            className={`md:hidden inline-flex items-center rounded px-1.5 py-0.5 font-mono text-[11px] font-semibold uppercase tracking-wider ${typeColor}`}
+            className={`md:hidden inline-flex items-center rounded px-1.5 py-0.5 font-mono text-xs font-semibold uppercase tracking-wider ${typeColor}`}
           >
             {isJeonse ? "전세" : "월세"}
           </span>
@@ -256,7 +256,7 @@ function TradeRow({
           >
             <span className="group-hover:underline">{trade.aptName}</span>
             <ExternalLink
-              className="h-3 w-3 shrink-0 text-zinc-600 transition group-hover:text-emerald-400"
+              className="h-3 w-3 shrink-0 text-zinc-500 transition group-hover:text-emerald-400"
               aria-hidden
             />
           </Link>
@@ -274,7 +274,7 @@ function TradeRow({
         {/* mobile: 면적 + 날짜 인라인 */}
         <p className="mt-1 flex items-baseline gap-2 font-mono text-xs tabular-nums text-zinc-500 md:hidden">
           <span>{trade.area.toFixed(1)}㎡ · {pyeongLabel(trade.area)}</span>
-          <span className="text-zinc-700">·</span>
+          <span className="text-zinc-600">·</span>
           <span>{formatDealDate(trade.dealDate)}</span>
         </p>
       </div>
@@ -290,7 +290,7 @@ function TradeRow({
         ) : (
           <p className="text-base font-semibold">
             <span className="text-amber-200">{formatAmount(trade.deposit)}</span>
-            <span className="text-zinc-700"> / </span>
+            <span className="text-zinc-600"> / </span>
             <span className="text-amber-300">{trade.monthlyRent}만</span>
           </p>
         )}

@@ -57,19 +57,19 @@ export function ApartmentTradesList({
             </p>
           )}
           {sortLabel ? (
-            <span className="inline-flex items-center gap-1 rounded-md bg-emerald-500/15 px-2 py-0.5 font-mono text-[11px] text-emerald-300">
+            <span className="inline-flex items-center gap-1 rounded-md bg-emerald-500/15 px-2 py-0.5 font-mono text-xs text-emerald-300">
               정렬 · {sortLabel}
             </span>
           ) : null}
         </div>
-        <p className="inline-flex items-center gap-1 font-mono text-[11px] text-zinc-500">
+        <p className="inline-flex items-center gap-1 font-mono text-xs text-zinc-500">
           <Info className="h-3 w-3" aria-hidden />
           호수는 개인정보 보호로 비공개
         </p>
       </header>
 
       {/* 컬럼 헤더 */}
-      <div className="hidden grid-cols-[40px_1fr_120px_100px_120px_24px] items-center gap-4 border-b border-zinc-800/80 px-6 py-2.5 text-[11px] font-medium uppercase tracking-wider text-zinc-500 md:grid">
+      <div className="hidden grid-cols-[40px_1fr_120px_100px_120px_24px] items-center gap-4 border-b border-zinc-800/80 px-6 py-2.5 text-xs font-medium uppercase tracking-wider text-zinc-500 md:grid">
         <span className="text-right">#</span>
         <span>단지·주소</span>
         <span>면적</span>
@@ -136,7 +136,7 @@ function TradeRow({
           expanded ? "bg-zinc-800/30" : ""
         }`}
       >
-        <span className="text-right font-mono text-xs tabular-nums text-zinc-600">
+        <span className="text-right font-mono text-xs tabular-nums text-zinc-500">
           {String(index).padStart(2, "0")}
         </span>
 
@@ -149,12 +149,12 @@ function TradeRow({
             >
               <span className="group-hover:underline">{trade.aptName}</span>
               <ExternalLink
-                className="h-3 w-3 shrink-0 text-zinc-600 transition group-hover:text-emerald-400"
+                className="h-3 w-3 shrink-0 text-zinc-500 transition group-hover:text-emerald-400"
                 aria-hidden
               />
             </Link>
             {trade.aptDong ? (
-              <span className="rounded bg-zinc-800 px-1.5 py-0.5 font-mono text-[11px] text-zinc-300">
+              <span className="rounded bg-zinc-800 px-1.5 py-0.5 font-mono text-xs text-zinc-300">
                 {trade.aptDong}
               </span>
             ) : null}
@@ -162,10 +162,10 @@ function TradeRow({
               <span className="font-mono text-xs text-zinc-400">{trade.floor}층</span>
             ) : null}
             {trade.buildYear != null ? (
-              <span className="font-mono text-xs text-zinc-600">{trade.buildYear}년식</span>
+              <span className="font-mono text-xs text-zinc-500">{trade.buildYear}년식</span>
             ) : null}
             {isCancelled ? (
-              <span className="inline-flex items-center gap-1 rounded bg-rose-500/15 px-1.5 py-0.5 font-mono text-[11px] text-rose-300">
+              <span className="inline-flex items-center gap-1 rounded bg-rose-500/15 px-1.5 py-0.5 font-mono text-xs text-rose-300">
                 <XCircle className="h-3 w-3" aria-hidden />
                 해제
               </span>
@@ -194,7 +194,7 @@ function TradeRow({
             {formatAmount(trade.dealAmount)}
           </p>
           {trade.pricePerPyeong != null ? (
-            <p className="mt-0.5 hidden text-[11px] text-zinc-500 md:block">
+            <p className="mt-0.5 hidden text-xs text-zinc-500 md:block">
               평당 {formatAmount(Math.round(trade.pricePerPyeong))}
             </p>
           ) : null}

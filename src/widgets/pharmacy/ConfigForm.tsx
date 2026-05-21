@@ -44,7 +44,7 @@ export function PharmacyConfigForm({
           defaultValue={cfg.nickname ?? ""}
           maxLength={20}
           onChange={(e) => onChange({ ...cfg, nickname: e.target.value || undefined })}
-          className="rounded-lg border border-white/5 bg-white/5 px-3 py-1.5 text-zinc-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
+          className="rounded-lg border border-zinc-800 bg-zinc-950/60 px-3 py-1.5 text-zinc-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
           placeholder="예: 집 근처"
         />
       </label>
@@ -55,7 +55,7 @@ export function PharmacyConfigForm({
           <select
             defaultValue={cfg.sido}
             onChange={(e) => onChange({ ...cfg, sido: e.target.value })}
-            className="rounded-lg border border-white/5 bg-white/5 px-3 py-1.5 text-zinc-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
+            className="rounded-lg border border-zinc-800 bg-zinc-950/60 px-3 py-1.5 text-zinc-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
           >
             {SIDOS.map((s) => (
               <option key={s} value={s} className="bg-zinc-900">
@@ -70,7 +70,7 @@ export function PharmacyConfigForm({
             type="text"
             defaultValue={cfg.sigungu}
             onChange={(e) => onChange({ ...cfg, sigungu: e.target.value })}
-            className="rounded-lg border border-white/5 bg-white/5 px-3 py-1.5 text-zinc-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
+            className="rounded-lg border border-zinc-800 bg-zinc-950/60 px-3 py-1.5 text-zinc-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
             placeholder="예: 유성구"
           />
         </label>
@@ -84,7 +84,7 @@ export function PharmacyConfigForm({
             step="0.0001"
             defaultValue={cfg.lat}
             onChange={(e) => onChange({ ...cfg, lat: Number(e.target.value) })}
-            className="rounded-lg border border-white/5 bg-white/5 px-3 py-1.5 font-mono text-zinc-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
+            className="rounded-lg border border-zinc-800 bg-zinc-950/60 px-3 py-1.5 font-mono text-zinc-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
           />
         </label>
         <label className="flex flex-1 flex-col gap-1">
@@ -94,7 +94,7 @@ export function PharmacyConfigForm({
             step="0.0001"
             defaultValue={cfg.lng}
             onChange={(e) => onChange({ ...cfg, lng: Number(e.target.value) })}
-            className="rounded-lg border border-white/5 bg-white/5 px-3 py-1.5 font-mono text-zinc-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
+            className="rounded-lg border border-zinc-800 bg-zinc-950/60 px-3 py-1.5 font-mono text-zinc-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
           />
         </label>
         <button
@@ -104,7 +104,7 @@ export function PharmacyConfigForm({
             if (geo.coords) onChange({ ...cfg, ...geo.coords });
           }}
           disabled={geo.status === "requesting"}
-          className="inline-flex h-9 items-center gap-1 rounded-lg border border-white/5 bg-white/5 px-2.5 text-xs text-zinc-200 hover:bg-white/10 disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
+          className="inline-flex h-9 items-center gap-1 rounded-lg border border-zinc-800 bg-zinc-950/60 px-2.5 text-xs text-zinc-200 hover:bg-zinc-800 disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
         >
           <Crosshair className="h-3.5 w-3.5" aria-hidden />
           내 위치
@@ -114,7 +114,7 @@ export function PharmacyConfigForm({
         <p className="text-xs text-amber-400">{geo.error}</p>
       ) : null}
       {geo.status === "success" && geo.coords ? (
-        <p className="font-mono text-[11px] text-emerald-400">
+        <p className="font-mono text-xs text-emerald-400">
           {geo.coords.lat.toFixed(4)}, {geo.coords.lng.toFixed(4)} — 위도/경도에 채워졌습니다
         </p>
       ) : null}

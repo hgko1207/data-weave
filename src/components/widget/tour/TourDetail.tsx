@@ -113,7 +113,7 @@ function TourCard({ item }: { item: TourItem }) {
           <ImageIcon className="h-8 w-8 text-zinc-700" aria-hidden />
         )}
         <span
-          className={`absolute left-3 top-3 inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 font-mono text-[11px] font-semibold ${meta.accent}`}
+          className={`absolute left-3 top-3 inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 font-mono text-xs font-semibold ${meta.accent}`}
         >
           <Icon className="h-3 w-3" aria-hidden />
           {meta.label}

@@ -40,7 +40,7 @@ export function FoodRecallConfigForm({
           defaultValue={cfg.nickname ?? ""}
           maxLength={20}
           onChange={(e) => onChange({ ...cfg, nickname: e.target.value || undefined })}
-          className="rounded-lg border border-white/5 bg-white/5 px-3 py-1.5 text-zinc-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
+          className="rounded-lg border border-zinc-800 bg-zinc-950/60 px-3 py-1.5 text-zinc-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
           placeholder="예: 우리집"
         />
       </label>
@@ -51,7 +51,7 @@ export function FoodRecallConfigForm({
           {cfg.allergyKeywords.map((kw) => (
             <span
               key={kw}
-              className="inline-flex items-center gap-1 rounded bg-emerald-950/40 px-2 py-0.5 font-mono text-[11px] text-emerald-300"
+              className="inline-flex items-center gap-1 rounded bg-emerald-950/40 px-2 py-0.5 font-mono text-xs text-emerald-300"
             >
               {kw}
               <button
@@ -65,7 +65,7 @@ export function FoodRecallConfigForm({
             </span>
           ))}
           {cfg.allergyKeywords.length === 0 ? (
-            <span className="text-[11px] text-zinc-500">키워드 미설정 — 모든 리콜 표시</span>
+            <span className="text-xs text-zinc-500">키워드 미설정 — 모든 리콜 표시</span>
           ) : null}
         </div>
         <div className="flex gap-2">
@@ -81,7 +81,7 @@ export function FoodRecallConfigForm({
                 setDraft("");
               }
             }}
-            className="flex-1 rounded-lg border border-white/5 bg-white/5 px-3 py-1.5 text-zinc-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
+            className="flex-1 rounded-lg border border-zinc-800 bg-zinc-950/60 px-3 py-1.5 text-zinc-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
           />
         </div>
         <div className="flex flex-wrap gap-1">
@@ -90,7 +90,7 @@ export function FoodRecallConfigForm({
               key={k}
               type="button"
               onClick={() => addKeyword(k)}
-              className="rounded-md border border-white/5 bg-white/5 px-2 py-0.5 text-[11px] text-zinc-400 hover:text-zinc-100 hover:bg-white/10"
+              className="rounded-md border border-zinc-800 bg-zinc-950/60 px-2 py-0.5 text-xs text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800"
             >
               + {k}
             </button>

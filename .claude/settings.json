@@ -45,7 +45,11 @@
       "Bash(echo \"--- exit: $? ---\")",
       "Bash(curl -s --max-time 20 \"http://www.kamis.or.kr/service/price/xml.do?action=dailyPriceByCategoryList&p_product_cls_code=01&p_item_category_code=200&p_country_code=&p_regday=2026-05-19&p_convert_kg_yn=Y&p_cert_key=e22ed86c-75ee-4350-b71d-e0bdc860ead0&p_cert_id=8072&p_returntype=json\")",
       "Bash(curl -s -i --max-time 20 \"https://www.kamis.or.kr/service/price/xml.do?action=dailySalesList&p_cert_key=e22ed86c-75ee-4350-b71d-e0bdc860ead0&p_cert_id=8072&p_returntype=json\")",
-      "Bash(awk -F= '/^[A-Z]/ {key=$1; val=$2; if \\(length\\(val\\) > 8\\) masked=substr\\(val,1,4\\)\"…\"substr\\(val,length\\(val\\)-2\\); else if \\(length\\(val\\)>0\\) masked=\"\\(set\\)\"; else masked=\"\\(EMPTY\\)\"; printf \"%-26s %s\\\\n\", key, masked}' .env.local)"
+      "Bash(awk -F= '/^[A-Z]/ {key=$1; val=$2; if \\(length\\(val\\) > 8\\) masked=substr\\(val,1,4\\)\"…\"substr\\(val,length\\(val\\)-2\\); else if \\(length\\(val\\)>0\\) masked=\"\\(set\\)\"; else masked=\"\\(EMPTY\\)\"; printf \"%-26s %s\\\\n\", key, masked}' .env.local)",
+      "Bash(xargs -0 sed -i 's/text-\\\\[9px\\\\]/text-xs/g; s/text-\\\\[10px\\\\]/text-xs/g; s/text-\\\\[11px\\\\]/text-xs/g')",
+      "Bash(xargs -0 sed -i 's/ text-zinc-600/ text-zinc-500/g')",
+      "Bash(xargs -0 sed -i 's/className=\"text-zinc-700\"/className=\"text-zinc-600\"/g')",
+      "Bash(xargs -0 sed -i 's/border border-white\\\\/5 bg-white\\\\/5/border border-zinc-800 bg-zinc-950\\\\/60/g; s/hover:bg-white\\\\/10/hover:bg-zinc-800/g; s/hover:bg-white\\\\/5/hover:bg-zinc-800/g')"
     ]
   }
 }

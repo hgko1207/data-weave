@@ -169,7 +169,7 @@ function MyNumbers({
                 </div>
                 <div className="flex shrink-0 items-center gap-2">
                   <span
-                    className={`inline-flex items-center rounded-md px-2 py-0.5 font-mono text-[11px] font-semibold ${result.tone}`}
+                    className={`inline-flex items-center rounded-md px-2 py-0.5 font-mono text-xs font-semibold ${result.tone}`}
                   >
                     {result.label}
                   </span>

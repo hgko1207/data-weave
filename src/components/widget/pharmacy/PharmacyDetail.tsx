@@ -95,7 +95,7 @@ function OpenBadge({ status }: { status: Facility["isOpenNow"] }) {
   const isOpen = status === "open";
   return (
     <span
-      className={`inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[11px] font-medium ${
+      className={`inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 text-xs font-medium ${
         isOpen
           ? "bg-emerald-500/15 text-emerald-300"
           : "bg-zinc-800 text-zinc-500"
@@ -134,7 +134,7 @@ function FacilityCard({ facility }: { facility: Facility }) {
 
       <div className="min-w-0 flex-1">
         <div className="flex flex-wrap items-baseline gap-2">
-          <span className="font-mono text-[11px] uppercase tracking-wider text-zinc-500">
+          <span className="font-mono text-xs uppercase tracking-wider text-zinc-500">
             {kindLabel}
           </span>
           <h3 className="text-base font-medium text-zinc-100">{facility.name}</h3>

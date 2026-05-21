@@ -115,7 +115,7 @@ function SubChart({
         <p className={`mt-3 font-mono text-base font-semibold ${palette.accent}`}>
           {formatAmount(yValue(t))}
         </p>
-        <p className="mt-1 font-mono text-[11px] text-zinc-500">
+        <p className="mt-1 font-mono text-xs text-zinc-500">
           {formatShortDate(t.dealDate)}
         </p>
       </div>

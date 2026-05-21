@@ -253,7 +253,7 @@ function StatCard({
       >
         {value}
       </p>
-      {sub ? <p className="mt-1 font-mono text-[11px] text-zinc-600">{sub}</p> : null}
+      {sub ? <p className="mt-1 font-mono text-xs text-zinc-500">{sub}</p> : null}
     </article>
   );
 }
@@ -319,7 +319,7 @@ function BuildingAreaGroups({ trades }: { trades: RentTrade[] }) {
                     <span className="text-amber-200">{formatAmount(monthlyAvg)}</span>
                     {monthlyRentAvg != null ? (
                       <>
-                        <span className="text-zinc-700"> / </span>
+                        <span className="text-zinc-600"> / </span>
                         <span className="text-amber-300">{monthlyRentAvg}만</span>
                       </>
                     ) : null}
@@ -344,7 +344,7 @@ function BuildingTradeList({ trades }: { trades: RentTrade[] }) {
         </p>
       </header>
 
-      <div className="hidden grid-cols-[40px_60px_1fr_160px_100px] items-center gap-4 border-b border-zinc-800/80 px-6 py-2.5 text-[11px] font-medium uppercase tracking-wider text-zinc-500 md:grid">
+      <div className="hidden grid-cols-[40px_60px_1fr_160px_100px] items-center gap-4 border-b border-zinc-800/80 px-6 py-2.5 text-xs font-medium uppercase tracking-wider text-zinc-500 md:grid">
         <span className="text-right">#</span>
         <span>종류</span>
         <span>면적·평형</span>
@@ -360,11 +360,11 @@ function BuildingTradeList({ trades }: { trades: RentTrade[] }) {
               key={t.id}
               className="grid grid-cols-[1fr_auto] items-center gap-3 px-6 py-3 md:grid-cols-[40px_60px_1fr_160px_100px] md:gap-4"
             >
-              <span className="hidden text-right font-mono text-xs tabular-nums text-zinc-600 md:block">
+              <span className="hidden text-right font-mono text-xs tabular-nums text-zinc-500 md:block">
                 {String(idx + 1).padStart(2, "0")}
               </span>
               <span
-                className={`hidden md:inline-flex items-center justify-center rounded px-1.5 py-0.5 font-mono text-[11px] font-semibold uppercase tracking-wider ${
+                className={`hidden md:inline-flex items-center justify-center rounded px-1.5 py-0.5 font-mono text-xs font-semibold uppercase tracking-wider ${
                   isJeonse ? "bg-cyan-500/15 text-cyan-300" : "bg-amber-500/15 text-amber-300"
                 }`}
               >
@@ -373,7 +373,7 @@ function BuildingTradeList({ trades }: { trades: RentTrade[] }) {
               <div className="min-w-0">
                 <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
                   <span
-                    className={`md:hidden inline-flex items-center rounded px-1.5 py-0.5 font-mono text-[11px] font-semibold uppercase tracking-wider ${
+                    className={`md:hidden inline-flex items-center rounded px-1.5 py-0.5 font-mono text-xs font-semibold uppercase tracking-wider ${
                       isJeonse ? "bg-cyan-500/15 text-cyan-300" : "bg-amber-500/15 text-amber-300"
                     }`}
                   >
@@ -387,7 +387,7 @@ function BuildingTradeList({ trades }: { trades: RentTrade[] }) {
                     <span className="font-mono text-xs text-zinc-500">· {t.floor}층</span>
                   ) : null}
                 </div>
-                <p className="mt-0.5 font-mono text-[11px] tabular-nums text-zinc-500 md:hidden">
+                <p className="mt-0.5 font-mono text-xs tabular-nums text-zinc-500 md:hidden">
                   {formatShortDate(t.dealDate)}
                 </p>
               </div>
@@ -397,7 +397,7 @@ function BuildingTradeList({ trades }: { trades: RentTrade[] }) {
                 ) : (
                   <>
                     <span className="text-amber-200">{formatAmount(t.deposit)}</span>
-                    <span className="text-zinc-700"> / </span>
+                    <span className="text-zinc-600"> / </span>
                     <span className="text-amber-300">{t.monthlyRent}만</span>
                   </>
                 )}

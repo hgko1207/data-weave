@@ -149,9 +149,9 @@ function DrawCard({
         {data.numbers.map((n) => (
           <LottoBall key={n} num={n} size="lg" />
         ))}
-        <span className="mx-1 font-mono text-2xl text-zinc-600">+</span>
+        <span className="mx-1 font-mono text-2xl text-zinc-500">+</span>
         <LottoBall num={data.bonus} size="lg" />
-        <span className="ml-1 inline-flex items-center rounded-md bg-zinc-800 px-2 py-0.5 font-mono text-[11px] text-zinc-400">
+        <span className="ml-1 inline-flex items-center rounded-md bg-zinc-800 px-2 py-0.5 font-mono text-xs text-zinc-400">
           보너스
         </span>
       </div>
@@ -215,7 +215,7 @@ function TopStoresCard({ stores }: { stores: TopStore[] }) {
                     <span className="text-sm font-medium text-zinc-100">{s.name}</span>
                     {s.method ? (
                       <span
-                        className={`inline-flex items-center rounded px-1.5 py-0.5 font-mono text-[11px] font-semibold uppercase tracking-wider ${METHOD_TONE[s.method]}`}
+                        className={`inline-flex items-center rounded px-1.5 py-0.5 font-mono text-xs font-semibold uppercase tracking-wider ${METHOD_TONE[s.method]}`}
                       >
                         {METHOD_LABEL[s.method]}
                       </span>

@@ -33,7 +33,7 @@ export function PharmacyRender({ data }: { data: SosData }) {
       </ul>
 
       {data.source === "mock" ? (
-        <p className="font-mono text-[10px] uppercase tracking-widest text-zinc-600">
+        <p className="font-mono text-xs uppercase tracking-widest text-zinc-500">
           mock · API 키 등록 시 실 데이터로 전환
         </p>
       ) : null}
@@ -59,13 +59,13 @@ function FacilityRow({ f }: { f: Facility }) {
         </div>
         <p className="truncate text-xs text-zinc-500">{f.address}</p>
         {f.hoursToday ? (
-          <p className="font-mono text-[11px] text-zinc-500">오늘 {f.hoursToday}</p>
+          <p className="font-mono text-xs text-zinc-500">오늘 {f.hoursToday}</p>
         ) : null}
         <div className="mt-1.5 flex gap-1.5">
           {f.phone ? (
             <a
               href={`tel:${f.phone.replace(/\D+/g, "")}`}
-              className="inline-flex items-center gap-1 rounded-lg bg-emerald-500/10 px-2 py-1 text-[11px] font-medium text-emerald-400 hover:bg-emerald-500/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
+              className="inline-flex items-center gap-1 rounded-lg bg-emerald-500/10 px-2 py-1 text-xs font-medium text-emerald-400 hover:bg-emerald-500/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
             >
               <Phone className="h-3 w-3" aria-hidden />
               <span className="font-mono">{f.phone}</span>
@@ -75,7 +75,7 @@ function FacilityRow({ f }: { f: Facility }) {
             href={kakaoUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1 rounded-lg border border-white/5 bg-white/5 px-2 py-1 text-[11px] text-zinc-300 hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
+            className="inline-flex items-center gap-1 rounded-lg border border-zinc-800 bg-zinc-950/60 px-2 py-1 text-xs text-zinc-300 hover:bg-zinc-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
           >
             <MapPin className="h-3 w-3" aria-hidden />
             지도

@@ -70,7 +70,7 @@ function Stat({
   return (
     <div className="flex flex-col gap-0.5">
       <dt className="text-xs text-zinc-500">
-        {label} <span className="font-mono text-zinc-600">({count})</span>
+        {label} <span className="font-mono text-zinc-500">({count})</span>
       </dt>
       <dd className={`font-mono text-base font-medium ${accent}`}>{value}</dd>
     </div>

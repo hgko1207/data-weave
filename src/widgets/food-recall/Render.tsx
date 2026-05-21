@@ -39,7 +39,7 @@ export function FoodRecallRender({ data }: { data: FoodRecallData }) {
           {data.matchedKeywords.map((kw) => (
             <span
               key={kw}
-              className="rounded bg-amber-950/30 px-1.5 py-0.5 font-mono text-[11px] text-amber-300"
+              className="rounded bg-amber-950/30 px-1.5 py-0.5 font-mono text-xs text-amber-300"
             >
               {kw}
             </span>
@@ -83,7 +83,7 @@ function pad(n: number): string {
 
 function MockBadge() {
   return (
-    <p className="font-mono text-[10px] uppercase tracking-widest text-zinc-600">
+    <p className="font-mono text-xs uppercase tracking-widest text-zinc-500">
       mock · API 키 등록 시 실 데이터로 전환
     </p>
   );

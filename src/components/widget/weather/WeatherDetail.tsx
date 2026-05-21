@@ -34,7 +34,7 @@ export function WeatherDetail({ data }: { data: WeatherData }) {
       <DailyForecastCard daily={data.daily} />
 
       {data.source === "mock" ? (
-        <p className="font-mono text-[10px] uppercase tracking-widest text-zinc-600">
+        <p className="font-mono text-xs uppercase tracking-widest text-zinc-500">
           mock · API 키 등록 시 실 데이터로 전환
         </p>
       ) : null}
@@ -147,7 +147,7 @@ function AirQualityCard({ data }: { data: WeatherData }) {
           <Wind className="h-5 w-5" aria-hidden />
         </span>
         <div>
-          <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
+          <p className="font-mono text-xs uppercase tracking-[0.18em] text-zinc-500">
             대기질
           </p>
           <p className="text-sm font-medium text-zinc-100">에어코리아</p>
@@ -284,7 +284,7 @@ function DailyRow({ day }: { day: DailyPoint }) {
         <span className="w-10 text-right text-base font-semibold text-cyan-300">
           {day.low != null ? `${Math.round(day.low)}°` : "—"}
         </span>
-        <span aria-hidden className="text-zinc-700">/</span>
+        <span aria-hidden className="text-zinc-600">/</span>
         <span className="w-10 text-base font-semibold text-rose-300">
           {day.high != null ? `${Math.round(day.high)}°` : "—"}
         </span>

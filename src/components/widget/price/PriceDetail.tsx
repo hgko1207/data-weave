@@ -11,7 +11,7 @@ export function PriceDetail({ data }: { data: PriceData }) {
             <h2 className="text-base font-semibold text-zinc-100">
               {CATEGORY_LABEL[data.category]} {data.cls === "wholesale" ? "도매" : "소매"}가
             </h2>
-            <span className="inline-flex items-center gap-1 rounded-md bg-zinc-800 px-2 py-0.5 font-mono text-[11px] text-zinc-400">
+            <span className="inline-flex items-center gap-1 rounded-md bg-zinc-800 px-2 py-0.5 font-mono text-xs text-zinc-400">
               {data.regday} 기준
             </span>
           </div>
@@ -31,7 +31,7 @@ export function PriceDetail({ data }: { data: PriceData }) {
         ) : (
           <>
             {/* 컬럼 헤더 — 데스크탑 */}
-            <div className="hidden grid-cols-[1fr_90px_110px_90px_90px] items-center gap-4 border-b border-zinc-800/80 px-6 py-2.5 text-[11px] font-medium uppercase tracking-wider text-zinc-500 md:grid">
+            <div className="hidden grid-cols-[1fr_90px_110px_90px_90px] items-center gap-4 border-b border-zinc-800/80 px-6 py-2.5 text-xs font-medium uppercase tracking-wider text-zinc-500 md:grid">
               <span>품목·품종</span>
               <span className="text-right">단위</span>
               <span className="text-right">당일가</span>
@@ -66,17 +66,17 @@ function PriceRow({ item }: { item: PriceItem }) {
           <h3 className="text-base font-medium text-zinc-100">{item.itemName}</h3>
           <span className="font-mono text-xs text-zinc-500">{item.kindName}</span>
           {item.rank !== "상품" ? (
-            <span className="rounded bg-zinc-800 px-1.5 py-0.5 font-mono text-[11px] text-zinc-400">
+            <span className="rounded bg-zinc-800 px-1.5 py-0.5 font-mono text-xs text-zinc-400">
               {item.rank}
             </span>
           ) : null}
         </div>
         {/* 모바일: 단위 + 변동 인라인 */}
-        <p className="mt-0.5 flex flex-wrap items-baseline gap-x-2 font-mono text-[11px] tabular-nums text-zinc-500 md:hidden">
+        <p className="mt-0.5 flex flex-wrap items-baseline gap-x-2 font-mono text-xs tabular-nums text-zinc-500 md:hidden">
           <span>/{item.unit}</span>
           {vsDay ? (
             <>
-              <span className="text-zinc-700">·</span>
+              <span className="text-zinc-600">·</span>
               <span className={vsDay.tone}>전일 {vsDay.label}</span>
             </>
           ) : null}
@@ -89,7 +89,7 @@ function PriceRow({ item }: { item: PriceItem }) {
 
       <p className="text-right font-mono text-base font-semibold tabular-nums text-zinc-100">
         {item.today != null ? `${item.today.toLocaleString()}` : "—"}
-        <span className="ml-0.5 text-[11px] font-normal text-zinc-500">
+        <span className="ml-0.5 text-xs font-normal text-zinc-500">
           {item.today != null ? "원" : ""}
         </span>
       </p>

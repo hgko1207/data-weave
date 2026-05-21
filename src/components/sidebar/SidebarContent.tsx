@@ -142,7 +142,7 @@ function DataSourceStatus() {
       <Activity className="h-3.5 w-3.5 shrink-0 text-emerald-400" aria-hidden />
       <div className="flex min-w-0 flex-1 flex-col leading-tight">
         <span className="text-xs font-medium text-zinc-300">데이터 소스</span>
-        <span className="text-[11px] text-zinc-500">{sources.length}/4 연결됨</span>
+        <span className="text-xs text-zinc-500">{sources.length}/4 연결됨</span>
       </div>
       <div className="flex items-center gap-1">
         {sources.map((s) => (
