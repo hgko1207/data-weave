@@ -36,7 +36,7 @@ src/
 │   ├── globals.css                # Tailwind v4 @theme + 다크 토큰
 │   └── (dashboard)/               # 모든 인증 후 페이지 (라우트 그룹)
 │       ├── layout.tsx             # Sidebar + 상단 header + 본문
-│       ├── page.tsx               # / 대시보드 (RSC, demo instances)
+│       ├── page.tsx               # / 대시보드 (핀 위젯 런처 + 전체 그룹별 둘러보기)
 │       ├── settings/page.tsx      # 위젯 핀 토글 (localStorage)
 │       ├── w/<id>/page.tsx        # 위젯별 상세 (RSC, searchParams 기반)
 │       └── w/apartment/building/  # 단지 상세 — 거래 행 → 아파트명 클릭 진입
