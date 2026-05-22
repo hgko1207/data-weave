@@ -4,6 +4,7 @@ import { formatYm } from "@/widgets/apartment/fetch";
 import type { ApartmentData, ApartmentTrade } from "@/widgets/apartment/schema";
 import type { ApartmentSort } from "./ApartmentFilters";
 import { ApartmentTradesList } from "./ApartmentTradesList";
+import { StatCard } from "@/components/widget/StatCard";
 
 const SORT_LABELS: Record<ApartmentSort, string> = {
   "date-desc": "최신순",
@@ -93,41 +94,6 @@ function StatsRow({ data }: { data: ApartmentData }) {
         valueClass="text-rose-300"
       />
     </div>
-  );
-}
-
-function StatCard({
-  icon,
-  label,
-  value,
-  accent,
-  valueClass,
-}: {
-  icon: React.ReactNode;
-  label: string;
-  value: string;
-  accent: string;
-  valueClass?: string;
-}) {
-  return (
-    <article className="rounded-xl border border-zinc-800/80 bg-zinc-900 p-4">
-      <div className="flex items-center gap-2.5">
-        <span
-          aria-hidden
-          className={`flex h-9 w-9 items-center justify-center rounded-md ${accent}`}
-        >
-          {icon}
-        </span>
-        <span className="text-sm font-medium text-zinc-300">{label}</span>
-      </div>
-      <p
-        className={`mt-3 font-mono text-2xl font-semibold tracking-tight ${
-          valueClass ?? "text-zinc-100"
-        }`}
-      >
-        {value}
-      </p>
-    </article>
   );
 }
 

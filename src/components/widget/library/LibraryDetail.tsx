@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 // (XCircle 제거 — book mode 미소장 표시 폐기)
 import type { Library, LibraryData, MatchedBook } from "@/widgets/library/schema";
+import { StatCard } from "@/components/widget/StatCard";
 
 type Ctx = { sido: string; sigungu: string; q: string };
 
@@ -237,41 +238,6 @@ function StatsRow({ data }: { data: LibraryData }) {
         accent="bg-zinc-800 text-zinc-300"
       />
     </div>
-  );
-}
-
-function StatCard({
-  icon,
-  label,
-  value,
-  accent,
-  valueClass,
-}: {
-  icon: React.ReactNode;
-  label: string;
-  value: string;
-  accent: string;
-  valueClass?: string;
-}) {
-  return (
-    <article className="rounded-xl border border-zinc-800/80 bg-zinc-900 p-4">
-      <div className="flex items-center gap-2.5">
-        <span
-          aria-hidden
-          className={`flex h-9 w-9 items-center justify-center rounded-md ${accent}`}
-        >
-          {icon}
-        </span>
-        <span className="text-sm font-medium text-zinc-300">{label}</span>
-      </div>
-      <p
-        className={`mt-3 font-mono text-2xl font-semibold tracking-tight ${
-          valueClass ?? "text-zinc-100"
-        }`}
-      >
-        {value}
-      </p>
-    </article>
   );
 }
 

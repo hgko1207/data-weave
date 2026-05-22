@@ -12,6 +12,7 @@ import {
 import { formatAmount, pyeongLabel, supplyPyeong } from "@/widgets/apartment/format";
 import type { ApartmentTrade } from "@/widgets/apartment/schema";
 import { BuildingPriceChart } from "./BuildingPriceChart";
+import { StatCard } from "@/components/widget/StatCard";
 
 type Props = {
   aptName: string;
@@ -226,44 +227,6 @@ function BuildingStats({ trades }: { trades: ApartmentTrade[] }) {
         sub={`최근 거래 ${formatShortDate(latest)}`}
       />
     </div>
-  );
-}
-
-function StatCard({
-  icon,
-  label,
-  value,
-  accent,
-  valueClass,
-  sub,
-}: {
-  icon: React.ReactNode;
-  label: string;
-  value: string;
-  accent: string;
-  valueClass?: string;
-  sub?: string;
-}) {
-  return (
-    <article className="rounded-xl border border-zinc-800/80 bg-zinc-900 p-4">
-      <div className="flex items-center gap-2.5">
-        <span
-          aria-hidden
-          className={`flex h-9 w-9 items-center justify-center rounded-md ${accent}`}
-        >
-          {icon}
-        </span>
-        <span className="text-sm font-medium text-zinc-300">{label}</span>
-      </div>
-      <p
-        className={`mt-3 font-mono text-2xl font-semibold tracking-tight ${
-          valueClass ?? "text-zinc-100"
-        }`}
-      >
-        {value}
-      </p>
-      {sub ? <p className="mt-1 font-mono text-xs text-zinc-500">{sub}</p> : null}
-    </article>
   );
 }
 

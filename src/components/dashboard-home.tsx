@@ -105,7 +105,10 @@ function WidgetCard({ widget, pinned }: { widget: WidgetMeta; pinned: boolean })
         <span className="flex items-center gap-1.5">
           <span className="text-sm font-semibold text-zinc-100">{widget.title}</span>
           {pinned ? (
-            <Star className="h-3 w-3 fill-amber-300 text-amber-300" aria-label="즐겨찾기" />
+            <>
+              <Star className="h-3 w-3 fill-amber-300 text-amber-300" aria-hidden />
+              <span className="sr-only">즐겨찾기됨</span>
+            </>
           ) : null}
         </span>
         <span className="mt-0.5 line-clamp-2 block text-xs leading-relaxed text-zinc-500">
