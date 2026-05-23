@@ -40,9 +40,9 @@ export function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
       >
         <span
           aria-hidden
-          className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-emerald-300 via-emerald-500 to-emerald-700 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.2),0_4px_12px_-2px_rgba(16,185,129,0.45)]"
+          className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500/15 text-emerald-300"
         >
-          <span className="font-mono text-sm font-bold text-emerald-950">D</span>
+          <span className="font-mono text-sm font-bold">D</span>
         </span>
         <div className="flex min-w-0 flex-1 flex-col leading-tight">
           <span className="text-sm font-semibold tracking-tight text-zinc-100">

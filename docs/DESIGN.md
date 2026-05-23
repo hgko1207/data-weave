@@ -393,19 +393,22 @@ STEP | USER DOES                        | FEELS    | DESIGN SUPPORTS
 | SOS 병원/약국 | 병원 리스트: 1열 stacked. 거리 right-align mono. 전화 버튼 full-width emerald. |
 | 위해식품 리콜 | 키워드 필터 `sticky top-16` (헤더 아래). 항목 카드 1열. |
 
-### 12.7 헤더 로고 스펙 (결정 1)
+### 12.7 헤더 로고 스펙 (결정 1 → Phase 1.5 갱신)
+
+> 사이드바 로고는 **플랫 단색 D 칩 + 워드마크**. 초기 안(emerald dot only)과 그라디언트 D 칩(inset+glow shadow)은 모두 폐기 — 그라디언트/glow는 AI 슬롭 텔이라 플랫으로 정착.
 
 ```tsx
-// src/app/(dashboard)/layout.tsx 헤더
-<a href="/" aria-label="DataWeave 홈" className="flex items-center gap-1.5">
-  <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 shadow-[0_0_6px] shadow-emerald-400/60" />
-  <span className="text-base font-semibold tracking-tight text-zinc-100">
-    DataWeave
-  </span>
-</a>
+// src/components/sidebar/SidebarContent.tsx 헤더
+<span
+  aria-hidden
+  className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500/15 text-emerald-300"
+>
+  <span className="font-mono text-sm font-bold">D</span>
+</span>
+<span className="text-sm font-semibold tracking-tight text-zinc-100">DataWeave</span>
 ```
 
-**원칙:** Wordmark 단일. Inter Bold + tracking-tight. 좌측에 emerald dot (3x3px 정도, 살짝 glow). 디자인 비용 0, 식별 명확. Linear/Vercel 톤.
+**원칙:** 플랫 단색 칩 (`bg-emerald-500/15` + `text-emerald-300`) — 사이드바 nav 액티브 칩과 동일 톤. 그라디언트·inset·glow shadow 금지. D 글리프는 mono bold. 식별 명확 + 슬롭 회피.
 
 ### 12.8 PWA Install Prompt 트리거 (결정 2)
 
