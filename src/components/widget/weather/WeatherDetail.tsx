@@ -12,12 +12,12 @@ import { HourlyStrip } from "@/widgets/weather/Render";
 import type { DailyPoint, WeatherData } from "@/widgets/weather/schema";
 import { getSkyVisual } from "./sky-icon";
 
-const gradeColor: Record<WeatherData["pm10Grade"], string> = {
-  "좋음": "text-emerald-400",
-  "보통": "text-cyan-400",
-  "나쁨": "text-amber-400",
-  "매우 나쁨": "text-rose-400",
-  "정보 없음": "text-zinc-500",
+const gradeBadge: Record<WeatherData["pm10Grade"], string> = {
+  "좋음": "bg-emerald-500/15 text-emerald-300",
+  "보통": "bg-cyan-500/15 text-cyan-300",
+  "나쁨": "bg-amber-500/15 text-amber-300",
+  "매우 나쁨": "bg-rose-500/15 text-rose-300",
+  "정보 없음": "bg-zinc-800 text-zinc-400",
 };
 
 export function WeatherDetail({ data }: { data: WeatherData }) {
@@ -42,11 +42,16 @@ export function WeatherDetail({ data }: { data: WeatherData }) {
 }
 
 function CurrentCard({ data }: { data: WeatherData }) {
-  const sky = getSkyVisual(data.skyText);
+  const night = isNightKst(data.observedAt);
+  const sky = getSkyVisual(data.skyText, night);
   const SkyIcon = sky.Icon;
+  const starry = night && data.skyText.includes("맑");
   return (
-    <article className="rounded-xl border border-zinc-800/80 bg-zinc-900 p-6">
-      <header className="flex items-start justify-between gap-3">
+    <article
+      className={`relative overflow-hidden rounded-xl border border-zinc-800/80 bg-gradient-to-b ${heroSky(data.skyText, night)} to-zinc-900 p-6`}
+    >
+      {starry ? <StarField /> : null}
+      <header className="relative flex items-start justify-between gap-3">
         <div className="flex items-center gap-2.5">
           <span className="flex h-9 w-9 items-center justify-center rounded-md bg-emerald-500/15 text-emerald-400">
             <CloudSun className="h-5 w-5" aria-hidden />
@@ -64,26 +69,32 @@ function CurrentCard({ data }: { data: WeatherData }) {
         </div>
       </header>
 
-      <div className="mt-6 flex items-baseline gap-3">
+      <div className="relative mt-6 flex flex-wrap items-end gap-3">
         <span className="font-mono text-6xl font-bold tracking-tight text-zinc-100">
           {data.temp.toFixed(1)}
         </span>
-        <span className="font-mono text-2xl text-zinc-400">°C</span>
+        <span className="mb-1.5 font-mono text-2xl text-zinc-400">°C</span>
         {data.todayHigh != null && data.todayLow != null ? (
-          <div className="ml-auto flex flex-col items-end gap-0.5 font-mono text-xs">
-            <span className="flex items-center gap-1 text-rose-300">
-              <ArrowUp className="h-3 w-3" aria-hidden />
-              {Math.round(data.todayHigh)}°
+          <div className="mb-1 ml-auto flex flex-col items-end gap-1.5">
+            <span className="flex items-center gap-1.5">
+              <span className="text-xs text-zinc-500">최고</span>
+              <span className="flex items-center gap-0.5 font-mono text-base font-semibold text-rose-300">
+                <ArrowUp className="h-4 w-4" aria-hidden />
+                {Math.round(data.todayHigh)}°
+              </span>
             </span>
-            <span className="flex items-center gap-1 text-cyan-300">
-              <ArrowDown className="h-3 w-3" aria-hidden />
-              {Math.round(data.todayLow)}°
+            <span className="flex items-center gap-1.5">
+              <span className="text-xs text-zinc-500">최저</span>
+              <span className="flex items-center gap-0.5 font-mono text-base font-semibold text-cyan-300">
+                <ArrowDown className="h-4 w-4" aria-hidden />
+                {Math.round(data.todayLow)}°
+              </span>
             </span>
           </div>
         ) : null}
       </div>
 
-      <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-6">
+      <div className="relative mt-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-6">
         <div className="grid flex-1 grid-cols-3 gap-2.5">
           <MetricTile
             icon={<Droplets className="h-3.5 w-3.5 text-cyan-400" aria-hidden />}
@@ -142,6 +153,55 @@ function MetricTile({
   );
 }
 
+// 현재 카드 hero 배경 — 시간/날씨 기반 은은한 하늘 틴트 (사이드바/메인 구분을 깨던
+// 옛 Aurora와 달리 hero 카드 1장에만 한정).
+function heroSky(skyText: string, night: boolean): string {
+  const clear = skyText.includes("맑");
+  const rain =
+    skyText.includes("비") || skyText.includes("눈") || skyText.includes("소나기");
+  if (night) {
+    if (clear) return "from-indigo-950/60";
+    if (rain) return "from-slate-900/60";
+    return "from-zinc-800/40";
+  }
+  if (clear) return "from-sky-900/40";
+  if (rain) return "from-slate-800/50";
+  return "from-zinc-800/40";
+}
+
+function isNightKst(iso: string): boolean {
+  const h = Number(
+    new Date(iso).toLocaleString("en-US", {
+      timeZone: "Asia/Seoul",
+      hour: "2-digit",
+      hour12: false,
+    }),
+  );
+  return !Number.isFinite(h) || h < 6 || h >= 19;
+}
+
+// 맑은 밤 hero 카드용 정적 별. 반짝임(animation)은 우리 모션 정책상 제외 — 정적 점만.
+function StarField() {
+  return (
+    <div
+      aria-hidden
+      className="pointer-events-none absolute inset-0 opacity-60"
+      style={{
+        backgroundImage: [
+          "radial-gradient(1px 1px at 18% 24%, rgba(255,255,255,0.7), transparent)",
+          "radial-gradient(1px 1px at 62% 16%, rgba(255,255,255,0.45), transparent)",
+          "radial-gradient(1.5px 1.5px at 82% 40%, rgba(255,255,255,0.6), transparent)",
+          "radial-gradient(1px 1px at 34% 62%, rgba(255,255,255,0.4), transparent)",
+          "radial-gradient(1px 1px at 73% 70%, rgba(255,255,255,0.35), transparent)",
+          "radial-gradient(1px 1px at 47% 38%, rgba(255,255,255,0.5), transparent)",
+          "radial-gradient(1px 1px at 90% 22%, rgba(255,255,255,0.4), transparent)",
+          "radial-gradient(1px 1px at 25% 84%, rgba(255,255,255,0.3), transparent)",
+        ].join(","),
+      }}
+    />
+  );
+}
+
 function AirQualityCard({ data }: { data: WeatherData }) {
   return (
     <article className="rounded-xl border border-zinc-800/80 bg-zinc-900 p-6">
@@ -157,18 +217,20 @@ function AirQualityCard({ data }: { data: WeatherData }) {
         </div>
       </header>
 
-      <dl className="mt-5 space-y-4">
+      <dl className="mt-5 space-y-3">
         <AirQualityRow
           label="미세먼지 (PM10)"
           value={data.pm10Value}
           unit="㎍/㎥"
           grade={data.pm10Grade}
+          max={150}
         />
         <AirQualityRow
           label="초미세먼지 (PM2.5)"
           value={data.pm25Value}
           unit="㎍/㎥"
           grade={data.pm25Grade}
+          max={75}
         />
       </dl>
     </article>
@@ -180,23 +242,43 @@ function AirQualityRow({
   value,
   unit,
   grade,
+  max,
 }: {
   label: string;
   value: number | null;
   unit: string;
   grade: WeatherData["pm10Grade"];
+  max: number;
 }) {
+  const pos = value != null ? Math.min(Math.max(value / max, 0), 1) * 100 : null;
   return (
-    <div className="space-y-1.5">
-      <div className="flex items-baseline justify-between">
+    <div className="rounded-lg border border-zinc-800 bg-zinc-950/60 p-4">
+      <div className="flex items-center justify-between gap-2">
         <dt className="text-sm text-zinc-400">{label}</dt>
-        <dd className={`text-sm font-medium ${gradeColor[grade]}`}>{grade}</dd>
+        <dd className={`rounded-md px-2 py-0.5 text-xs font-medium ${gradeBadge[grade]}`}>
+          {grade}
+        </dd>
       </div>
-      <div className="flex items-baseline gap-1.5">
-        <span className="font-mono text-2xl font-semibold text-zinc-100">
+      <div className="mt-2 flex items-baseline gap-1.5">
+        <span className="font-mono text-3xl font-semibold tabular-nums text-zinc-100">
           {value ?? "—"}
         </span>
-        <span className="font-mono text-sm text-zinc-500">{unit}</span>
+        <span className="font-mono text-xs text-zinc-500">{unit}</span>
+      </div>
+      <div
+        className="relative mt-3 h-1.5 w-full rounded-full"
+        style={{
+          background:
+            "linear-gradient(to right, rgb(52,211,153), rgb(34,211,238) 35%, rgb(251,191,36) 70%, rgb(251,113,133))",
+        }}
+        aria-hidden
+      >
+        {pos != null ? (
+          <span
+            className="absolute top-1/2 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full bg-zinc-100 ring-2 ring-zinc-950"
+            style={{ left: `${pos}%` }}
+          />
+        ) : null}
       </div>
     </div>
   );
