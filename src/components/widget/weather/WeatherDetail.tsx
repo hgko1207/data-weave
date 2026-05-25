@@ -83,31 +83,31 @@ function CurrentCard({ data }: { data: WeatherData }) {
         ) : null}
       </div>
 
-      <div className="mt-6 flex flex-col gap-5 sm:flex-row sm:items-center">
-        <dl className="grid flex-1 grid-cols-2 gap-x-6 gap-y-3.5 text-sm">
-          <DetailRow
-            icon={<Droplets className="h-4 w-4 text-cyan-400" aria-hidden />}
+      <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-6">
+        <div className="grid flex-1 grid-cols-3 gap-2.5">
+          <MetricTile
+            icon={<Droplets className="h-3.5 w-3.5 text-cyan-400" aria-hidden />}
             label="강수확률"
             value={`${data.pop}%`}
           />
-          <DetailRow
-            icon={<ThermometerSun className="h-4 w-4 text-amber-400" aria-hidden />}
+          <MetricTile
+            icon={<ThermometerSun className="h-3.5 w-3.5 text-amber-400" aria-hidden />}
             label="체감"
-            value={data.feelsLike != null ? `${data.feelsLike.toFixed(1)}°C` : "—"}
+            value={data.feelsLike != null ? `${data.feelsLike.toFixed(1)}°` : "—"}
           />
-          <DetailRow
-            icon={<Gauge className="h-4 w-4 text-cyan-300" aria-hidden />}
+          <MetricTile
+            icon={<Gauge className="h-3.5 w-3.5 text-cyan-300" aria-hidden />}
             label="습도"
             value={data.humidity != null ? `${data.humidity}%` : "—"}
           />
           {data.precipitation != null && data.precipitation > 0 ? (
-            <DetailRow
-              icon={<CloudRain className="h-4 w-4 text-cyan-400" aria-hidden />}
+            <MetricTile
+              icon={<CloudRain className="h-3.5 w-3.5 text-cyan-400" aria-hidden />}
               label="강수량"
-              value={`${data.precipitation.toFixed(1)}mm/h`}
+              value={`${data.precipitation.toFixed(1)}mm`}
             />
           ) : null}
-        </dl>
+        </div>
         {data.windSpeed != null ? (
           <WindCompass
             deg={data.windDirection}
@@ -120,7 +120,7 @@ function CurrentCard({ data }: { data: WeatherData }) {
   );
 }
 
-function DetailRow({
+function MetricTile({
   icon,
   label,
   value,
@@ -130,10 +130,14 @@ function DetailRow({
   value: string;
 }) {
   return (
-    <div className="flex items-center gap-2">
-      {icon}
-      <dt className="text-zinc-400">{label}</dt>
-      <dd className="ml-auto font-mono text-base font-medium text-zinc-100">{value}</dd>
+    <div className="rounded-lg border border-zinc-800 bg-zinc-950/60 px-3 py-2.5">
+      <div className="flex items-center gap-1.5">
+        {icon}
+        <span className="text-xs text-zinc-400">{label}</span>
+      </div>
+      <p className="mt-1.5 font-mono text-lg font-semibold tabular-nums text-zinc-100">
+        {value}
+      </p>
     </div>
   );
 }
@@ -244,7 +248,7 @@ function DailyForecastCard({
           {daily.length}일 · 단기 + 중기
         </p>
       </header>
-      <ul className="mt-2">
+      <ul className="mt-2 grid grid-cols-1 gap-x-10 lg:grid-cols-2 lg:[&>li:nth-child(2)]:border-t-0">
         {daily.map((d) => (
           <DailyRow
             key={d.dayOffset}
