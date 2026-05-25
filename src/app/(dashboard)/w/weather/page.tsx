@@ -67,7 +67,7 @@ export default async function WeatherDetailPage({ searchParams }: Props) {
 
   return (
     <>
-      <WeatherBackdrop observedAt={data.observedAt} skyText={data.skyText} />
+      <WeatherBackdrop observedAt={data.observedAt} />
       <div className="relative z-10">
         <PageFrame
           eyebrow="widget · weather"
