@@ -7,7 +7,6 @@ import {
   ArrowUp,
   Gauge,
   CloudRain,
-  Compass,
 } from "lucide-react";
 import { HourlyStrip } from "@/widgets/weather/Render";
 import type { DailyPoint, WeatherData } from "@/widgets/weather/schema";
@@ -31,7 +30,7 @@ export function WeatherDetail({ data }: { data: WeatherData }) {
 
       <HourlyChartCard data={data} />
 
-      <DailyForecastCard daily={data.daily} />
+      <DailyForecastCard daily={data.daily} currentTemp={data.temp} />
 
       {data.source === "mock" ? (
         <p className="font-mono text-xs uppercase tracking-widest text-zinc-500">
@@ -84,39 +83,39 @@ function CurrentCard({ data }: { data: WeatherData }) {
         ) : null}
       </div>
 
-      <dl className="mt-6 grid grid-cols-2 gap-x-6 gap-y-3.5 text-sm">
-        <DetailRow
-          icon={<Droplets className="h-4 w-4 text-cyan-400" aria-hidden />}
-          label="강수확률"
-          value={`${data.pop}%`}
-        />
-        <DetailRow
-          icon={<ThermometerSun className="h-4 w-4 text-amber-400" aria-hidden />}
-          label="체감"
-          value={data.feelsLike != null ? `${data.feelsLike.toFixed(1)}°C` : "—"}
-        />
-        <DetailRow
-          icon={<Gauge className="h-4 w-4 text-cyan-300" aria-hidden />}
-          label="습도"
-          value={data.humidity != null ? `${data.humidity}%` : "—"}
-        />
-        <DetailRow
-          icon={<Compass className="h-4 w-4 text-zinc-300" aria-hidden />}
-          label="바람"
-          value={
-            data.windSpeed != null
-              ? `${data.windDirectionLabel ?? ""} ${data.windSpeed.toFixed(1)}m/s`.trim()
-              : "—"
-          }
-        />
-        {data.precipitation != null && data.precipitation > 0 ? (
+      <div className="mt-6 flex flex-col gap-5 sm:flex-row sm:items-center">
+        <dl className="grid flex-1 grid-cols-2 gap-x-6 gap-y-3.5 text-sm">
           <DetailRow
-            icon={<CloudRain className="h-4 w-4 text-cyan-400" aria-hidden />}
-            label="강수량"
-            value={`${data.precipitation.toFixed(1)}mm/h`}
+            icon={<Droplets className="h-4 w-4 text-cyan-400" aria-hidden />}
+            label="강수확률"
+            value={`${data.pop}%`}
+          />
+          <DetailRow
+            icon={<ThermometerSun className="h-4 w-4 text-amber-400" aria-hidden />}
+            label="체감"
+            value={data.feelsLike != null ? `${data.feelsLike.toFixed(1)}°C` : "—"}
+          />
+          <DetailRow
+            icon={<Gauge className="h-4 w-4 text-cyan-300" aria-hidden />}
+            label="습도"
+            value={data.humidity != null ? `${data.humidity}%` : "—"}
+          />
+          {data.precipitation != null && data.precipitation > 0 ? (
+            <DetailRow
+              icon={<CloudRain className="h-4 w-4 text-cyan-400" aria-hidden />}
+              label="강수량"
+              value={`${data.precipitation.toFixed(1)}mm/h`}
+            />
+          ) : null}
+        </dl>
+        {data.windSpeed != null ? (
+          <WindCompass
+            deg={data.windDirection}
+            label={data.windDirectionLabel}
+            speed={data.windSpeed}
           />
         ) : null}
-      </dl>
+      </div>
     </article>
   );
 }
@@ -222,8 +221,20 @@ function HourlyChartCard({ data }: { data: WeatherData }) {
   );
 }
 
-function DailyForecastCard({ daily }: { daily: DailyPoint[] }) {
+function DailyForecastCard({
+  daily,
+  currentTemp,
+}: {
+  daily: DailyPoint[];
+  currentTemp: number;
+}) {
   if (daily.length === 0) return null;
+
+  // 주간 전체 기온 범위 — 레인지 바 트랙의 양 끝 기준
+  const lows = daily.map((d) => d.low).filter((v): v is number => v != null);
+  const highs = daily.map((d) => d.high).filter((v): v is number => v != null);
+  const weekMin = lows.length > 0 ? Math.min(...lows) : 0;
+  const weekMax = highs.length > 0 ? Math.max(...highs) : 1;
 
   return (
     <article className="rounded-xl border border-zinc-800/80 bg-zinc-900 p-6">
@@ -235,60 +246,185 @@ function DailyForecastCard({ daily }: { daily: DailyPoint[] }) {
       </header>
       <ul className="mt-2">
         {daily.map((d) => (
-          <DailyRow key={d.dayOffset} day={d} />
+          <DailyRow
+            key={d.dayOffset}
+            day={d}
+            weekMin={weekMin}
+            weekMax={weekMax}
+            currentTemp={d.dayOffset === 0 ? currentTemp : null}
+          />
         ))}
       </ul>
     </article>
   );
 }
 
-function DailyRow({ day }: { day: DailyPoint }) {
+function DailyRow({
+  day,
+  weekMin,
+  weekMax,
+  currentTemp,
+}: {
+  day: DailyPoint;
+  weekMin: number;
+  weekMax: number;
+  currentTemp: number | null;
+}) {
   const sky = getSkyVisual(day.skyText);
   const Icon = sky.Icon;
   const isWeekend = day.label === "토요일" || day.label === "일요일";
-  const popLevel = (day.pop ?? 0) > 30 ? "high" : (day.pop ?? 0) > 0 ? "low" : "none";
+  const pop = day.pop ?? 0;
 
   return (
-    <li className="grid grid-cols-[80px_36px_1fr_88px_auto] items-center gap-4 border-t border-zinc-800/60 py-4 first:border-t-0">
+    <li className="grid grid-cols-[2.75rem_1.5rem_2.25rem_1.75rem_1fr_1.75rem] items-center gap-2.5 border-t border-zinc-800/60 py-3.5 first:border-t-0 sm:gap-3.5">
       <span
-        className={`text-base font-medium ${isWeekend ? "text-rose-300" : "text-zinc-100"}`}
+        className={`text-sm font-medium ${isWeekend ? "text-rose-300" : "text-zinc-100"}`}
       >
-        {day.label}
+        {day.label.replace("요일", "")}
       </span>
 
-      <Icon className={`h-6 w-6 shrink-0 ${sky.color}`} aria-hidden />
+      <span className="flex items-center">
+        <Icon className={`h-5 w-5 shrink-0 ${sky.color}`} aria-hidden />
+        <span className="sr-only">{day.skyText}</span>
+      </span>
 
-      <span className="truncate text-sm text-zinc-400">{day.skyText}</span>
+      <span className="text-right font-mono text-xs tabular-nums text-cyan-400">
+        {pop > 0 ? `${day.pop}%` : ""}
+      </span>
 
-      <div className="flex items-center gap-1.5">
-        {popLevel === "none" ? (
-          <span className="font-mono text-sm text-zinc-700">—</span>
-        ) : (
-          <>
-            <Droplets
-              className={`h-4 w-4 ${popLevel === "high" ? "text-cyan-400" : "text-cyan-400/60"}`}
-              aria-hidden
-            />
-            <span
-              className={`font-mono text-sm tabular-nums ${
-                popLevel === "high" ? "text-cyan-400" : "text-cyan-400/70"
-              }`}
-            >
-              {day.pop}%
-            </span>
-          </>
-        )}
-      </div>
+      <span className="text-right font-mono text-sm tabular-nums text-cyan-300">
+        {day.low != null ? `${Math.round(day.low)}°` : "—"}
+      </span>
 
-      <div className="flex items-baseline gap-2.5 font-mono tabular-nums">
-        <span className="w-10 text-right text-base font-semibold text-cyan-300">
-          {day.low != null ? `${Math.round(day.low)}°` : "—"}
-        </span>
-        <span aria-hidden className="text-zinc-600">/</span>
-        <span className="w-10 text-base font-semibold text-rose-300">
-          {day.high != null ? `${Math.round(day.high)}°` : "—"}
-        </span>
-      </div>
+      <TempRangeBar
+        low={day.low}
+        high={day.high}
+        weekMin={weekMin}
+        weekMax={weekMax}
+        currentTemp={currentTemp}
+      />
+
+      <span className="font-mono text-sm tabular-nums text-rose-300">
+        {day.high != null ? `${Math.round(day.high)}°` : "—"}
+      </span>
     </li>
   );
+}
+
+// 그날 최저~최고 구간을 주간 전체 범위(weekMin~weekMax) 위에 막대로.
+// 막대 색은 양 끝 절대기온으로 cold(cyan)→hot(rose) 매핑. 오늘 행은 현재기온 점 표시.
+function TempRangeBar({
+  low,
+  high,
+  weekMin,
+  weekMax,
+  currentTemp,
+}: {
+  low: number | null;
+  high: number | null;
+  weekMin: number;
+  weekMax: number;
+  currentTemp: number | null;
+}) {
+  const track = "relative h-1.5 w-full rounded-full bg-zinc-800";
+  if (low == null || high == null) {
+    return <div className={track} aria-hidden />;
+  }
+  const span = weekMax - weekMin || 1;
+  const leftPct = ((low - weekMin) / span) * 100;
+  const widthPct = Math.max(((high - low) / span) * 100, 6);
+  const dotPct =
+    currentTemp != null
+      ? Math.min(Math.max(((currentTemp - weekMin) / span) * 100, 2), 98)
+      : null;
+
+  return (
+    <div className={track} aria-hidden>
+      <div
+        className="absolute inset-y-0 rounded-full"
+        style={{
+          left: `${leftPct}%`,
+          width: `${widthPct}%`,
+          background: `linear-gradient(to right, ${tempColor(low)}, ${tempColor(high)})`,
+        }}
+      />
+      {dotPct != null ? (
+        <span
+          className="absolute top-1/2 h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-zinc-100 ring-2 ring-zinc-900"
+          style={{ left: `${dotPct}%` }}
+        />
+      ) : null}
+    </div>
+  );
+}
+
+// 바람 나침반 — windDirection(도, 북=0 시계방향)으로 바늘 회전.
+function WindCompass({
+  deg,
+  label,
+  speed,
+}: {
+  deg: number | null;
+  label: string | null;
+  speed: number;
+}) {
+  const rot = deg ?? 0;
+  return (
+    <div className="flex shrink-0 flex-col items-center justify-center gap-1.5">
+      <div className="relative h-[72px] w-[72px] rounded-full border border-zinc-700 bg-zinc-950/60">
+        <span className="absolute left-1/2 top-1 -translate-x-1/2 font-mono text-xs text-zinc-400">
+          N
+        </span>
+        <span className="absolute bottom-1 left-1/2 -translate-x-1/2 font-mono text-xs text-zinc-600">
+          S
+        </span>
+        <span className="absolute left-1.5 top-1/2 -translate-y-1/2 font-mono text-xs text-zinc-600">
+          W
+        </span>
+        <span className="absolute right-1.5 top-1/2 -translate-y-1/2 font-mono text-xs text-zinc-600">
+          E
+        </span>
+        <svg viewBox="0 0 100 100" className="absolute inset-0 h-full w-full">
+          <g transform={`rotate(${rot} 50 50)`}>
+            <polygon points="50,22 44,52 56,52" fill="rgb(52, 211, 153)" />
+            <polygon points="50,78 44,52 56,52" fill="rgb(82, 82, 91)" />
+          </g>
+          <circle cx="50" cy="50" r="3.5" fill="rgb(228, 228, 231)" />
+        </svg>
+      </div>
+      <span className="font-mono text-xs text-zinc-400">
+        {[label, `${speed.toFixed(1)}m/s`].filter(Boolean).join(" · ")}
+      </span>
+    </div>
+  );
+}
+
+// 절대 기온 → 색 (cold→hot). 막대 inline gradient 용 (DESIGN.md §14.5 rgb 컨벤션).
+function tempColor(t: number): string {
+  const stops: Array<[number, [number, number, number]]> = [
+    [-5, [34, 211, 238]], // cyan-400
+    [8, [52, 211, 153]], // emerald-400
+    [18, [251, 191, 36]], // amber-400
+    [30, [251, 113, 133]], // rose-400
+  ];
+  if (t <= stops[0][0]) return rgbStr(stops[0][1]);
+  const last = stops[stops.length - 1];
+  if (t >= last[0]) return rgbStr(last[1]);
+  for (let i = 0; i < stops.length - 1; i++) {
+    const [t0, c0] = stops[i];
+    const [t1, c1] = stops[i + 1];
+    if (t >= t0 && t <= t1) {
+      const f = (t - t0) / (t1 - t0);
+      return rgbStr([
+        Math.round(c0[0] + (c1[0] - c0[0]) * f),
+        Math.round(c0[1] + (c1[1] - c0[1]) * f),
+        Math.round(c0[2] + (c1[2] - c0[2]) * f),
+      ]);
+    }
+  }
+  return rgbStr(stops[0][1]);
+}
+
+function rgbStr([r, g, b]: [number, number, number]): string {
+  return `rgb(${r}, ${g}, ${b})`;
 }
