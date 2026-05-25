@@ -74,15 +74,16 @@ export function HourlyStrip({
   return (
     <div className="overflow-x-auto pb-1">
       <ul className="flex gap-2 min-w-min">
-        {items.map((h) => {
+        {items.map((h, idx) => {
           const ratio = (h.temp - minTemp) / range;
+          const label = idx === 0 ? "지금" : h.time;
           return (
             <li
               key={h.time}
               className="flex shrink-0 flex-col items-center gap-2 rounded-lg border border-zinc-800 bg-zinc-950/60 px-3 py-3 w-[76px]"
             >
               <span className="font-mono text-xs font-medium uppercase tracking-wider text-zinc-400">
-                {h.time}
+                {label}
               </span>
               <span
                 className="font-mono text-lg font-semibold tabular-nums"

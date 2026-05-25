@@ -77,7 +77,7 @@ export async function fetchWeather(ctx: WidgetContext): Promise<WeatherData> {
       fetchAirKorea(airKey, cfg.sidoName, ctx.abort),
     ]);
 
-    const base = mergeWeather(cfg.regionName, kma, air);
+    const base = mergeWeather(cfg.regionName, kma, air, ctx.now);
 
     // 중기예보는 best-effort. 실패해도 단기 결과 살림.
     let midDaily: DailyPoint[] = [];
@@ -192,7 +192,7 @@ type MidResp = ReturnType<typeof midResponseSchema.parse>;
 
 type WeatherBase = Omit<WeatherData, "daily"> & { daily: DailyPoint[] };
 
-function mergeWeather(region: string, kma: KmaResp, air: AirResp): WeatherBase {
+function mergeWeather(region: string, kma: KmaResp, air: AirResp, now: Date): WeatherBase {
   const items = kma.response.body?.items?.item ?? [];
   const byKey = (cat: string) =>
     items
@@ -202,19 +202,37 @@ function mergeWeather(region: string, kma: KmaResp, air: AirResp): WeatherBase {
       );
 
   const tmpItems = byKey("TMP");
-  const popItems = byKey("POP");
-  const tmp = tmpItems[0]?.fcstValue;
-  const pop = popItems[0]?.fcstValue;
-  const sky = byKey("SKY")[0]?.fcstValue;
-  const pty = byKey("PTY")[0]?.fcstValue;
-  const wsd = byKey("WSD")[0]?.fcstValue;
-  const reh = byKey("REH")[0]?.fcstValue;
-  const vec = byKey("VEC")[0]?.fcstValue;
-  const pcp = byKey("PCP")[0]?.fcstValue;
+
+  // 현재 시각(KST, 시 단위) 이후 예보만 — "지금 → +24h" 롤링 윈도우.
+  // KMA는 발표시각 기준 앞부터 주므로 지나간 시간이 섞임 → 현재 시각으로 컷.
+  const nowKey = kstHourKey(now);
+  const futureTmp = tmpItems.filter((it) => it.fcstDate + it.fcstTime >= nowKey);
+  const hourlyTmp = futureTmp.length > 0 ? futureTmp : tmpItems;
+
+  // 현재(가장 가까운) 시각의 각 카테고리 값 — 매칭 실패 시 첫 값으로 폴백.
+  const curKey = hourlyTmp[0] ? hourlyTmp[0].fcstDate + hourlyTmp[0].fcstTime : null;
+  const atCur = (cat: string): string | undefined => {
+    if (curKey) {
+      const m = items.find(
+        (it) => it.category === cat && it.fcstDate + it.fcstTime === curKey,
+      );
+      if (m) return m.fcstValue;
+    }
+    return byKey(cat)[0]?.fcstValue;
+  };
+
+  const tmp = hourlyTmp[0]?.fcstValue ?? tmpItems[0]?.fcstValue;
+  const pop = atCur("POP");
+  const sky = atCur("SKY");
+  const pty = atCur("PTY");
+  const wsd = atCur("WSD");
+  const reh = atCur("REH");
+  const vec = atCur("VEC");
+  const pcp = atCur("PCP");
 
   const skyText = pty && pty !== "0" ? PTY_TEXT[pty] || "강수" : SKY_TEXT[sky ?? "1"] || "맑음";
 
-  const hourly = tmpItems.slice(0, 24).map((it) => {
+  const hourly = hourlyTmp.slice(0, 24).map((it) => {
     const popMatch = items.find(
       (p) => p.category === "POP" && p.fcstDate === it.fcstDate && p.fcstTime === it.fcstTime,
     );
@@ -443,6 +461,12 @@ export function midTermBaseTime(now: Date): string {
   }
   // KMA expects 10-digit tmFc: YYYYMMDDHH (no minutes).
   return `${day.getFullYear()}${pad(day.getMonth() + 1)}${pad(day.getDate())}${pad(baseHour)}`;
+}
+
+// 현재 시각을 KST 시 단위 키(YYYYMMDDHH00)로 — 시간대별 예보 컷 기준.
+function kstHourKey(now: Date): string {
+  const tz = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Seoul" }));
+  return `${tz.getFullYear()}${pad(tz.getMonth() + 1)}${pad(tz.getDate())}${pad(tz.getHours())}00`;
 }
 
 export function kmaBaseDateTime(now: Date): { base_date: string; base_time: string } {
