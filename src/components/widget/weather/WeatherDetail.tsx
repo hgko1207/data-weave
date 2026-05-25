@@ -45,13 +45,9 @@ function CurrentCard({ data }: { data: WeatherData }) {
   const night = isNightKst(data.observedAt);
   const sky = getSkyVisual(data.skyText, night);
   const SkyIcon = sky.Icon;
-  const starry = night && data.skyText.includes("맑");
   return (
-    <article
-      className={`relative flex flex-col overflow-hidden rounded-xl border border-zinc-800/80 bg-gradient-to-b ${heroSky(data.skyText, night)} to-zinc-900 p-6`}
-    >
-      {starry ? <StarField /> : null}
-      <header className="relative flex items-start justify-between gap-3">
+    <article className="flex flex-col rounded-xl border border-zinc-800/80 bg-zinc-900 p-6">
+      <header className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-2.5">
           <span className="flex h-9 w-9 items-center justify-center rounded-md bg-emerald-500/15 text-emerald-400">
             <CloudSun className="h-5 w-5" aria-hidden />
@@ -153,22 +149,6 @@ function MetricTile({
   );
 }
 
-// 현재 카드 hero 배경 — 시간/날씨 기반 은은한 하늘 틴트 (사이드바/메인 구분을 깨던
-// 옛 Aurora와 달리 hero 카드 1장에만 한정).
-function heroSky(skyText: string, night: boolean): string {
-  const clear = skyText.includes("맑");
-  const rain =
-    skyText.includes("비") || skyText.includes("눈") || skyText.includes("소나기");
-  if (night) {
-    if (clear) return "from-indigo-950/60";
-    if (rain) return "from-slate-900/60";
-    return "from-zinc-800/40";
-  }
-  if (clear) return "from-sky-900/40";
-  if (rain) return "from-slate-800/50";
-  return "from-zinc-800/40";
-}
-
 function isNightKst(iso: string): boolean {
   const h = Number(
     new Date(iso).toLocaleString("en-US", {
@@ -178,28 +158,6 @@ function isNightKst(iso: string): boolean {
     }),
   );
   return !Number.isFinite(h) || h < 6 || h >= 19;
-}
-
-// 맑은 밤 hero 카드용 정적 별. 반짝임(animation)은 우리 모션 정책상 제외 — 정적 점만.
-function StarField() {
-  return (
-    <div
-      aria-hidden
-      className="pointer-events-none absolute inset-0 opacity-60"
-      style={{
-        backgroundImage: [
-          "radial-gradient(1px 1px at 18% 24%, rgba(255,255,255,0.7), transparent)",
-          "radial-gradient(1px 1px at 62% 16%, rgba(255,255,255,0.45), transparent)",
-          "radial-gradient(1.5px 1.5px at 82% 40%, rgba(255,255,255,0.6), transparent)",
-          "radial-gradient(1px 1px at 34% 62%, rgba(255,255,255,0.4), transparent)",
-          "radial-gradient(1px 1px at 73% 70%, rgba(255,255,255,0.35), transparent)",
-          "radial-gradient(1px 1px at 47% 38%, rgba(255,255,255,0.5), transparent)",
-          "radial-gradient(1px 1px at 90% 22%, rgba(255,255,255,0.4), transparent)",
-          "radial-gradient(1px 1px at 25% 84%, rgba(255,255,255,0.3), transparent)",
-        ].join(","),
-      }}
-    />
-  );
 }
 
 function AirQualityCard({ data }: { data: WeatherData }) {

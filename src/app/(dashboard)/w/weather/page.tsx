@@ -4,6 +4,7 @@ import { PageFrame } from "@/components/page-frame";
 import { BookmarkButton } from "@/components/bookmark/BookmarkButton";
 import { RegionPicker } from "@/components/widget/weather/RegionPicker";
 import { WeatherDetail } from "@/components/widget/weather/WeatherDetail";
+import { WeatherBackdrop } from "@/components/widget/weather/WeatherBackdrop";
 import { fetchWeather } from "@/widgets/weather/fetch";
 import { findWeatherRegion } from "@/widgets/weather/regions";
 import { weatherDataSchema, type WeatherData } from "@/widgets/weather/schema";
@@ -65,30 +66,35 @@ export default async function WeatherDetailPage({ searchParams }: Props) {
   }
 
   return (
-    <PageFrame
-      eyebrow="widget · weather"
-      title={`날씨 · ${data.region}`}
-      description="기상청 단기예보 + 에어코리아 미세먼지. 지역을 선택해 즉시 갱신됩니다."
-      actions={
-        <>
-          <BookmarkButton label={`날씨 · ${data.region}`} widgetId="weather" />
-          <Link
-            href="/"
-            className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-zinc-800 bg-zinc-900 px-3 text-xs text-zinc-300 transition hover:border-zinc-700 hover:bg-zinc-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
-          >
-            <ArrowLeft className="h-3.5 w-3.5" aria-hidden />
-            대시보드
-          </Link>
-        </>
-      }
-    >
-      <RegionPicker active={region.regionName} />
-      {errorMessage ? (
-        <div className="rounded-lg border border-amber-500/20 bg-amber-500/[0.06] px-4 py-3 text-xs text-amber-200">
-          데이터를 불러오지 못했습니다: <span className="font-mono">{errorMessage}</span>
-        </div>
-      ) : null}
-      <WeatherDetail data={data} />
-    </PageFrame>
+    <>
+      <WeatherBackdrop observedAt={data.observedAt} skyText={data.skyText} />
+      <div className="relative z-10">
+        <PageFrame
+          eyebrow="widget · weather"
+          title={`날씨 · ${data.region}`}
+          description="기상청 단기예보 + 에어코리아 미세먼지. 지역을 선택해 즉시 갱신됩니다."
+          actions={
+            <>
+              <BookmarkButton label={`날씨 · ${data.region}`} widgetId="weather" />
+              <Link
+                href="/"
+                className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-zinc-800 bg-zinc-900 px-3 text-xs text-zinc-300 transition hover:border-zinc-700 hover:bg-zinc-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
+              >
+                <ArrowLeft className="h-3.5 w-3.5" aria-hidden />
+                대시보드
+              </Link>
+            </>
+          }
+        >
+          <RegionPicker active={region.regionName} />
+          {errorMessage ? (
+            <div className="rounded-lg border border-amber-500/20 bg-amber-500/[0.06] px-4 py-3 text-xs text-amber-200">
+              데이터를 불러오지 못했습니다: <span className="font-mono">{errorMessage}</span>
+            </div>
+          ) : null}
+          <WeatherDetail data={data} />
+        </PageFrame>
+      </div>
+    </>
   );
 }
