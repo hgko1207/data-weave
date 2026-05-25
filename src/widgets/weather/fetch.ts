@@ -233,13 +233,19 @@ function mergeWeather(region: string, kma: KmaResp, air: AirResp, now: Date): We
   const skyText = pty && pty !== "0" ? PTY_TEXT[pty] || "강수" : SKY_TEXT[sky ?? "1"] || "맑음";
 
   const hourly = hourlyTmp.slice(0, 24).map((it) => {
-    const popMatch = items.find(
-      (p) => p.category === "POP" && p.fcstDate === it.fcstDate && p.fcstTime === it.fcstTime,
-    );
+    const at = (cat: string) =>
+      items.find(
+        (p) => p.category === cat && p.fcstDate === it.fcstDate && p.fcstTime === it.fcstTime,
+      )?.fcstValue;
+    const hPty = at("PTY");
+    const hSky = at("SKY");
+    const hSkyText =
+      hPty && hPty !== "0" ? PTY_TEXT[hPty] || "강수" : SKY_TEXT[hSky ?? "1"] || "맑음";
     return {
       time: `${it.fcstTime.slice(0, 2)}:00`,
       temp: Number(it.fcstValue),
-      pop: Number(popMatch?.fcstValue ?? 0),
+      pop: Number(at("POP") ?? 0),
+      skyText: hSkyText,
     };
   });
 

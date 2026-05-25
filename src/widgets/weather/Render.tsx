@@ -1,5 +1,6 @@
 "use client";
 
+import { getSkyVisual } from "@/components/widget/weather/sky-icon";
 import type { WeatherData } from "./schema";
 
 const gradeColor: Record<WeatherData["pm10Grade"], string> = {
@@ -76,15 +77,18 @@ export function HourlyStrip({
       <ul className="flex gap-2 min-w-min">
         {items.map((h, idx) => {
           const ratio = (h.temp - minTemp) / range;
-          const label = idx === 0 ? "지금" : h.time;
+          const label = idx === 0 ? "지금" : koreanHour(h.time);
+          const sky = getSkyVisual(h.skyText, isNight(h.time));
+          const SkyIcon = sky.Icon;
           return (
             <li
               key={h.time}
-              className="flex shrink-0 flex-col items-center gap-2 rounded-lg border border-zinc-800 bg-zinc-950/60 px-3 py-3 w-[76px]"
+              className="flex w-[84px] shrink-0 flex-col items-center gap-2 rounded-lg border border-zinc-800 bg-zinc-950/60 px-3 py-3"
             >
-              <span className="font-mono text-xs font-medium uppercase tracking-wider text-zinc-400">
+              <span className="whitespace-nowrap font-mono text-xs font-medium text-zinc-400">
                 {label}
               </span>
+              <SkyIcon className={`h-5 w-5 ${sky.color}`} aria-hidden />
               <span
                 className="font-mono text-lg font-semibold tabular-nums"
                 style={{
@@ -116,4 +120,18 @@ export function HourlyStrip({
 
 function formatTemp(t: number): string {
   return `${t.toFixed(1)}°C`;
+}
+
+// "14:00" → "오후 2시" (12시간 한글). 자정 0시 → 오전 12시, 정오 12시 → 오후 12시.
+function koreanHour(time: string): string {
+  const h = Number(time.slice(0, 2));
+  if (!Number.isFinite(h)) return time;
+  const ampm = h < 12 ? "오전" : "오후";
+  const h12 = h % 12 === 0 ? 12 : h % 12;
+  return `${ampm} ${h12}시`;
+}
+
+function isNight(time: string): boolean {
+  const h = Number(time.slice(0, 2));
+  return h < 6 || h >= 19;
 }

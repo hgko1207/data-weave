@@ -7,10 +7,12 @@ export function buildMockWeather(region: string): WeatherData {
   const hourly = Array.from({ length: 24 }, (_, i) => {
     const t = new Date(now.getTime() + i * 60 * 60 * 1000);
     const hh = String(t.getHours()).padStart(2, "0");
+    const pop = i % 7 < 2 ? 30 : 10;
     return {
       time: `${hh}:00`,
       temp: -3.2 + Math.sin(i / 3) * 4,
-      pop: i % 7 < 2 ? 30 : 10,
+      pop,
+      skyText: pop >= 30 ? "흐림" : i % 4 === 0 ? "구름많음" : "맑음",
     };
   });
 

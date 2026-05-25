@@ -18,6 +18,7 @@ export const hourlyPointSchema = z
     time: z.string(),
     temp: z.number(),
     pop: z.number().min(0).max(100),
+    skyText: z.string(),
   })
   .strict();
 
