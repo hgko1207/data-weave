@@ -22,7 +22,7 @@ export default function AppLayout({
       <Sidebar />
 
       <div className="flex w-full flex-1 flex-col">
-        <header className="sticky top-0 z-20 flex h-14 items-center border-b border-zinc-800/80 bg-zinc-950/85 backdrop-blur">
+        <header className="sticky top-0 z-20 flex h-14 items-center border-b border-zinc-800/80 bg-zinc-900">
           <div className="flex h-full w-full items-center justify-between gap-3 px-6 lg:px-8">
             <Breadcrumb eyebrow={eyebrow} title={title} />
             <button
