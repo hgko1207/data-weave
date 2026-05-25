@@ -48,7 +48,7 @@ function CurrentCard({ data }: { data: WeatherData }) {
   const starry = night && data.skyText.includes("맑");
   return (
     <article
-      className={`relative overflow-hidden rounded-xl border border-zinc-800/80 bg-gradient-to-b ${heroSky(data.skyText, night)} to-zinc-900 p-6`}
+      className={`relative flex flex-col overflow-hidden rounded-xl border border-zinc-800/80 bg-gradient-to-b ${heroSky(data.skyText, night)} to-zinc-900 p-6`}
     >
       {starry ? <StarField /> : null}
       <header className="relative flex items-start justify-between gap-3">
@@ -94,7 +94,7 @@ function CurrentCard({ data }: { data: WeatherData }) {
         ) : null}
       </div>
 
-      <div className="relative mt-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-6">
+      <div className="relative mt-auto flex flex-col gap-4 pt-6 sm:flex-row sm:items-center sm:gap-6">
         <div className="grid flex-1 grid-cols-3 gap-2.5">
           <MetricTile
             icon={<Droplets className="h-3.5 w-3.5 text-cyan-400" aria-hidden />}
@@ -252,7 +252,7 @@ function AirQualityRow({
 }) {
   const pos = value != null ? Math.min(Math.max(value / max, 0), 1) * 100 : null;
   return (
-    <div className="rounded-lg border border-zinc-800 bg-zinc-950/60 p-4">
+    <div className="rounded-lg border border-zinc-800 bg-zinc-950/60 p-3.5">
       <div className="flex items-center justify-between gap-2">
         <dt className="text-sm text-zinc-400">{label}</dt>
         <dd className={`rounded-md px-2 py-0.5 text-xs font-medium ${gradeBadge[grade]}`}>
@@ -260,13 +260,13 @@ function AirQualityRow({
         </dd>
       </div>
       <div className="mt-2 flex items-baseline gap-1.5">
-        <span className="font-mono text-3xl font-semibold tabular-nums text-zinc-100">
+        <span className="font-mono text-2xl font-semibold tabular-nums text-zinc-100">
           {value ?? "—"}
         </span>
         <span className="font-mono text-xs text-zinc-500">{unit}</span>
       </div>
       <div
-        className="relative mt-3 h-1.5 w-full rounded-full"
+        className="relative mt-2.5 h-1.5 w-full rounded-full"
         style={{
           background:
             "linear-gradient(to right, rgb(52,211,153), rgb(34,211,238) 35%, rgb(251,191,36) 70%, rgb(251,113,133))",
