@@ -6,7 +6,9 @@ import { Search } from "lucide-react";
 import { CommandPalette } from "@/components/command-palette";
 import { PwaInstallPrompt } from "@/components/pwa-install-prompt";
 import { Sidebar } from "@/components/sidebar/Sidebar";
+import { ContentBackdrop } from "@/components/content-backdrop";
 import { getPageTitle } from "@/lib/page-titles";
+import { WIDGET_META } from "@/widgets/_metadata";
 
 export default function AppLayout({
   children,
@@ -16,6 +18,11 @@ export default function AppLayout({
   const [paletteOpen, setPaletteOpen] = useState(false);
   const pathname = usePathname();
   const { eyebrow, title } = getPageTitle(pathname);
+
+  // 위젯 상세 페이지면 그룹별 배경 틴트. 날씨는 자체 우주 배경을 쓰므로 제외.
+  const widgetId = pathname.startsWith("/w/") ? pathname.split("/")[2] : null;
+  const widget = widgetId ? WIDGET_META.find((w) => w.id === widgetId) : null;
+  const group = widget && widget.id !== "weather" ? widget.group : null;
 
   return (
     <div className="flex min-h-full bg-zinc-950">
@@ -40,8 +47,9 @@ export default function AppLayout({
           </div>
         </header>
 
-        <main className="flex-1 bg-zinc-950">
-          <div className="mx-auto max-w-7xl px-6 py-8 lg:px-8 lg:py-10">
+        <main className="relative flex-1 bg-zinc-950">
+          {group ? <ContentBackdrop group={group} /> : null}
+          <div className="relative z-10 mx-auto max-w-7xl px-6 py-8 lg:px-8 lg:py-10">
             {children}
           </div>
         </main>
