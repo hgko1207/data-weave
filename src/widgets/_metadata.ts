@@ -8,6 +8,7 @@ import {
   Pill,
   ShieldAlert,
   ShoppingCart,
+  Siren,
   Ticket,
 } from "lucide-react";
 
@@ -49,6 +50,13 @@ export const WIDGET_META: WidgetMeta[] = [
     title: "식품 리콜",
     icon: ShieldAlert,
     description: "식약처 회수·판매중지 알림",
+    group: "living",
+  },
+  {
+    id: "disaster",
+    title: "재난문자",
+    icon: Siren,
+    description: "행정안전부 긴급재난문자 — 지역·긴급단계별 타임라인",
     group: "living",
   },
   {
