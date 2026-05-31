@@ -4,9 +4,9 @@ import {
   disasterDataSchema,
   type DisasterData,
   type DisasterMessage,
-  type EmergencyLevel,
 } from "./schema";
 import { buildMockDisaster } from "./mock";
+import { mapEmergencyLevel } from "./utils";
 import { logger } from "@/lib/logger";
 
 // 행정안전부 긴급재난문자 (재난안전데이터공유플랫폼).
@@ -155,7 +155,7 @@ function normalize(row: RawMessage): DisasterMessage | null {
     sentAt,
     region: row.RCPTN_RGN_NM?.trim() || "",
     disasterType: row.DST_SE_NM?.trim() || "기타",
-    level: mapLevel(row.EMRG_STEP_NM),
+    level: mapEmergencyLevel(row.EMRG_STEP_NM),
     message: msg,
   };
 }
@@ -167,9 +167,3 @@ function toIsoKst(crtDt: string): string | null {
   return `${m[1]}-${m[2]}-${m[3]}T${m[4]}:${m[5]}:${m[6]}+09:00`;
 }
 
-function mapLevel(stepName: string | undefined): EmergencyLevel {
-  if (!stepName) return "info";
-  if (stepName.includes("위급")) return "critical";
-  if (stepName.includes("긴급")) return "emergency";
-  return "info";
-}

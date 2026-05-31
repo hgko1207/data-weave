@@ -61,12 +61,15 @@ export function buildMockLibrary(
     };
   });
 
+  // (seed >> 4) % 4 — JS bitwise shift는 32-bit signed로 변환되어 큰 seed에서
+  // 음수 인덱스가 나올 수 있음. Math.abs로 unsigned 처리.
   const matchedBook: MatchedBook | null =
     mode === "book" && query
       ? {
           title: query,
           author: ["김영하", "한강", "정세랑", "박완서"][seed % 4],
-          publisher: ["문학동네", "창비", "민음사", "은행나무"][(seed >> 4) % 4],
+          publisher:
+            ["문학동네", "창비", "민음사", "은행나무"][Math.abs(seed >> 4) % 4],
           isbn: `9788${String(seed % 1_000_000_000).padStart(9, "0")}`,
           imageUrl: null,
           year: `${2010 + (seed % 15)}`,
