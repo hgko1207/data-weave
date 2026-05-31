@@ -6,7 +6,9 @@ import { useRouter } from "next/navigation";
 import { LAWD_BY_SIDO, getSigunguListWithCode } from "@/widgets/apartment/lawd-codes";
 import type { EmergencyLevel } from "@/widgets/disaster/schema";
 
-const SIDOS = Object.keys(LAWD_BY_SIDO);
+// '전국'은 재난문자 위젯 한정 가상 옵션 — 지역 필터 없이 모든 메시지.
+const NATIONWIDE = "전국";
+const SIDOS = [NATIONWIDE, ...Object.keys(LAWD_BY_SIDO)];
 
 export type DisasterLevel = "all" | EmergencyLevel;
 
@@ -35,13 +37,18 @@ export function DisasterFilters({ current }: { current: DisasterFilterValues }) 
   const [sido, setSido] = useState(current.sido);
   const [sigungu, setSigungu] = useState(current.sigungu);
 
-  const sigunguOptions = useMemo(() => getSigunguListWithCode(sido), [sido]);
+  const isNationwide = sido === NATIONWIDE;
+  const sigunguOptions = useMemo(
+    () => (isNationwide ? [] : getSigunguListWithCode(sido)),
+    [sido, isNationwide],
+  );
 
   const buildHref = (overrides: Partial<DisasterFilterValues>) => {
-    const params = new URLSearchParams({
-      sido: overrides.sido ?? current.sido,
-      sigungu: overrides.sigungu ?? current.sigungu,
-    });
+    const nextSido = overrides.sido ?? current.sido;
+    const nextSigungu =
+      nextSido === NATIONWIDE ? "" : overrides.sigungu ?? current.sigungu;
+    const params = new URLSearchParams({ sido: nextSido });
+    if (nextSigungu) params.set("sigungu", nextSigungu);
     const level = overrides.level ?? current.level;
     if (level !== "all") params.set("level", level);
     const w = overrides.windowHours ?? current.windowHours;
@@ -51,12 +58,20 @@ export function DisasterFilters({ current }: { current: DisasterFilterValues }) 
 
   const onSidoChange = (next: string) => {
     setSido(next);
-    const first = getSigunguListWithCode(next)[0];
-    if (first) setSigungu(first.name);
+    if (next === NATIONWIDE) {
+      setSigungu("");
+    } else {
+      const first = getSigunguListWithCode(next)[0];
+      if (first) setSigungu(first.name);
+    }
   };
 
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (isNationwide) {
+      router.push(buildHref({ sido: NATIONWIDE, sigungu: "" }));
+      return;
+    }
     const match = sigunguOptions.find((o) => o.name === sigungu);
     if (!match) return;
     router.push(buildHref({ sido, sigungu: match.name }));
@@ -85,17 +100,26 @@ export function DisasterFilters({ current }: { current: DisasterFilterValues }) 
         </label>
 
         <label className="flex flex-col gap-1.5">
-          <span className="text-xs text-zinc-400">시·군·구</span>
+          <span className="text-xs text-zinc-400">
+            시·군·구{isNationwide ? " (전국 선택 시 비활성)" : ""}
+          </span>
           <select
-            value={sigungu}
+            value={isNationwide ? "" : sigungu}
             onChange={(e) => setSigungu(e.target.value)}
-            className="h-10 rounded-lg border border-zinc-800 bg-zinc-950/60 px-3 text-sm text-zinc-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
+            disabled={isNationwide}
+            className="h-10 rounded-lg border border-zinc-800 bg-zinc-950/60 px-3 text-sm text-zinc-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            {sigunguOptions.map((sg) => (
-              <option key={sg.code} value={sg.name} className="bg-zinc-900">
-                {sg.name}
+            {isNationwide ? (
+              <option value="" className="bg-zinc-900">
+                —
               </option>
-            ))}
+            ) : (
+              sigunguOptions.map((sg) => (
+                <option key={sg.code} value={sg.name} className="bg-zinc-900">
+                  {sg.name}
+                </option>
+              ))
+            )}
           </select>
         </label>
 

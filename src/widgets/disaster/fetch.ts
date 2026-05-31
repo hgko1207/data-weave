@@ -93,14 +93,17 @@ export async function fetchDisaster(ctx: WidgetContext): Promise<DisasterData> {
       return Number.isFinite(t) && t >= cutoff;
     });
 
-    // 지역 매칭 (시·도 포함, 시·군·구 가능하면 추가 좁힘)
+    // 지역 매칭. '전국'은 필터 없음. 그 외엔 시·도(필수) → 시·군·구(있으면 추가).
+    // ⚠ 시·도 매칭 0건이면 전국 폴백 X — 사용자가 명시적으로 "전국" 선택해야 함.
     const sido = cfg.sido;
     const sigungu = cfg.sigungu;
-    const sidoMatched = messages.filter((m) => m.region.includes(sido));
-    if (sidoMatched.length > 0) messages = sidoMatched;
-    if (sigungu) {
-      const sguMatched = messages.filter((m) => m.region.includes(sigungu));
-      if (sguMatched.length > 0) messages = sguMatched;
+    if (sido && sido !== "전국") {
+      messages = messages.filter((m) => m.region.includes(sido));
+      if (sigungu && messages.length > 0) {
+        const sguMatched = messages.filter((m) => m.region.includes(sigungu));
+        // 시·군·구 매칭 없으면 시·도 결과 유지 (시·군·구가 좁혀서 빈 게 자연스러우니까)
+        if (sguMatched.length > 0) messages = sguMatched;
+      }
     }
 
     // 긴급단계 필터

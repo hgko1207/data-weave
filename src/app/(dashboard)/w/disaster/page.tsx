@@ -30,14 +30,23 @@ type Props = {
 
 export default async function DisasterPage({ searchParams }: Props) {
   const params = await searchParams;
-  const sido = params.sido && LAWD_BY_SIDO[params.sido] ? params.sido : DEFAULT_SIDO;
-  const sigunguMap = LAWD_BY_SIDO[sido];
-  const requestedSigungu = params.sigungu ?? "";
-  const sigungu = sigunguMap[requestedSigungu]
-    ? requestedSigungu
-    : sido === DEFAULT_SIDO
-    ? DEFAULT_SIGUNGU
-    : Object.keys(sigunguMap)[0];
+  // '전국'은 가상 옵션 — LAWD 매핑 없음, 지역 필터 안 함.
+  const isNationwide = params.sido === "전국";
+  const sido = isNationwide
+    ? "전국"
+    : params.sido && LAWD_BY_SIDO[params.sido]
+    ? params.sido
+    : DEFAULT_SIDO;
+  let sigungu = "";
+  if (!isNationwide) {
+    const sigunguMap = LAWD_BY_SIDO[sido];
+    const requestedSigungu = params.sigungu ?? "";
+    sigungu = sigunguMap[requestedSigungu]
+      ? requestedSigungu
+      : sido === DEFAULT_SIDO
+      ? DEFAULT_SIGUNGU
+      : Object.keys(sigunguMap)[0];
+  }
   const levelRaw = (params.level ?? "all") as DisasterLevel;
   const level: DisasterLevel = ALLOWED_LEVELS.has(levelRaw) ? levelRaw : "all";
   const windowNum = params.window ? Number(params.window) : 72;
@@ -69,11 +78,14 @@ export default async function DisasterPage({ searchParams }: Props) {
   return (
     <PageFrame
       eyebrow="widget · disaster"
-      title={`재난문자 · ${sido} ${sigungu}`}
+      title={`재난문자 · ${isNationwide ? "전국" : `${sido} ${sigungu}`}`}
       description="행정안전부 긴급재난문자. 지역·긴급단계·기간별로 최근 발송 내역을 타임라인으로."
       actions={
         <>
-          <BookmarkButton label={`재난문자 · ${sido} ${sigungu}`} widgetId="disaster" />
+          <BookmarkButton
+            label={`재난문자 · ${isNationwide ? "전국" : `${sido} ${sigungu}`}`}
+            widgetId="disaster"
+          />
           <Link
             href="/"
             className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-zinc-800 bg-zinc-900 px-3 text-xs text-zinc-300 transition hover:border-zinc-700 hover:bg-zinc-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"

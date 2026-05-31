@@ -1,4 +1,5 @@
-import { Siren, AlertTriangle, Info } from "lucide-react";
+import Link from "next/link";
+import { Siren, AlertTriangle, Info, Globe } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import type { DisasterData, DisasterMessage, EmergencyLevel } from "@/widgets/disaster/schema";
 
@@ -35,15 +36,7 @@ export function DisasterDetail({ data }: { data: DisasterData }) {
       <StatsRow data={data} />
 
       {data.messages.length === 0 ? (
-        <article className="rounded-xl border border-zinc-800/80 bg-zinc-900 p-12 text-center">
-          <Siren className="mx-auto h-7 w-7 text-zinc-500" aria-hidden />
-          <p className="mt-3 text-base font-medium text-zinc-100">
-            최근 {data.windowHours}시간 재난문자가 없어요
-          </p>
-          <p className="mt-1 text-xs text-zinc-500">
-            평온합니다. 기간을 늘리거나 다른 지역을 선택해보세요.
-          </p>
-        </article>
+        <EmptyState region={data.region} windowHours={data.windowHours} />
       ) : (
         <Timeline messages={data.messages} />
       )}
@@ -54,6 +47,31 @@ export function DisasterDetail({ data }: { data: DisasterData }) {
         </p>
       ) : null}
     </div>
+  );
+}
+
+function EmptyState({ region, windowHours }: { region: string; windowHours: number }) {
+  const isNationwide = region.startsWith("전국");
+  const nationwideHref = `/w/disaster?sido=${encodeURIComponent("전국")}&window=${windowHours}`;
+  return (
+    <article className="rounded-xl border border-zinc-800/80 bg-zinc-900 p-10 text-center">
+      <Siren className="mx-auto h-7 w-7 text-zinc-500" aria-hidden />
+      <p className="mt-3 text-base font-medium text-zinc-100">
+        {region}에 최근 {windowHours}시간 재난문자가 없어요
+      </p>
+      <p className="mt-1 text-xs text-zinc-500">
+        평온한 상태입니다. 기간을 늘리거나 다른 지역을 선택해보세요.
+      </p>
+      {!isNationwide ? (
+        <Link
+          href={nationwideHref}
+          className="mt-5 inline-flex h-9 items-center gap-1.5 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-3 text-xs font-medium text-emerald-200 transition hover:border-emerald-500/50 hover:bg-emerald-500/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
+        >
+          <Globe className="h-3.5 w-3.5" aria-hidden />
+          전국 메시지 보기
+        </Link>
+      ) : null}
+    </article>
   );
 }
 
