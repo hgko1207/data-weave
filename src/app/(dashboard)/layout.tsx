@@ -7,6 +7,8 @@ import { CommandPalette } from "@/components/command-palette";
 import { PwaInstallPrompt } from "@/components/pwa-install-prompt";
 import { Sidebar } from "@/components/sidebar/Sidebar";
 import { ContentBackdrop } from "@/components/content-backdrop";
+import { WidgetErrorBoundary } from "@/components/error-boundary";
+import { PageError } from "@/components/page-error";
 import { getPageTitle } from "@/lib/page-titles";
 import { WIDGET_META } from "@/widgets/_metadata";
 
@@ -50,7 +52,16 @@ export default function AppLayout({
         <main className="relative flex-1 bg-zinc-950">
           {group ? <ContentBackdrop group={group} /> : null}
           <div className="relative z-10 mx-auto max-w-7xl px-6 py-8 lg:px-8 lg:py-10">
-            {children}
+            {/* 페이지 단위 에러 격리 — 한 위젯의 client 렌더 오류가 사이드바·헤더에 번지지 않게.
+                pathname을 key로 사용해 페이지 이동 시 boundary state 자동 리셋. */}
+            <WidgetErrorBoundary
+              key={pathname}
+              fallback={(err, reset) => (
+                <PageError message={err.message} onRetry={reset} />
+              )}
+            >
+              {children}
+            </WidgetErrorBoundary>
           </div>
         </main>
       </div>
