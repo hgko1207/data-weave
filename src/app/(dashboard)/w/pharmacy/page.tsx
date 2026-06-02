@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { PageFrame } from "@/components/page-frame";
 import { BookmarkButton } from "@/components/bookmark/BookmarkButton";
+import { DataSourceNotice } from "@/components/widget/DataSourceNotice";
 import {
   PharmacyFilters,
   type PharmacyFilterValues,
@@ -97,11 +98,7 @@ export default async function PharmacyDetailPage({ searchParams }: Props) {
         current={{ sido, sigungu, radius, kind, openNow }}
       />
 
-      {errorMessage ? (
-        <div className="rounded-lg border border-amber-500/20 bg-amber-500/[0.06] px-4 py-3 text-xs text-amber-200">
-          데이터를 불러오지 못했습니다: <span className="font-mono">{errorMessage}</span>
-        </div>
-      ) : null}
+      <DataSourceNotice errorMessage={errorMessage} source={data.source} />
 
       <PharmacyDetail data={displayData} kindFilter={kind} openNowFilter={openNow} />
     </PageFrame>

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { PageFrame } from "@/components/page-frame";
 import { BookmarkButton } from "@/components/bookmark/BookmarkButton";
+import { DataSourceNotice } from "@/components/widget/DataSourceNotice";
 import { TourFilters } from "@/components/widget/tour/TourFilters";
 import { TourDetail } from "@/components/widget/tour/TourDetail";
 import { fetchTour } from "@/widgets/tour/fetch";
@@ -86,11 +87,7 @@ export default async function TourDetailPage({ searchParams }: Props) {
     >
       <TourFilters current={{ sido, sigungu, category }} />
 
-      {errorMessage ? (
-        <div className="rounded-lg border border-amber-500/20 bg-amber-500/[0.06] px-4 py-3 text-xs text-amber-200">
-          데이터를 불러오지 못했습니다: <span className="font-mono">{errorMessage}</span>
-        </div>
-      ) : null}
+      <DataSourceNotice errorMessage={errorMessage} source={data.source} />
 
       <TourDetail data={data} />
     </PageFrame>
