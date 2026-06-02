@@ -38,7 +38,13 @@ type RawResponse = {
 export async function fetchDisaster(ctx: WidgetContext): Promise<DisasterData> {
   const cfg = disasterConfigSchema.parse(ctx.config);
   const key = process.env.DISASTER_API_KEY;
-  const region = `${cfg.sido} ${cfg.sigungu}`;
+  // sigungu가 빈 값이면 시·도 전체. region 라벨 정리.
+  const region =
+    cfg.sido === "전국"
+      ? "전국"
+      : cfg.sigungu
+        ? `${cfg.sido} ${cfg.sigungu}`
+        : `${cfg.sido} 전체`;
 
   if (!key) {
     logger.info("disaster.fetch fallback to mock", { reason: "no DISASTER_API_KEY" });

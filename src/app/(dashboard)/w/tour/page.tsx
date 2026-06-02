@@ -35,11 +35,8 @@ export default async function TourDetailPage({ searchParams }: Props) {
   const sido = params.sido && LAWD_BY_SIDO[params.sido] ? params.sido : DEFAULT_SIDO;
   const sigunguMap = LAWD_BY_SIDO[sido];
   const requestedSigungu = params.sigungu ?? "";
-  const sigungu = sigunguMap[requestedSigungu]
-    ? requestedSigungu
-    : sido === DEFAULT_SIDO
-    ? DEFAULT_SIGUNGU
-    : Object.keys(sigunguMap)[0];
+  // 빈 값 = '전체'(시·도 전체). 유효한 시·군·구면 그것, 아니면 '전체'.
+  const sigungu = requestedSigungu && sigunguMap[requestedSigungu] ? requestedSigungu : "";
   const catRaw = (params.category ?? "all") as TourCategory;
   const category: TourCategory = ALLOWED_CATS.has(catRaw) ? catRaw : "all";
 
@@ -65,15 +62,16 @@ export default async function TourDetailPage({ searchParams }: Props) {
     });
   }
 
+  const regionLabel = sigungu ? `${sido} ${sigungu}` : `${sido} 전체`;
   return (
     <PageFrame
       eyebrow="widget · tour"
-      title={`관광·전시 · ${sido} ${sigungu}`}
+      title={`관광·전시 · ${regionLabel}`}
       description="한국관광공사 TourAPI 기반. 자연·문화·축제·레저·쇼핑 카테고리로 지역 명소 둘러보기."
       actions={
         <>
           <BookmarkButton
-            label={`관광 · ${sido} ${sigungu}${category !== "all" ? ` · ${category}` : ""}`}
+            label={`관광 · ${regionLabel}${category !== "all" ? ` · ${category}` : ""}`}
             widgetId="tour"
           />
           <Link

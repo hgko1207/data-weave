@@ -30,11 +30,10 @@ export default async function LibraryDetailPage({ searchParams }: Props) {
   const sido = params.sido && LAWD_BY_SIDO[params.sido] ? params.sido : DEFAULT_SIDO;
   const sigunguMap = LAWD_BY_SIDO[sido];
   const requestedSigungu = params.sigungu ?? "";
-  const sigungu = sigunguMap[requestedSigungu]
+  // 빈 값 = '전체'(시·도 전체). 유효한 시·군·구면 그것, 아니면 '전체'.
+  const sigungu = requestedSigungu && sigunguMap[requestedSigungu]
     ? requestedSigungu
-    : sido === DEFAULT_SIDO
-    ? DEFAULT_SIGUNGU
-    : Object.keys(sigunguMap)[0];
+    : "";
   const modeRaw = (params.mode ?? "location") as LibraryMode;
   const mode: LibraryMode = ALLOWED_MODES.has(modeRaw) ? modeRaw : "location";
   const q = (params.q ?? "").slice(0, 60);
@@ -65,15 +64,17 @@ export default async function LibraryDetailPage({ searchParams }: Props) {
     });
   }
 
+  // sigungu가 빈 값이면 '전체'로 표시 (시·도 전체 조회).
+  const regionLabel = sigungu ? `${sido} ${sigungu}` : `${sido} 전체`;
   const bookmarkLabel =
     mode === "book" && q
-      ? `도서관 · ${sido} ${sigungu} · "${q}"`
-      : `도서관 · ${sido} ${sigungu}`;
+      ? `도서관 · ${regionLabel} · "${q}"`
+      : `도서관 · ${regionLabel}`;
 
   return (
     <PageFrame
       eyebrow="widget · library"
-      title={`공공도서관 · ${sido} ${sigungu}`}
+      title={`공공도서관 · ${regionLabel}`}
       description="전국 공공도서관 위치·운영시간 + 도서명으로 보유 도서관 검색."
       actions={
         <>

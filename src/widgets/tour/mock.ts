@@ -73,7 +73,7 @@ export function buildMockTour(
   }
 
   return {
-    region: `${region} ${sigungu}`,
+    region: sigungu ? `${region} ${sigungu}` : `${region} 전체`,
     category,
     items,
     total: items.length,

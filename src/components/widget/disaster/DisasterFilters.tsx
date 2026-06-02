@@ -56,14 +56,10 @@ export function DisasterFilters({ current }: { current: DisasterFilterValues }) 
     return `/w/disaster?${params.toString()}`;
   };
 
+  // 시·도 변경 시 시·군·구는 '전체'(빈 값)로 리셋 — 광역시 전체 등 자연스러운 기본.
   const onSidoChange = (next: string) => {
     setSido(next);
-    if (next === NATIONWIDE) {
-      setSigungu("");
-    } else {
-      const first = getSigunguListWithCode(next)[0];
-      if (first) setSigungu(first.name);
-    }
+    setSigungu("");
   };
 
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -72,9 +68,9 @@ export function DisasterFilters({ current }: { current: DisasterFilterValues }) 
       router.push(buildHref({ sido: NATIONWIDE, sigungu: "" }));
       return;
     }
-    const match = sigunguOptions.find((o) => o.name === sigungu);
-    if (!match) return;
-    router.push(buildHref({ sido, sigungu: match.name }));
+    // 빈 값('전체')은 그대로 통과, 값이 있으면 옵션 매칭 확인.
+    if (sigungu && !sigunguOptions.find((o) => o.name === sigungu)) return;
+    router.push(buildHref({ sido, sigungu }));
   };
 
   return (
@@ -114,11 +110,16 @@ export function DisasterFilters({ current }: { current: DisasterFilterValues }) 
                 —
               </option>
             ) : (
-              sigunguOptions.map((sg) => (
-                <option key={sg.code} value={sg.name} className="bg-zinc-900">
-                  {sg.name}
+              <>
+                <option value="" className="bg-zinc-900">
+                  전체
                 </option>
-              ))
+                {sigunguOptions.map((sg) => (
+                  <option key={sg.code} value={sg.name} className="bg-zinc-900">
+                    {sg.name}
+                  </option>
+                ))}
+              </>
             )}
           </select>
         </label>

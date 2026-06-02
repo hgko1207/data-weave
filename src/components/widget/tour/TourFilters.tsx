@@ -33,26 +33,25 @@ export function TourFilters({ current }: { current: TourFilterValues }) {
   const sigunguOptions = useMemo(() => getSigunguListWithCode(sido), [sido]);
 
   const buildHref = (overrides: Partial<TourFilterValues>) => {
-    const params = new URLSearchParams({
-      sido: overrides.sido ?? current.sido,
-      sigungu: overrides.sigungu ?? current.sigungu,
-    });
+    const nextSido = overrides.sido ?? current.sido;
+    const nextSigungu = overrides.sigungu ?? current.sigungu;
+    const params = new URLSearchParams({ sido: nextSido });
+    if (nextSigungu) params.set("sigungu", nextSigungu); // 빈 값 = 시·도 전체
     const cat = overrides.category ?? current.category;
     if (cat !== "all") params.set("category", cat);
     return `/w/tour?${params.toString()}`;
   };
 
+  // 시·도 바꾸면 시·군·구는 '전체'로 리셋.
   const onSidoChange = (next: string) => {
     setSido(next);
-    const first = getSigunguListWithCode(next)[0];
-    if (first) setSigungu(first.name);
+    setSigungu("");
   };
 
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const match = sigunguOptions.find((o) => o.name === sigungu);
-    if (!match) return;
-    router.push(buildHref({ sido, sigungu: match.name }));
+    if (sigungu && !sigunguOptions.find((o) => o.name === sigungu)) return;
+    router.push(buildHref({ sido, sigungu }));
   };
 
   return (
@@ -84,6 +83,9 @@ export function TourFilters({ current }: { current: TourFilterValues }) {
             onChange={(e) => setSigungu(e.target.value)}
             className="h-10 rounded-lg border border-zinc-800 bg-zinc-950/60 px-3 text-sm text-zinc-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
           >
+            <option value="" className="bg-zinc-900">
+              전체
+            </option>
             {sigunguOptions.map((sg) => (
               <option key={sg.code} value={sg.name} className="bg-zinc-900">
                 {sg.name}

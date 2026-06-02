@@ -31,10 +31,11 @@ export function LibraryFilters({ current }: { current: LibraryFilterValues }) {
   const sigunguOptions = useMemo(() => getSigunguListWithCode(sido), [sido]);
 
   const buildHref = (overrides: Partial<LibraryFilterValues>) => {
-    const params = new URLSearchParams({
-      sido: overrides.sido ?? current.sido,
-      sigungu: overrides.sigungu ?? current.sigungu,
-    });
+    const nextSido = overrides.sido ?? current.sido;
+    const nextSigungu = overrides.sigungu ?? current.sigungu;
+    const params = new URLSearchParams({ sido: nextSido });
+    // sigungu 빈 값('전체')은 URL 생략 — 시·도 전체 의미.
+    if (nextSigungu) params.set("sigungu", nextSigungu);
     const mode = overrides.mode ?? current.mode;
     if (mode !== "location") params.set("mode", mode);
     const q = overrides.q ?? current.q;
@@ -42,19 +43,17 @@ export function LibraryFilters({ current }: { current: LibraryFilterValues }) {
     return `/w/library?${params.toString()}`;
   };
 
+  // 시·도 바꾸면 시·군·구는 '전체'(빈 값)로 리셋 — 사용자가 명시적으로 좁히게.
   const onSidoChange = (next: string) => {
     setSido(next);
-    const first = getSigunguListWithCode(next)[0];
-    if (first) setSigungu(first.name);
+    setSigungu("");
   };
 
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const match = sigunguOptions.find((o) => o.name === sigungu);
-    if (!match) return;
-    router.push(
-      buildHref({ sido, sigungu: match.name, q: query.trim() }),
-    );
+    // '전체'는 빈 문자열로 전달. 시·군·구 선택 시엔 목록 매칭 확인.
+    if (sigungu && !sigunguOptions.find((o) => o.name === sigungu)) return;
+    router.push(buildHref({ sido, sigungu, q: query.trim() }));
   };
 
   const placeholder =
@@ -95,6 +94,9 @@ export function LibraryFilters({ current }: { current: LibraryFilterValues }) {
             onChange={(e) => setSigungu(e.target.value)}
             className="h-10 rounded-lg border border-zinc-800 bg-zinc-950/60 px-3 text-sm text-zinc-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
           >
+            <option value="" className="bg-zinc-900">
+              전체
+            </option>
             {sigunguOptions.map((sg) => (
               <option key={sg.code} value={sg.name} className="bg-zinc-900">
                 {sg.name}

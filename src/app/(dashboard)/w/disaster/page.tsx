@@ -41,11 +41,8 @@ export default async function DisasterPage({ searchParams }: Props) {
   if (!isNationwide) {
     const sigunguMap = LAWD_BY_SIDO[sido];
     const requestedSigungu = params.sigungu ?? "";
-    sigungu = sigunguMap[requestedSigungu]
-      ? requestedSigungu
-      : sido === DEFAULT_SIDO
-      ? DEFAULT_SIGUNGU
-      : Object.keys(sigunguMap)[0];
+    // 빈 값 = '전체'(시·도 전체). 유효한 시·군·구면 그것, 아니면 '전체'.
+    sigungu = requestedSigungu && sigunguMap[requestedSigungu] ? requestedSigungu : "";
   }
   const levelRaw = (params.level ?? "all") as DisasterLevel;
   const level: DisasterLevel = ALLOWED_LEVELS.has(levelRaw) ? levelRaw : "all";
@@ -65,8 +62,9 @@ export default async function DisasterPage({ searchParams }: Props) {
       error: err instanceof Error ? err.message : String(err),
     });
     errorMessage = err instanceof Error ? err.message : "알 수 없는 오류";
+    const region = isNationwide ? "전국" : sigungu ? `${sido} ${sigungu}` : `${sido} 전체`;
     data = disasterDataSchema.parse({
-      region: `${sido} ${sigungu}`,
+      region,
       windowHours,
       level,
       messages: [],
@@ -78,12 +76,12 @@ export default async function DisasterPage({ searchParams }: Props) {
   return (
     <PageFrame
       eyebrow="widget · disaster"
-      title={`재난문자 · ${isNationwide ? "전국" : `${sido} ${sigungu}`}`}
+      title={`재난문자 · ${isNationwide ? "전국" : sigungu ? `${sido} ${sigungu}` : `${sido} 전체`}`}
       description="행정안전부 긴급재난문자. 지역·긴급단계·기간별로 최근 발송 내역을 타임라인으로."
       actions={
         <>
           <BookmarkButton
-            label={`재난문자 · ${isNationwide ? "전국" : `${sido} ${sigungu}`}`}
+            label={`재난문자 · ${isNationwide ? "전국" : sigungu ? `${sido} ${sigungu}` : `${sido} 전체`}`}
             widgetId="disaster"
           />
           <Link

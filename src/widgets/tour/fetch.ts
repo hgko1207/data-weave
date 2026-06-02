@@ -38,7 +38,8 @@ export async function fetchTour(ctx: WidgetContext): Promise<TourData> {
   const cfg = tourConfigSchema.parse(ctx.config);
   const key = process.env.TOUR_API_KEY || process.env.DATA_GO_KR_KEY;
   const areaCode = SIDO_AREA_CODE[cfg.sido];
-  const region = `${cfg.sido} ${cfg.sigungu}`;
+  // sigungu가 빈 값이면 시·도 전체. region 라벨에 trailing space 없게.
+  const region = cfg.sigungu ? `${cfg.sido} ${cfg.sigungu}` : `${cfg.sido} 전체`;
 
   if (!key || !areaCode) {
     logger.info("tour.fetch fallback to mock", {
