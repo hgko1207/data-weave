@@ -40,3 +40,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# lighthouse reports (임시 산출물 — 시간 지나면 stale)
+/lighthouse-reports/
