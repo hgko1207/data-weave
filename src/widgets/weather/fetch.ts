@@ -327,7 +327,11 @@ function buildShortTermDaily(items: KmaItem[]): DailyPoint[] {
 
   const dates = Array.from(new Set(list.map((it) => it.fcstDate))).sort();
   const todayIdx = dates.indexOf(today);
-  return dates.slice(0, 3).map((date, i) => {
+  // KMA 단기예보는 보통 D+0~D+2 (3일치). 발표 시각에 따라 응답에 D+3 일부 시간대
+  // 데이터가 포함되기도 함. KMA 중기예보가 D+3 필드를 일관성 없게 채우는 운영
+  // 특성을 보완하려고 단기에서 D+3 시도 — 데이터가 부분적이라도 빈 슬롯보다 나음.
+  // mergeDaily에서 중기 D+3와 충돌하면 단기(=여기 결과) 우선.
+  return dates.slice(0, 4).map((date, i) => {
     const dayOffset = i + (todayIdx === 0 ? 0 : 0);
     const dayItems = list.filter((it) => it.fcstDate === date);
     const tmps = dayItems
@@ -346,9 +350,16 @@ function buildShortTermDaily(items: KmaItem[]): DailyPoint[] {
         acc[it.category] = it.fcstValue;
         return acc;
       }, {});
-    const sky = noonItem["SKY"] ?? "1";
-    const pty = noonItem["PTY"] ?? "0";
-    const skyText = pty !== "0" ? PTY_TEXT[pty] || "강수" : SKY_TEXT[sky] || "맑음";
+    // SKY/PTY 데이터 없을 때 기본값 부여 X — D+3처럼 부분 데이터인 경우
+    // '맑음'으로 잘못 fallback되면 햇님 아이콘이 강제로 나옴. 없으면 '정보 없음'.
+    const sky = noonItem["SKY"];
+    const pty = noonItem["PTY"];
+    const skyText =
+      pty && pty !== "0"
+        ? PTY_TEXT[pty] || "강수"
+        : sky
+          ? SKY_TEXT[sky] || "정보 없음"
+          : "정보 없음";
 
     const pops = dayItems
       .filter((it) => it.category === "POP")
@@ -415,7 +426,8 @@ function numOrNull(v: string | number | null | undefined): number | null {
 }
 
 function mergeDaily(short: DailyPoint[], mid: DailyPoint[]): DailyPoint[] {
-  // short(0~2) + mid(3~7). 같은 dayOffset 충돌 시 short 우선.
+  // short(0~3 시도) + mid(3~7). D+3 충돌 시 단기 우선 — KMA 중기예보 D+3은
+  // 운영상 자주 비어 있어 단기 부분 데이터가 더 안정적.
   const byOffset = new Map<number, DailyPoint>();
   for (const d of short) byOffset.set(d.dayOffset, d);
   for (const d of mid) if (!byOffset.has(d.dayOffset)) byOffset.set(d.dayOffset, d);
