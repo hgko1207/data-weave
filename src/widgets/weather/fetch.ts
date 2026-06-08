@@ -407,7 +407,9 @@ function firstMidItem(resp: MidResp): Record<string, string | number | null> | n
 }
 
 function numOrNull(v: string | number | null | undefined): number | null {
-  if (v == null) return null;
+  // KMA 중기예보는 D+3 데이터가 빠질 때 빈 문자열("")로 응답.
+  // Number("") === 0이라 0°C로 잘못 렌더됨 → 명시적으로 null 처리.
+  if (v == null || v === "") return null;
   const n = typeof v === "string" ? Number(v) : v;
   return Number.isFinite(n) ? n : null;
 }
