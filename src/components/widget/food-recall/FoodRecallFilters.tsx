@@ -94,7 +94,7 @@ export function FoodRecallFilters({ current }: { current: FoodRecallFilterValues
         />
 
         <div className="flex flex-wrap items-center gap-2">
-          <span className="text-xs text-zinc-500">자주 쓰는 키워드</span>
+          <span className="text-xs text-zinc-400">자주 쓰는 키워드</span>
           <div className="flex flex-wrap gap-1.5">
             {COMMON_KEYWORDS.map((kw) => {
               const active = current.keywords.includes(kw);
@@ -148,7 +148,7 @@ function ChipGroup({
 }) {
   return (
     <div className="flex items-center gap-2">
-      <span className="text-xs text-zinc-500">{label}</span>
+      <span className="text-xs text-zinc-400">{label}</span>
       <div className="flex flex-wrap gap-1.5">
         {options.map((o) => (
           <Link

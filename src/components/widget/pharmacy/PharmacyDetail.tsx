@@ -22,7 +22,7 @@ export function PharmacyDetail({
       <header className="flex flex-wrap items-baseline justify-between gap-3 border-b border-zinc-800/80 px-6 py-4">
         <div className="flex items-baseline gap-3">
           <h2 className="text-base font-semibold text-zinc-100">{data.region}</h2>
-          <p className="font-mono text-xs uppercase tracking-[0.14em] text-zinc-500">
+          <p className="font-mono text-xs uppercase tracking-[0.14em] text-zinc-400">
             반경 {data.radiusKm}km
           </p>
         </div>
@@ -45,7 +45,7 @@ export function PharmacyDetail({
               ? "반경 내 약국이 없어요."
               : "반경 내 응급실이 없어요."}
           </p>
-          <p className="mt-1 text-xs text-zinc-500">
+          <p className="mt-1 text-xs text-zinc-400">
             {openNowFilter
               ? "'지금 영업중만' 필터를 해제하거나 반경을 넓혀보세요."
               : "시·군·구나 반경을 넓혀보세요."}
@@ -63,7 +63,7 @@ export function PharmacyDetail({
       )}
 
       {data.source === "mock" ? (
-        <p className="border-t border-zinc-800/80 px-6 py-3 font-mono text-xs uppercase tracking-wider text-zinc-500">
+        <p className="border-t border-zinc-800/80 px-6 py-3 font-mono text-xs uppercase tracking-wider text-zinc-400">
           mock · API 키 등록 시 실 데이터로 전환
         </p>
       ) : null}
@@ -82,7 +82,7 @@ function CountLine({
 }) {
   return (
     <span className="flex items-baseline gap-1">
-      <span className="text-xs text-zinc-500">{label}</span>
+      <span className="text-xs text-zinc-400">{label}</span>
       <span className={`font-mono text-base font-semibold tabular-nums ${color}`}>
         {value}
       </span>
@@ -134,7 +134,7 @@ function FacilityCard({ facility }: { facility: Facility }) {
 
       <div className="min-w-0 flex-1">
         <div className="flex flex-wrap items-baseline gap-2">
-          <span className="font-mono text-xs uppercase tracking-wider text-zinc-500">
+          <span className="font-mono text-xs uppercase tracking-wider text-zinc-400">
             {kindLabel}
           </span>
           <h3 className="text-base font-medium text-zinc-100">{facility.name}</h3>
@@ -145,7 +145,7 @@ function FacilityCard({ facility }: { facility: Facility }) {
         </div>
         <p className="mt-1 truncate text-sm text-zinc-400">{facility.address}</p>
         {facility.hoursToday ? (
-          <p className="mt-1 font-mono text-xs text-zinc-500">
+          <p className="mt-1 font-mono text-xs text-zinc-400">
             오늘 {facility.hoursToday}
           </p>
         ) : null}

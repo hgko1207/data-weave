@@ -13,7 +13,7 @@ export function LottoStats({ stats }: { stats: Stats }) {
             <BarChart3 className="h-4 w-4" aria-hidden />
           </span>
           <div>
-            <p className="font-mono text-xs font-semibold uppercase tracking-[0.14em] text-zinc-500">
+            <p className="font-mono text-xs font-semibold uppercase tracking-[0.14em] text-zinc-400">
               번호 통계
             </p>
             <p className="text-sm font-medium text-zinc-100">
@@ -51,7 +51,7 @@ export function LottoStats({ stats }: { stats: Stats }) {
 
       {/* 번호별 출현 빈도 막대 (1~45) */}
       <div className="mt-5">
-        <p className="font-mono text-xs uppercase tracking-wider text-zinc-500">
+        <p className="font-mono text-xs uppercase tracking-wider text-zinc-400">
           번호별 출현 빈도
         </p>
         <div className="mt-3 grid grid-cols-[repeat(15,minmax(0,1fr))] gap-1">
@@ -72,14 +72,14 @@ export function LottoStats({ stats }: { stats: Stats }) {
                     style={{ height: `${Math.max(heightPct, 4)}%` }}
                   />
                 </div>
-                <span className="font-mono text-xs tabular-nums text-zinc-500">{n}</span>
+                <span className="font-mono text-xs tabular-nums text-zinc-400">{n}</span>
               </div>
             );
           })}
         </div>
       </div>
 
-      <p className="mt-4 text-xs leading-relaxed text-zinc-500">
+      <p className="mt-4 text-xs leading-relaxed text-zinc-400">
         로또는 매 회 완전 무작위라 과거 빈도가 다음 회차 확률에 영향을 주지 않습니다. 통계는 재미로만
         참고하세요.
         {stats.source === "mock" ? " (현재 mock — 한국에서 접속 시 실 데이터)" : ""}

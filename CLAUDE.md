@@ -119,6 +119,10 @@ src/
 **금지:**
 - `text-[10px]` — 다크에서 안 보임. 캡션도 `text-xs` 하한.
 - `text-zinc-600` 이하 본문 — `text-zinc-400` 또는 `text-zinc-500`만.
+- **`text-xs` + `text-zinc-500` 조합** — 작은 텍스트(<14pt)는 WCAG AA 대비
+  4.5:1 필요. `text-zinc-500` (#71717b)은 다크 배경 대비 3.67:1로 미달.
+  `text-xs`엔 무조건 `text-zinc-400` 이상. `text-zinc-500`은 큰 텍스트
+  (text-base 이상) 또는 보조 강조에만.
 - 폰트 mono를 본문에 사용
 
 ### 컴포넌트 빌딩 블록

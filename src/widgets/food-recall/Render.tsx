@@ -28,7 +28,7 @@ export function FoodRecallRender({ data }: { data: FoodRecallData }) {
           {data.filteredTotal}
         </span>
         <span className="text-sm text-zinc-300">건</span>
-        <span className="text-xs text-zinc-500">
+        <span className="text-xs text-zinc-400">
           / 전체 <span className="font-mono">{data.total}</span> · 최근{" "}
           <span className="font-mono">{data.windowHours}시간</span>
         </span>
@@ -62,7 +62,7 @@ function RecallRow({ item }: { item: RecallItem }) {
   return (
     <li className="py-2.5">
       <p className="text-sm font-medium text-zinc-100">{item.productName}</p>
-      <p className="text-xs text-zinc-500">
+      <p className="text-xs text-zinc-400">
         {item.company} · <span className="font-mono">{formatDate(item.recallDate)}</span>
       </p>
       <p className="mt-1 text-xs text-amber-300/90">{item.reason}</p>
@@ -83,7 +83,7 @@ function pad(n: number): string {
 
 function MockBadge() {
   return (
-    <p className="font-mono text-xs uppercase tracking-widest text-zinc-500">
+    <p className="font-mono text-xs uppercase tracking-widest text-zinc-400">
       mock · API 키 등록 시 실 데이터로 전환
     </p>
   );

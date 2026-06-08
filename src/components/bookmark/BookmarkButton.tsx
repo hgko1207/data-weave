@@ -34,7 +34,7 @@ export function BookmarkButton({ label, widgetId }: Props) {
       <button
         type="button"
         disabled
-        className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-zinc-800 bg-zinc-900 px-3 text-xs text-zinc-500"
+        className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-zinc-800 bg-zinc-900 px-3 text-xs text-zinc-400"
       >
         <Star className="h-3.5 w-3.5" aria-hidden />
         즐겨찾기

@@ -46,7 +46,7 @@ export function PriceFilters({ current }: { current: PriceFilterValues }) {
 
       {/* 부류 chips */}
       <div className="mt-4 flex flex-wrap items-center gap-2">
-        <span className="text-xs text-zinc-500">부류</span>
+        <span className="text-xs text-zinc-400">부류</span>
         <div className="flex flex-wrap gap-1.5">
           {PRICE_CATEGORIES.map((cat) => {
             const active = cat === current.category;
@@ -72,7 +72,7 @@ export function PriceFilters({ current }: { current: PriceFilterValues }) {
 
       {/* 소매/도매 토글 */}
       <div className="mt-3 flex flex-wrap items-center gap-2">
-        <span className="text-xs text-zinc-500">구분</span>
+        <span className="text-xs text-zinc-400">구분</span>
         <div className="flex flex-wrap gap-1.5">
           {PRICE_CLS.map((cls) => {
             const active = cls === current.cls;

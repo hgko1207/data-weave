@@ -15,7 +15,7 @@ export function PriceDetail({ data }: { data: PriceData }) {
               {data.regday} 기준
             </span>
           </div>
-          <p className="font-mono text-xs uppercase tracking-[0.14em] text-zinc-500">
+          <p className="font-mono text-xs uppercase tracking-[0.14em] text-zinc-400">
             {data.items.length}품목
           </p>
         </header>
@@ -24,14 +24,14 @@ export function PriceDetail({ data }: { data: PriceData }) {
           <div className="p-12 text-center">
             <ShoppingCart className="mx-auto h-7 w-7 text-zinc-500" aria-hidden />
             <p className="mt-3 text-base font-medium text-zinc-100">가격 정보가 없어요</p>
-            <p className="mt-1 text-xs text-zinc-500">
+            <p className="mt-1 text-xs text-zinc-400">
               주말·공휴일은 데이터가 없을 수 있어요. 다른 부류를 선택해보세요.
             </p>
           </div>
         ) : (
           <>
             {/* 컬럼 헤더 — 데스크탑 */}
-            <div className="hidden grid-cols-[1fr_90px_110px_90px_90px] items-center gap-4 border-b border-zinc-800/80 px-6 py-2.5 text-xs font-medium uppercase tracking-wider text-zinc-500 md:grid">
+            <div className="hidden grid-cols-[1fr_90px_110px_90px_90px] items-center gap-4 border-b border-zinc-800/80 px-6 py-2.5 text-xs font-medium uppercase tracking-wider text-zinc-400 md:grid">
               <span>품목·품종</span>
               <span className="text-right">단위</span>
               <span className="text-right">당일가</span>
@@ -48,7 +48,7 @@ export function PriceDetail({ data }: { data: PriceData }) {
       </article>
 
       {data.source === "mock" ? (
-        <p className="font-mono text-xs uppercase tracking-wider text-zinc-500">
+        <p className="font-mono text-xs uppercase tracking-wider text-zinc-400">
           mock · 한국에서 접속 시 KAMIS 실 데이터로 전환
         </p>
       ) : null}
@@ -64,7 +64,7 @@ function PriceRow({ item }: { item: PriceItem }) {
       <div className="min-w-0">
         <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
           <h3 className="text-base font-medium text-zinc-100">{item.itemName}</h3>
-          <span className="font-mono text-xs text-zinc-500">{item.kindName}</span>
+          <span className="font-mono text-xs text-zinc-400">{item.kindName}</span>
           {item.rank !== "상품" ? (
             <span className="rounded bg-zinc-800 px-1.5 py-0.5 font-mono text-xs text-zinc-400">
               {item.rank}
@@ -72,7 +72,7 @@ function PriceRow({ item }: { item: PriceItem }) {
           ) : null}
         </div>
         {/* 모바일: 단위 + 변동 인라인 */}
-        <p className="mt-0.5 flex flex-wrap items-baseline gap-x-2 font-mono text-xs tabular-nums text-zinc-500 md:hidden">
+        <p className="mt-0.5 flex flex-wrap items-baseline gap-x-2 font-mono text-xs tabular-nums text-zinc-400 md:hidden">
           <span>/{item.unit}</span>
           {vsDay ? (
             <>
@@ -83,21 +83,21 @@ function PriceRow({ item }: { item: PriceItem }) {
         </p>
       </div>
 
-      <span className="hidden text-right font-mono text-xs text-zinc-500 md:block">
+      <span className="hidden text-right font-mono text-xs text-zinc-400 md:block">
         {item.unit}
       </span>
 
       <p className="text-right font-mono text-base font-semibold tabular-nums text-zinc-100">
         {item.today != null ? `${item.today.toLocaleString()}` : "—"}
-        <span className="ml-0.5 text-xs font-normal text-zinc-500">
+        <span className="ml-0.5 text-xs font-normal text-zinc-400">
           {item.today != null ? "원" : ""}
         </span>
       </p>
 
-      <p className={`hidden text-right font-mono text-xs tabular-nums md:block ${vsDay?.tone ?? "text-zinc-500"}`}>
+      <p className={`hidden text-right font-mono text-xs tabular-nums md:block ${vsDay?.tone ?? "text-zinc-400"}`}>
         {vsDay ? vsDay.label : "—"}
       </p>
-      <p className={`hidden text-right font-mono text-xs tabular-nums md:block ${vsWeek?.tone ?? "text-zinc-500"}`}>
+      <p className={`hidden text-right font-mono text-xs tabular-nums md:block ${vsWeek?.tone ?? "text-zinc-400"}`}>
         {vsWeek ? vsWeek.label : "—"}
       </p>
     </li>

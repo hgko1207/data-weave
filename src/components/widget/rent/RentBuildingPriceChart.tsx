@@ -20,7 +20,7 @@ export function RentBuildingPriceChart({ trades }: Props) {
             <LineChart className="h-4 w-4" aria-hidden />
           </span>
           <div>
-            <p className="font-mono text-xs font-semibold uppercase tracking-[0.14em] text-zinc-500">
+            <p className="font-mono text-xs font-semibold uppercase tracking-[0.14em] text-zinc-400">
               보증금 추이
             </p>
             <p className="text-sm font-medium text-zinc-100">단지 시간순 거래</p>
@@ -40,7 +40,7 @@ export function RentBuildingPriceChart({ trades }: Props) {
           <LineChart className="h-4 w-4" aria-hidden />
         </span>
         <div>
-          <p className="font-mono text-xs font-semibold uppercase tracking-[0.14em] text-zinc-500">
+          <p className="font-mono text-xs font-semibold uppercase tracking-[0.14em] text-zinc-400">
             보증금 추이
           </p>
           <p className="text-sm font-medium text-zinc-100">단지 시간순 거래</p>
@@ -100,8 +100,8 @@ function SubChart({
   if (trades.length === 0) {
     return (
       <div className="rounded-lg border border-zinc-800/80 bg-zinc-950/40 p-4">
-        <p className="font-mono text-xs uppercase tracking-wider text-zinc-500">{label}</p>
-        <p className="mt-3 text-xs text-zinc-500">거래 없음</p>
+        <p className="font-mono text-xs uppercase tracking-wider text-zinc-400">{label}</p>
+        <p className="mt-3 text-xs text-zinc-400">거래 없음</p>
       </div>
     );
   }
@@ -109,13 +109,13 @@ function SubChart({
     const t = trades[0];
     return (
       <div className="rounded-lg border border-zinc-800/80 bg-zinc-950/40 p-4">
-        <p className="font-mono text-xs uppercase tracking-wider text-zinc-500">
+        <p className="font-mono text-xs uppercase tracking-wider text-zinc-400">
           {label} · 1건
         </p>
         <p className={`mt-3 font-mono text-base font-semibold ${palette.accent}`}>
           {formatAmount(yValue(t))}
         </p>
-        <p className="mt-1 font-mono text-xs text-zinc-500">
+        <p className="mt-1 font-mono text-xs text-zinc-400">
           {formatShortDate(t.dealDate)}
         </p>
       </div>

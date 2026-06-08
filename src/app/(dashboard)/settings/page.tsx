@@ -45,7 +45,7 @@ export default function SettingsPage() {
       }
     >
       <section className="space-y-3">
-        <h2 className="font-mono text-xs uppercase tracking-[0.18em] text-zinc-500">
+        <h2 className="font-mono text-xs uppercase tracking-[0.18em] text-zinc-400">
           대시보드 위젯
         </h2>
         <ul className="overflow-hidden rounded-xl border border-zinc-800/80 bg-zinc-900 divide-y divide-zinc-800/80">
@@ -83,7 +83,7 @@ function PinRow({
       </div>
       <div className="min-w-0 flex-1">
         <p className="text-sm font-medium text-zinc-100">{widget.title}</p>
-        <p className="truncate text-xs text-zinc-500">{widget.description}</p>
+        <p className="truncate text-xs text-zinc-400">{widget.description}</p>
       </div>
       <Toggle on={pinned} disabled={loading} onChange={onToggle} label={`${widget.title} 핀`} />
     </li>

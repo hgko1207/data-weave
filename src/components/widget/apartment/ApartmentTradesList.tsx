@@ -48,11 +48,11 @@ export function ApartmentTradesList({
         <div className="flex flex-wrap items-baseline gap-3">
           <h2 className="text-base font-semibold text-zinc-100">거래 내역</h2>
           {query ? (
-            <p className="font-mono text-xs tabular-nums text-zinc-500">
+            <p className="font-mono text-xs tabular-nums text-zinc-400">
               <span className="text-emerald-300">{trades.length}</span>건 매칭 · 전체 {totalAvailable}건
             </p>
           ) : (
-            <p className="font-mono text-xs uppercase tracking-[0.14em] text-zinc-500">
+            <p className="font-mono text-xs uppercase tracking-[0.14em] text-zinc-400">
               {Math.min(trades.length, 200)}건
             </p>
           )}
@@ -62,14 +62,14 @@ export function ApartmentTradesList({
             </span>
           ) : null}
         </div>
-        <p className="inline-flex items-center gap-1 font-mono text-xs text-zinc-500">
+        <p className="inline-flex items-center gap-1 font-mono text-xs text-zinc-400">
           <Info className="h-3 w-3" aria-hidden />
           호수는 개인정보 보호로 비공개
         </p>
       </header>
 
       {/* 컬럼 헤더 */}
-      <div className="hidden grid-cols-[40px_1fr_120px_100px_120px_24px] items-center gap-4 border-b border-zinc-800/80 px-6 py-2.5 text-xs font-medium uppercase tracking-wider text-zinc-500 md:grid">
+      <div className="hidden grid-cols-[40px_1fr_120px_100px_120px_24px] items-center gap-4 border-b border-zinc-800/80 px-6 py-2.5 text-xs font-medium uppercase tracking-wider text-zinc-400 md:grid">
         <span className="text-right">#</span>
         <span>단지·주소</span>
         <span>면적</span>
@@ -94,7 +94,7 @@ export function ApartmentTradesList({
       </ul>
 
       {trades.length < totalAvailable ? (
-        <p className="border-t border-zinc-800/80 px-6 py-3 text-center font-mono text-xs text-zinc-500">
+        <p className="border-t border-zinc-800/80 px-6 py-3 text-center font-mono text-xs text-zinc-400">
           전체 {totalAvailable}건 중 {trades.length}건 표시
         </p>
       ) : null}
@@ -136,7 +136,7 @@ function TradeRow({
           expanded ? "bg-zinc-800/30" : ""
         }`}
       >
-        <span className="text-right font-mono text-xs tabular-nums text-zinc-500">
+        <span className="text-right font-mono text-xs tabular-nums text-zinc-400">
           {String(index).padStart(2, "0")}
         </span>
 
@@ -162,7 +162,7 @@ function TradeRow({
               <span className="font-mono text-xs text-zinc-400">{trade.floor}층</span>
             ) : null}
             {trade.buildYear != null ? (
-              <span className="font-mono text-xs text-zinc-500">{trade.buildYear}년식</span>
+              <span className="font-mono text-xs text-zinc-400">{trade.buildYear}년식</span>
             ) : null}
             {isCancelled ? (
               <span className="inline-flex items-center gap-1 rounded bg-rose-500/15 px-1.5 py-0.5 font-mono text-xs text-rose-300">
@@ -171,13 +171,13 @@ function TradeRow({
               </span>
             ) : null}
           </div>
-          <p className="mt-0.5 truncate text-xs text-zinc-500">
+          <p className="mt-0.5 truncate text-xs text-zinc-400">
             {trade.dong}
             {trade.jibun ? ` ${trade.jibun}` : ""}
             {trade.roadName ? ` · ${trade.roadName}` : ""}
           </p>
           {/* mobile: 면적 + 날짜 인라인 */}
-          <p className="mt-1 flex items-baseline gap-3 font-mono text-xs tabular-nums text-zinc-500 md:hidden">
+          <p className="mt-1 flex items-baseline gap-3 font-mono text-xs tabular-nums text-zinc-400 md:hidden">
             <span>{trade.area.toFixed(1)}㎡ ({pyeongLabel(trade.area)})</span>
             <span>·</span>
             <span>{formatDealDate(trade.dealDate)}</span>
@@ -186,7 +186,7 @@ function TradeRow({
 
         <div className="hidden flex-col items-start font-mono tabular-nums md:flex">
           <span className="text-sm text-zinc-200">{trade.area.toFixed(1)}㎡</span>
-          <span className="text-xs text-zinc-500">{pyeongLabel(trade.area)}</span>
+          <span className="text-xs text-zinc-400">{pyeongLabel(trade.area)}</span>
         </div>
 
         <div className="text-right font-mono tabular-nums">
@@ -194,13 +194,13 @@ function TradeRow({
             {formatAmount(trade.dealAmount)}
           </p>
           {trade.pricePerPyeong != null ? (
-            <p className="mt-0.5 hidden text-xs text-zinc-500 md:block">
+            <p className="mt-0.5 hidden text-xs text-zinc-400 md:block">
               평당 {formatAmount(Math.round(trade.pricePerPyeong))}
             </p>
           ) : null}
         </div>
 
-        <p className="hidden text-right font-mono text-xs tabular-nums text-zinc-500 md:block">
+        <p className="hidden text-right font-mono text-xs tabular-nums text-zinc-400 md:block">
           {formatDealDate(trade.dealDate)}
         </p>
 
@@ -322,7 +322,7 @@ function DetailRow({
   return (
     <div className="flex items-center gap-2">
       {icon}
-      <dt className="text-xs text-zinc-500">{label}</dt>
+      <dt className="text-xs text-zinc-400">{label}</dt>
       <dd className={`ml-auto truncate font-mono text-sm ${tone ?? "text-zinc-200"}`}>
         {value}
       </dd>

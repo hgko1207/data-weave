@@ -58,7 +58,7 @@ export function TourDetail({ data }: { data: TourData }) {
         <p className="mt-3 text-base font-medium text-zinc-100">
           조건에 맞는 장소가 없어요
         </p>
-        <p className="mt-1 text-xs text-zinc-500">
+        <p className="mt-1 text-xs text-zinc-400">
           다른 시·군·구를 선택하거나 카테고리를 풀어보세요.
         </p>
       </article>
@@ -68,10 +68,10 @@ export function TourDetail({ data }: { data: TourData }) {
   return (
     <div className="space-y-4">
       <div className="flex items-baseline gap-3">
-        <span className="font-mono text-xs uppercase tracking-[0.14em] text-zinc-500">
+        <span className="font-mono text-xs uppercase tracking-[0.14em] text-zinc-400">
           {data.region}
         </span>
-        <span className="font-mono text-xs text-zinc-500">·</span>
+        <span className="font-mono text-xs text-zinc-400">·</span>
         <span className="font-mono text-xs tabular-nums text-emerald-300">
           {data.total}곳
         </span>
@@ -84,7 +84,7 @@ export function TourDetail({ data }: { data: TourData }) {
       </ul>
 
       {data.source === "mock" ? (
-        <p className="font-mono text-xs uppercase tracking-wider text-zinc-500">
+        <p className="font-mono text-xs uppercase tracking-wider text-zinc-400">
           mock · API 키 등록 시 실 데이터로 전환
         </p>
       ) : null}
@@ -122,7 +122,7 @@ function TourCard({ item }: { item: TourItem }) {
 
       <div className="p-4">
         <h3 className="truncate text-base font-medium text-zinc-100">{item.title}</h3>
-        <p className="mt-1 truncate text-xs text-zinc-500">{item.address}</p>
+        <p className="mt-1 truncate text-xs text-zinc-400">{item.address}</p>
 
         {item.overview ? (
           <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-zinc-400">

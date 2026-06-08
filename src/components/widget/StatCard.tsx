@@ -27,7 +27,7 @@ export function StatCard({ icon, label, value, accent, valueClass, sub }: Props)
       >
         {value}
       </p>
-      {sub ? <p className="mt-1 font-mono text-xs text-zinc-500">{sub}</p> : null}
+      {sub ? <p className="mt-1 font-mono text-xs text-zinc-400">{sub}</p> : null}
     </article>
   );
 }

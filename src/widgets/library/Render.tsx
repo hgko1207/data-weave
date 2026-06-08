@@ -10,20 +10,20 @@ export function LibraryRender({ data }: { data: LibraryData }) {
           {data.total}
         </span>
         <span className="text-sm text-zinc-300">곳</span>
-        <span className="text-xs text-zinc-500">{data.region}</span>
+        <span className="text-xs text-zinc-400">{data.region}</span>
       </div>
 
       <ul className="divide-y divide-white/5">
         {data.libraries.slice(0, 4).map((lib) => (
           <li key={lib.id} className="py-2">
             <p className="text-sm font-medium text-zinc-100">{lib.name}</p>
-            <p className="truncate text-xs text-zinc-500">{lib.address}</p>
+            <p className="truncate text-xs text-zinc-400">{lib.address}</p>
           </li>
         ))}
       </ul>
 
       {data.source === "mock" ? (
-        <p className="font-mono text-xs uppercase tracking-widest text-zinc-500">
+        <p className="font-mono text-xs uppercase tracking-widest text-zinc-400">
           mock · API 키 등록 시 실 데이터로 전환
         </p>
       ) : null}

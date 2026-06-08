@@ -8,7 +8,7 @@ export function PharmacyRender({ data }: { data: SosData }) {
     return (
       <div className="space-y-2 text-sm">
         <p className="text-zinc-300">반경 {data.radiusKm}km 내 운영 중인 곳이 없어요.</p>
-        <p className="text-xs text-zinc-500">
+        <p className="text-xs text-zinc-400">
           시군구나 반경을 넓혀보세요.
         </p>
       </div>
@@ -33,7 +33,7 @@ export function PharmacyRender({ data }: { data: SosData }) {
       </ul>
 
       {data.source === "mock" ? (
-        <p className="font-mono text-xs uppercase tracking-widest text-zinc-500">
+        <p className="font-mono text-xs uppercase tracking-widest text-zinc-400">
           mock · API 키 등록 시 실 데이터로 전환
         </p>
       ) : null}
@@ -57,9 +57,9 @@ function FacilityRow({ f }: { f: Facility }) {
             {f.distanceKm.toFixed(1)}km
           </span>
         </div>
-        <p className="truncate text-xs text-zinc-500">{f.address}</p>
+        <p className="truncate text-xs text-zinc-400">{f.address}</p>
         {f.hoursToday ? (
-          <p className="font-mono text-xs text-zinc-500">오늘 {f.hoursToday}</p>
+          <p className="font-mono text-xs text-zinc-400">오늘 {f.hoursToday}</p>
         ) : null}
         <div className="mt-1.5 flex gap-1.5">
           {f.phone ? (

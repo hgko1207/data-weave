@@ -21,7 +21,7 @@ export function RentRender({ data }: { data: RentData }) {
   return (
     <div className="space-y-4">
       <div>
-        <p className="font-mono text-xs uppercase tracking-wider text-zinc-500">
+        <p className="font-mono text-xs uppercase tracking-wider text-zinc-400">
           {data.region} · {formatYm(data.dealYm)}
         </p>
         <div className="mt-1 flex items-baseline gap-2">
@@ -69,7 +69,7 @@ function Stat({
 }) {
   return (
     <div className="flex flex-col gap-0.5">
-      <dt className="text-xs text-zinc-500">
+      <dt className="text-xs text-zinc-400">
         {label} <span className="font-mono text-zinc-500">({count})</span>
       </dt>
       <dd className={`font-mono text-base font-medium ${accent}`}>{value}</dd>
@@ -79,7 +79,7 @@ function Stat({
 
 function MockBadge() {
   return (
-    <p className="font-mono text-xs uppercase tracking-wider text-zinc-500">
+    <p className="font-mono text-xs uppercase tracking-wider text-zinc-400">
       mock · API 키 등록 시 실 데이터로 전환
     </p>
   );

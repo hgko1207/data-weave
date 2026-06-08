@@ -65,7 +65,7 @@ export function FoodRecallConfigForm({
             </span>
           ))}
           {cfg.allergyKeywords.length === 0 ? (
-            <span className="text-xs text-zinc-500">키워드 미설정 — 모든 리콜 표시</span>
+            <span className="text-xs text-zinc-400">키워드 미설정 — 모든 리콜 표시</span>
           ) : null}
         </div>
         <div className="flex gap-2">

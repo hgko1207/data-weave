@@ -23,7 +23,7 @@ export function ApartmentRender({ data }: { data: ApartmentData }) {
   return (
     <div className="space-y-4">
       <div>
-        <p className="font-mono text-xs uppercase tracking-wider text-zinc-500">
+        <p className="font-mono text-xs uppercase tracking-wider text-zinc-400">
           {data.region} · {formatYm(data.dealYm)}
         </p>
         <div className="mt-1 flex items-baseline gap-2">
@@ -40,7 +40,7 @@ export function ApartmentRender({ data }: { data: ApartmentData }) {
         <Stat label="최고" value={formatAmount(data.maxAmount)} accent="text-rose-300" />
       </dl>
 
-      <p className="font-mono text-xs text-zinc-500">
+      <p className="font-mono text-xs text-zinc-400">
         총 거래 <span className="text-zinc-200">{data.totalCount}</span>건
       </p>
 
@@ -60,7 +60,7 @@ function Stat({
 }) {
   return (
     <div className="flex flex-col gap-0.5">
-      <dt className="text-xs text-zinc-500">{label}</dt>
+      <dt className="text-xs text-zinc-400">{label}</dt>
       <dd className={`font-mono text-base font-medium ${accent ?? "text-zinc-100"}`}>
         {value}
       </dd>
@@ -70,7 +70,7 @@ function Stat({
 
 function MockBadge() {
   return (
-    <p className="font-mono text-xs uppercase tracking-wider text-zinc-500">
+    <p className="font-mono text-xs uppercase tracking-wider text-zinc-400">
       mock · API 키 등록 시 실 데이터로 전환
     </p>
   );

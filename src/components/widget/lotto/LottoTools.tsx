@@ -54,7 +54,7 @@ function Generator() {
             <Wand2 className="h-4 w-4" aria-hidden />
           </span>
           <div>
-            <p className="font-mono text-xs font-semibold uppercase tracking-[0.14em] text-zinc-500">
+            <p className="font-mono text-xs font-semibold uppercase tracking-[0.14em] text-zinc-400">
               번호 생성기
             </p>
             <p className="text-sm font-medium text-zinc-100">균형 잡힌 무작위 5세트</p>
@@ -91,7 +91,7 @@ function Generator() {
         ))}
       </ul>
 
-      <p className="mt-4 text-xs leading-relaxed text-zinc-500">
+      <p className="mt-4 text-xs leading-relaxed text-zinc-400">
         홀짝 균형(2~4개)과 합계(100~175) 범위를 고려한 무작위입니다. 당첨 확률을 높이진 못하지만
         고르게 분포된 조합을 뽑아줍니다.
       </p>
@@ -136,7 +136,7 @@ function MyNumbers({
           <Save className="h-4 w-4" aria-hidden />
         </span>
         <div>
-          <p className="font-mono text-xs font-semibold uppercase tracking-[0.14em] text-zinc-500">
+          <p className="font-mono text-xs font-semibold uppercase tracking-[0.14em] text-zinc-400">
             내 번호
           </p>
           <p className="text-sm font-medium text-zinc-100">{round}회 당첨번호와 대조</p>
@@ -188,7 +188,7 @@ function MyNumbers({
         </ul>
       )}
 
-      <p className="mt-4 text-xs leading-relaxed text-zinc-500">
+      <p className="mt-4 text-xs leading-relaxed text-zinc-400">
         저장한 번호는 이 브라우저에만 보관됩니다. {round}회 당첨번호 기준으로 등수를 계산해요.
       </p>
     </article>

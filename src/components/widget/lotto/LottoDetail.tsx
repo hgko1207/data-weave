@@ -42,7 +42,7 @@ export function LottoDetail({ data }: Props) {
       )}
 
       {data.source === "mock" ? (
-        <p className="font-mono text-xs uppercase tracking-wider text-zinc-500">
+        <p className="font-mono text-xs uppercase tracking-wider text-zinc-400">
           mock · 한국에서 접속 시 동행복권 실 데이터로 전환
         </p>
       ) : null}
@@ -59,7 +59,7 @@ function TopStoresExternal({ round }: { round: number }) {
           <Store className="h-4 w-4" aria-hidden />
         </span>
         <div>
-          <p className="font-mono text-xs font-semibold uppercase tracking-[0.14em] text-zinc-500">
+          <p className="font-mono text-xs font-semibold uppercase tracking-[0.14em] text-zinc-400">
             1등 배출점
           </p>
           <p className="text-sm font-medium text-zinc-100">동행복권에서 확인</p>
@@ -99,7 +99,7 @@ function DrawCard({
             <Ticket className="h-4 w-4" aria-hidden />
           </span>
           <div>
-            <p className="font-mono text-xs font-semibold uppercase tracking-[0.14em] text-zinc-500">
+            <p className="font-mono text-xs font-semibold uppercase tracking-[0.14em] text-zinc-400">
               당첨번호
             </p>
             <p className="text-sm font-medium text-zinc-100">
@@ -168,7 +168,7 @@ function PrizeCard({ data }: { data: LottoData }) {
           <Trophy className="h-4 w-4" aria-hidden />
         </span>
         <div>
-          <p className="font-mono text-xs font-semibold uppercase tracking-[0.14em] text-zinc-500">
+          <p className="font-mono text-xs font-semibold uppercase tracking-[0.14em] text-zinc-400">
             1등 당첨
           </p>
           <p className="text-sm font-medium text-zinc-100">{data.firstPrizeWinners}명 배출</p>
@@ -177,7 +177,7 @@ function PrizeCard({ data }: { data: LottoData }) {
       <p className="mt-4 font-mono text-3xl font-semibold tracking-tight text-amber-200">
         {formatKRW(data.firstPrizeAmount)}
       </p>
-      <p className="mt-1 font-mono text-xs text-zinc-500">1인당 당첨금</p>
+      <p className="mt-1 font-mono text-xs text-zinc-400">1인당 당첨금</p>
     </article>
   );
 }
@@ -197,14 +197,14 @@ function TopStoresCard({ stores }: { stores: TopStore[] }) {
     <article className="rounded-xl border border-zinc-800/80 bg-zinc-900">
       <header className="flex flex-wrap items-baseline justify-between gap-3 border-b border-zinc-800/80 px-6 py-4">
         <h2 className="text-base font-semibold text-zinc-100">1등 배출점</h2>
-        <p className="font-mono text-xs uppercase tracking-[0.14em] text-zinc-500">
+        <p className="font-mono text-xs uppercase tracking-[0.14em] text-zinc-400">
           {stores.length}곳
         </p>
       </header>
       <div className="divide-y divide-zinc-800/60">
         {groups.map(([sido, list]) => (
           <section key={sido} className="px-6 py-4">
-            <p className="mb-2 font-mono text-xs font-medium uppercase tracking-wider text-zinc-500">
+            <p className="mb-2 font-mono text-xs font-medium uppercase tracking-wider text-zinc-400">
               {sido} · {list.length}곳
             </p>
             <ul className="space-y-2">
@@ -220,7 +220,7 @@ function TopStoresCard({ stores }: { stores: TopStore[] }) {
                         {METHOD_LABEL[s.method]}
                       </span>
                     ) : null}
-                    <span className="truncate text-xs text-zinc-500">{s.address}</span>
+                    <span className="truncate text-xs text-zinc-400">{s.address}</span>
                     <a
                       href={mapHref}
                       target="_blank"

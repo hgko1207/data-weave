@@ -77,7 +77,7 @@ function Breadcrumb({ eyebrow, title }: { eyebrow?: string; title: string }) {
     <nav aria-label="현재 위치" className="flex min-w-0 items-center gap-2">
       {eyebrow ? (
         <>
-          <span className="hidden font-mono text-xs uppercase tracking-[0.14em] text-zinc-500 md:inline">
+          <span className="hidden font-mono text-xs uppercase tracking-[0.14em] text-zinc-400 md:inline">
             {eyebrow.split(" · ").join(" / ")}
           </span>
           <span aria-hidden className="hidden text-zinc-700 md:inline">/</span>

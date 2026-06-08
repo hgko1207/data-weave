@@ -18,7 +18,7 @@ export function SidePanelStub({ items }: { items: string[] }) {
       aria-label="추가 예정 컨트롤"
       className="rounded-xl border border-dashed border-zinc-800 bg-zinc-900/40 p-5"
     >
-      <p className="font-mono text-xs font-semibold uppercase tracking-[0.18em] text-zinc-500">
+      <p className="font-mono text-xs font-semibold uppercase tracking-[0.18em] text-zinc-400">
         곧 추가
       </p>
       <ul className="mt-4 space-y-2.5">

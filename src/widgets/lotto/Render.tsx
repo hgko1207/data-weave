@@ -11,19 +11,19 @@ export function LottoRender({ data }: { data: LottoData }) {
           {data.round}
         </span>
         <span className="text-sm text-zinc-300">회</span>
-        <span className="font-mono text-xs text-zinc-500">{data.drawDate}</span>
+        <span className="font-mono text-xs text-zinc-400">{data.drawDate}</span>
       </div>
 
       <div className="flex flex-wrap items-center gap-1.5">
         {data.numbers.map((n) => (
           <LottoBall key={n} num={n} size="sm" />
         ))}
-        <span className="font-mono text-xs text-zinc-500">+</span>
+        <span className="font-mono text-xs text-zinc-400">+</span>
         <LottoBall num={data.bonus} size="sm" />
       </div>
 
       {data.source === "mock" ? (
-        <p className="font-mono text-xs uppercase tracking-widest text-zinc-500">
+        <p className="font-mono text-xs uppercase tracking-widest text-zinc-400">
           mock · API 연동 시 실 데이터로 전환
         </p>
       ) : null}

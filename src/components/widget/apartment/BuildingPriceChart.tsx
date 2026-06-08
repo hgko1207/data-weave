@@ -226,7 +226,7 @@ function ChartCard({
             <LineChart className="h-4 w-4" aria-hidden />
           </span>
           <div>
-            <p className="font-mono text-xs font-semibold uppercase tracking-[0.14em] text-zinc-500">
+            <p className="font-mono text-xs font-semibold uppercase tracking-[0.14em] text-zinc-400">
               거래 가격 흐름
             </p>
             {subLabel ? (

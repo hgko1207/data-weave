@@ -169,7 +169,7 @@ export function ApartmentFilters({ current }: { current: ApartmentFilterValues }
 
       {/* 정렬 chips — 클릭 즉시 URL 갱신 (검색 버튼 누를 필요 X) + 거래 내역으로 스크롤 */}
       <div className="mt-4 flex flex-wrap items-center gap-2">
-        <span className="text-xs text-zinc-500">정렬</span>
+        <span className="text-xs text-zinc-400">정렬</span>
         <div className="flex flex-wrap gap-1.5">
           {SORT_OPTIONS.map((o) => {
             const active = o.value === current.sort;

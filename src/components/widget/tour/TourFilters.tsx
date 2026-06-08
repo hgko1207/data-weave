@@ -104,7 +104,7 @@ export function TourFilters({ current }: { current: TourFilterValues }) {
 
       {/* 카테고리 chips */}
       <div className="mt-4 flex flex-wrap items-center gap-2">
-        <span className="text-xs text-zinc-500">카테고리</span>
+        <span className="text-xs text-zinc-400">카테고리</span>
         <div className="flex flex-wrap gap-1.5">
           {CATEGORIES.map((c) => {
             const active = c.value === current.category;

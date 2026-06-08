@@ -25,13 +25,13 @@ export function FoodRecallDetail({
       <header className="flex flex-wrap items-baseline justify-between gap-3 border-b border-zinc-800/80 px-6 py-4">
         <div className="flex items-baseline gap-3">
           <h2 className="text-base font-semibold text-zinc-100">검색 결과</h2>
-          <p className="font-mono text-xs uppercase tracking-[0.14em] text-zinc-500">
+          <p className="font-mono text-xs uppercase tracking-[0.14em] text-zinc-400">
             최근 {data.windowHours}시간
           </p>
         </div>
         <div className="flex items-baseline gap-4 text-sm">
           <span className="flex items-baseline gap-1">
-            <span className="text-xs text-zinc-500">매칭</span>
+            <span className="text-xs text-zinc-400">매칭</span>
             <span
               className={`font-mono text-base font-semibold tabular-nums ${
                 filteredTotal > 0 ? "text-amber-400" : "text-emerald-400"
@@ -39,21 +39,21 @@ export function FoodRecallDetail({
             >
               {filteredTotal}
             </span>
-            <span className="text-xs text-zinc-500">건</span>
+            <span className="text-xs text-zinc-400">건</span>
           </span>
           <span className="flex items-baseline gap-1">
-            <span className="text-xs text-zinc-500">전체</span>
+            <span className="text-xs text-zinc-400">전체</span>
             <span className="font-mono text-base font-semibold tabular-nums text-zinc-200">
               {data.total}
             </span>
-            <span className="text-xs text-zinc-500">건</span>
+            <span className="text-xs text-zinc-400">건</span>
           </span>
         </div>
       </header>
 
       {hasFilter ? (
         <div className="flex flex-wrap items-center gap-2 border-b border-zinc-800/80 px-6 py-3">
-          <span className="text-xs text-zinc-500">매칭된 키워드</span>
+          <span className="text-xs text-zinc-400">매칭된 키워드</span>
           <div className="flex flex-wrap gap-1.5">
             {data.matchedKeywords.map((kw) => (
               <span
@@ -78,7 +78,7 @@ export function FoodRecallDetail({
       </ul>
 
       {data.source === "mock" ? (
-        <p className="border-t border-zinc-800/80 px-6 py-3 font-mono text-xs uppercase tracking-wider text-zinc-500">
+        <p className="border-t border-zinc-800/80 px-6 py-3 font-mono text-xs uppercase tracking-wider text-zinc-400">
           mock · API 키 등록 시 실 데이터로 전환
         </p>
       ) : null}
@@ -115,7 +115,7 @@ function EmptyState({
     <div className="px-6 py-12 text-center">
       <ShieldCheck className="mx-auto h-7 w-7 text-emerald-400" aria-hidden />
       <p className="mt-3 text-base font-medium text-zinc-100">{title}</p>
-      <p className="mt-1 text-xs text-zinc-500">{hint}</p>
+      <p className="mt-1 text-xs text-zinc-400">{hint}</p>
     </div>
   );
 }
@@ -159,7 +159,7 @@ function RecallRow({
             <Building2 className="h-3.5 w-3.5 text-zinc-500" aria-hidden />
             <span className="truncate">{item.company || "회사 정보 없음"}</span>
             <span aria-hidden className="text-zinc-600">·</span>
-            <span className="font-mono text-xs text-zinc-500">
+            <span className="font-mono text-xs text-zinc-400">
               {formatDate(item.recallDate)}
             </span>
           </p>

@@ -42,7 +42,7 @@ export function DisasterDetail({ data }: { data: DisasterData }) {
       )}
 
       {data.source === "mock" ? (
-        <p className="font-mono text-xs uppercase tracking-wider text-zinc-500">
+        <p className="font-mono text-xs uppercase tracking-wider text-zinc-400">
           mock · 활용신청 후 행정안전부 실 데이터로 전환
         </p>
       ) : null}
@@ -59,7 +59,7 @@ function EmptyState({ region, windowHours }: { region: string; windowHours: numb
       <p className="mt-3 text-base font-medium text-zinc-100">
         {region}에 최근 {windowHours}시간 재난문자가 없어요
       </p>
-      <p className="mt-1 text-xs text-zinc-500">
+      <p className="mt-1 text-xs text-zinc-400">
         평온한 상태입니다. 기간을 늘리거나 다른 지역을 선택해보세요.
       </p>
       {!isNationwide ? (
@@ -144,7 +144,7 @@ function Timeline({ messages }: { messages: DisasterMessage[] }) {
     <article className="rounded-xl border border-zinc-800/80 bg-zinc-900">
       <header className="flex flex-wrap items-baseline justify-between gap-3 border-b border-zinc-800/80 px-6 py-4">
         <h2 className="text-base font-semibold text-zinc-100">재난문자 타임라인</h2>
-        <p className="font-mono text-xs uppercase tracking-[0.14em] text-zinc-500">
+        <p className="font-mono text-xs uppercase tracking-[0.14em] text-zinc-400">
           {messages.length}건 · 최신순
         </p>
       </header>
@@ -176,12 +176,12 @@ function MessageRow({ message }: { message: DisasterMessage }) {
             {meta.label}
           </span>
           <span className="text-sm font-medium text-zinc-100">{message.disasterType}</span>
-          <span className="font-mono text-xs tabular-nums text-zinc-500">
+          <span className="font-mono text-xs tabular-nums text-zinc-400">
             {formatSentAt(message.sentAt)}
           </span>
         </div>
         <p className="mt-1.5 text-sm leading-relaxed text-zinc-300">{message.message}</p>
-        <p className="mt-1 truncate text-xs text-zinc-500">{message.region}</p>
+        <p className="mt-1 truncate text-xs text-zinc-400">{message.region}</p>
       </div>
     </li>
   );

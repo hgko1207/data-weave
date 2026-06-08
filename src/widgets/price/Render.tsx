@@ -12,7 +12,7 @@ export function PriceRender({ data }: { data: PriceData }) {
           {data.items.length}
         </span>
         <span className="text-sm text-zinc-300">품목</span>
-        <span className="text-xs text-zinc-500">
+        <span className="text-xs text-zinc-400">
           {CATEGORY_LABEL[data.category]} · {data.cls === "wholesale" ? "도매" : "소매"}
         </span>
       </div>
@@ -23,14 +23,14 @@ export function PriceRender({ data }: { data: PriceData }) {
             <span className="truncate text-sm text-zinc-100">{it.itemName}</span>
             <span className="shrink-0 font-mono text-sm tabular-nums text-zinc-300">
               {it.today != null ? `${it.today.toLocaleString()}원` : "—"}
-              <span className="ml-1 text-xs text-zinc-500">/{it.unit}</span>
+              <span className="ml-1 text-xs text-zinc-400">/{it.unit}</span>
             </span>
           </li>
         ))}
       </ul>
 
       {data.source === "mock" ? (
-        <p className="font-mono text-xs uppercase tracking-widest text-zinc-500">
+        <p className="font-mono text-xs uppercase tracking-widest text-zinc-400">
           mock · API 키 등록 시 실 데이터로 전환
         </p>
       ) : null}

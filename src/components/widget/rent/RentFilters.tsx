@@ -204,7 +204,7 @@ function ChipGroup({
 }) {
   return (
     <div className="flex items-center gap-2">
-      <span className="text-xs text-zinc-500">{label}</span>
+      <span className="text-xs text-zinc-400">{label}</span>
       <div className="flex flex-wrap gap-1.5">
         {options.map((o) => (
           <Link

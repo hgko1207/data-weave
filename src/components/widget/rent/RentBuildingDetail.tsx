@@ -39,7 +39,7 @@ export function RentBuildingDetail({
         <p className="mt-3 text-base font-medium text-zinc-100">
           최근 {monthsScanned}개월 전월세 거래가 없어요
         </p>
-        <p className="mt-1 text-xs text-zinc-500">
+        <p className="mt-1 text-xs text-zinc-400">
           단지명·법정동이 변경되었거나 거래가 발생하지 않았을 수 있어요.
         </p>
         <Link
@@ -81,7 +81,7 @@ export function RentBuildingDetail({
       <BuildingTradeList trades={trades} />
 
       {source === "mock" ? (
-        <p className="font-mono text-xs uppercase tracking-wider text-zinc-500">
+        <p className="font-mono text-xs uppercase tracking-wider text-zinc-400">
           mock · API 키 등록 시 실 데이터로 전환
         </p>
       ) : null}
@@ -115,7 +115,7 @@ function BuildingHeader({
           <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
             <h2 className="text-2xl font-semibold tracking-tight text-zinc-100">{aptName}</h2>
             {buildYear != null ? (
-              <span className="font-mono text-xs text-zinc-500">{buildYear}년식</span>
+              <span className="font-mono text-xs text-zinc-400">{buildYear}년식</span>
             ) : null}
           </div>
           <p className="mt-1 text-sm text-zinc-400">
@@ -164,7 +164,7 @@ function MetaItem({
       <span className="text-zinc-500" aria-hidden>
         {icon}
       </span>
-      <dt className="text-xs text-zinc-500">{label}</dt>
+      <dt className="text-xs text-zinc-400">{label}</dt>
       <dd className="font-mono text-sm tabular-nums text-zinc-200">{value}</dd>
     </div>
   );
@@ -236,7 +236,7 @@ function BuildingAreaGroups({ trades }: { trades: RentTrade[] }) {
     <article className="rounded-xl border border-zinc-800/80 bg-zinc-900">
       <header className="flex flex-wrap items-baseline justify-between gap-3 border-b border-zinc-800/80 px-6 py-4">
         <h3 className="text-base font-semibold text-zinc-100">평형별 거래</h3>
-        <p className="font-mono text-xs uppercase tracking-[0.14em] text-zinc-500">
+        <p className="font-mono text-xs uppercase tracking-[0.14em] text-zinc-400">
           {groups.length}개 평형
         </p>
       </header>
@@ -264,9 +264,9 @@ function BuildingAreaGroups({ trades }: { trades: RentTrade[] }) {
                 <span className="font-mono text-lg font-semibold tabular-nums text-zinc-100">
                   {g.pyeong}
                 </span>
-                <span className="text-xs text-zinc-500">평형</span>
+                <span className="text-xs text-zinc-400">평형</span>
               </div>
-              <p className="hidden font-mono text-xs text-zinc-500 tabular-nums md:block">
+              <p className="hidden font-mono text-xs text-zinc-400 tabular-nums md:block">
                 전용 {areaRange}㎡ · {g.jeonse.length + g.monthly.length}건
               </p>
               <div className="text-right font-mono tabular-nums">
@@ -302,12 +302,12 @@ function BuildingTradeList({ trades }: { trades: RentTrade[] }) {
     <article className="rounded-xl border border-zinc-800/80 bg-zinc-900">
       <header className="flex flex-wrap items-baseline justify-between gap-3 border-b border-zinc-800/80 px-6 py-4">
         <h3 className="text-base font-semibold text-zinc-100">거래 내역 · 최신순</h3>
-        <p className="font-mono text-xs uppercase tracking-[0.14em] text-zinc-500">
+        <p className="font-mono text-xs uppercase tracking-[0.14em] text-zinc-400">
           {trades.length}건
         </p>
       </header>
 
-      <div className="hidden grid-cols-[40px_60px_1fr_160px_100px] items-center gap-4 border-b border-zinc-800/80 px-6 py-2.5 text-xs font-medium uppercase tracking-wider text-zinc-500 md:grid">
+      <div className="hidden grid-cols-[40px_60px_1fr_160px_100px] items-center gap-4 border-b border-zinc-800/80 px-6 py-2.5 text-xs font-medium uppercase tracking-wider text-zinc-400 md:grid">
         <span className="text-right">#</span>
         <span>종류</span>
         <span>면적·평형</span>
@@ -323,7 +323,7 @@ function BuildingTradeList({ trades }: { trades: RentTrade[] }) {
               key={t.id}
               className="grid grid-cols-[1fr_auto] items-center gap-3 px-6 py-3 md:grid-cols-[40px_60px_1fr_160px_100px] md:gap-4"
             >
-              <span className="hidden text-right font-mono text-xs tabular-nums text-zinc-500 md:block">
+              <span className="hidden text-right font-mono text-xs tabular-nums text-zinc-400 md:block">
                 {String(idx + 1).padStart(2, "0")}
               </span>
               <span
@@ -345,12 +345,12 @@ function BuildingTradeList({ trades }: { trades: RentTrade[] }) {
                   <span className="font-mono text-sm font-medium tabular-nums text-zinc-100">
                     {t.area.toFixed(1)}㎡
                   </span>
-                  <span className="font-mono text-xs text-zinc-500">{pyeongLabel(t.area)}</span>
+                  <span className="font-mono text-xs text-zinc-400">{pyeongLabel(t.area)}</span>
                   {t.floor != null ? (
-                    <span className="font-mono text-xs text-zinc-500">· {t.floor}층</span>
+                    <span className="font-mono text-xs text-zinc-400">· {t.floor}층</span>
                   ) : null}
                 </div>
-                <p className="mt-0.5 font-mono text-xs tabular-nums text-zinc-500 md:hidden">
+                <p className="mt-0.5 font-mono text-xs tabular-nums text-zinc-400 md:hidden">
                   {formatShortDate(t.dealDate)}
                 </p>
               </div>
@@ -365,7 +365,7 @@ function BuildingTradeList({ trades }: { trades: RentTrade[] }) {
                   </>
                 )}
               </p>
-              <p className="hidden text-right font-mono text-xs tabular-nums text-zinc-500 md:block">
+              <p className="hidden text-right font-mono text-xs tabular-nums text-zinc-400 md:block">
                 {formatShortDate(t.dealDate)}
               </p>
             </li>

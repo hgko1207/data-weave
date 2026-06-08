@@ -133,7 +133,7 @@ export function LibraryFilters({ current }: { current: LibraryFilterValues }) {
 
       {/* mode chips */}
       <div className="mt-4 flex flex-wrap items-center gap-2">
-        <span className="text-xs text-zinc-500">검색 방식</span>
+        <span className="text-xs text-zinc-400">검색 방식</span>
         <div className="flex flex-wrap gap-1.5">
           {MODE_OPTIONS.map((o) => {
             const active = o.value === current.mode;

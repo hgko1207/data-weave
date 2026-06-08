@@ -37,7 +37,7 @@ export function DashboardHome() {
         <SectionHeader title="즐겨찾는 위젯">
           <Link
             href="/settings"
-            className="inline-flex items-center gap-1 font-mono text-xs text-zinc-500 transition hover:text-zinc-300"
+            className="inline-flex items-center gap-1 font-mono text-xs text-zinc-400 transition hover:text-zinc-300"
           >
             <Settings className="h-3 w-3" aria-hidden />
             관리
@@ -55,7 +55,7 @@ export function DashboardHome() {
           <div className="rounded-xl border border-dashed border-zinc-800 bg-zinc-900/40 p-8 text-center">
             <Star className="mx-auto h-6 w-6 text-zinc-600" aria-hidden />
             <p className="mt-3 text-sm text-zinc-300">즐겨찾는 위젯이 없어요</p>
-            <p className="mt-1 text-xs text-zinc-500">
+            <p className="mt-1 text-xs text-zinc-400">
               아래 위젯의 별을 누르거나 설정에서 자주 보는 위젯을 핀하세요.
             </p>
           </div>
@@ -111,7 +111,7 @@ function WidgetCard({ widget, pinned }: { widget: WidgetMeta; pinned: boolean })
             </>
           ) : null}
         </span>
-        <span className="mt-0.5 line-clamp-2 block text-xs leading-relaxed text-zinc-500">
+        <span className="mt-0.5 line-clamp-2 block text-xs leading-relaxed text-zinc-400">
           {widget.description}
         </span>
       </span>

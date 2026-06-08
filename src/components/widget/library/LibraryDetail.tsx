@@ -70,7 +70,7 @@ export function LibraryDetail({ data, ctx }: Props) {
 function MockNote({ source }: { source: LibraryData["source"] }) {
   if (source !== "mock") return null;
   return (
-    <p className="font-mono text-xs uppercase tracking-wider text-zinc-500">
+    <p className="font-mono text-xs uppercase tracking-wider text-zinc-400">
       mock · 한국에서 접속 시 정보나루 실 데이터로 전환
     </p>
   );
@@ -83,7 +83,7 @@ function BookGrid({ books, query, ctx }: { books: MatchedBook[]; query: string; 
       <article className="rounded-xl border border-zinc-800/80 bg-zinc-900 p-12 text-center">
         <BookOpen className="mx-auto h-7 w-7 text-zinc-500" aria-hidden />
         <p className="mt-3 text-base font-medium text-zinc-100">도서명을 검색해보세요</p>
-        <p className="mt-1 text-xs text-zinc-500">
+        <p className="mt-1 text-xs text-zinc-400">
           책 제목을 입력하면 그 책을 소장한 도서관을 찾아드려요.
         </p>
       </article>
@@ -96,7 +96,7 @@ function BookGrid({ books, query, ctx }: { books: MatchedBook[]; query: string; 
         <p className="mt-3 text-base font-medium text-zinc-100">
           &ldquo;{query}&rdquo; 검색 결과가 없어요
         </p>
-        <p className="mt-1 text-xs text-zinc-500">다른 제목으로 검색해보세요.</p>
+        <p className="mt-1 text-xs text-zinc-400">다른 제목으로 검색해보세요.</p>
       </article>
     );
   }
@@ -106,7 +106,7 @@ function BookGrid({ books, query, ctx }: { books: MatchedBook[]; query: string; 
         <h2 className="text-base font-semibold text-zinc-100">
           &ldquo;{query}&rdquo; 검색 결과
         </h2>
-        <p className="font-mono text-xs uppercase tracking-[0.14em] text-zinc-500">
+        <p className="font-mono text-xs uppercase tracking-[0.14em] text-zinc-400">
           {books.length}권 · 책 선택 시 소장 도서관 조회
         </p>
       </header>
@@ -129,10 +129,10 @@ function BookGrid({ books, query, ctx }: { books: MatchedBook[]; query: string; 
                 <span className="line-clamp-2 text-sm font-medium text-zinc-100 group-hover:text-emerald-200">
                   {book.title}
                 </span>
-                <span className="mt-1 line-clamp-1 block text-xs text-zinc-500">
+                <span className="mt-1 line-clamp-1 block text-xs text-zinc-400">
                   {book.author ?? ""}
                 </span>
-                <span className="mt-0.5 block text-xs text-zinc-500">
+                <span className="mt-0.5 block text-xs text-zinc-400">
                   {[book.publisher, book.year].filter(Boolean).join(" · ")}
                 </span>
               </span>
@@ -166,7 +166,7 @@ function SelectedBookCard({ book, backHref }: { book: MatchedBook; backHref: str
             {[book.author, book.publisher, book.year].filter(Boolean).join(" · ")}
           </p>
           {book.isbn ? (
-            <p className="mt-0.5 font-mono text-xs text-zinc-500">ISBN {book.isbn}</p>
+            <p className="mt-0.5 font-mono text-xs text-zinc-400">ISBN {book.isbn}</p>
           ) : null}
           <Link
             href={backHref}
@@ -249,7 +249,7 @@ function LibraryList({ data }: { data: LibraryData }) {
         <p className="mt-3 text-base font-medium text-zinc-100">
           조건에 맞는 도서관이 없어요
         </p>
-        <p className="mt-1 text-xs text-zinc-500">
+        <p className="mt-1 text-xs text-zinc-400">
           다른 시·군·구를 선택하거나 검색어를 비워보세요.
         </p>
       </article>
@@ -262,7 +262,7 @@ function LibraryList({ data }: { data: LibraryData }) {
     <article className="rounded-xl border border-zinc-800/80 bg-zinc-900">
       <header className="flex flex-wrap items-baseline justify-between gap-3 border-b border-zinc-800/80 px-6 py-4">
         <h2 className="text-base font-semibold text-zinc-100">도서관 목록</h2>
-        <p className="font-mono text-xs uppercase tracking-[0.14em] text-zinc-500">
+        <p className="font-mono text-xs uppercase tracking-[0.14em] text-zinc-400">
           {data.libraries.length}곳
         </p>
       </header>
@@ -294,12 +294,12 @@ function LibraryRow({
     <li className="flex flex-col gap-3 px-6 py-4 transition hover:bg-zinc-800/40 md:flex-row md:items-start md:justify-between md:gap-6">
       <div className="min-w-0 flex-1">
         <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
-          <span className="font-mono text-xs tabular-nums text-zinc-500">
+          <span className="font-mono text-xs tabular-nums text-zinc-400">
             {String(index).padStart(2, "0")}
           </span>
           <h3 className="text-base font-medium text-zinc-100">{lib.name}</h3>
           {lib.bookCount != null ? (
-            <span className="font-mono text-xs tabular-nums text-zinc-500">
+            <span className="font-mono text-xs tabular-nums text-zinc-400">
               장서 {lib.bookCount.toLocaleString()}권
             </span>
           ) : null}
@@ -319,7 +319,7 @@ function LibraryRow({
             )
           ) : null}
         </div>
-        <p className="mt-0.5 truncate text-xs text-zinc-500">{lib.address}</p>
+        <p className="mt-0.5 truncate text-xs text-zinc-400">{lib.address}</p>
         {/* 운영시간·휴관 요약 한 줄 (전체는 title 툴팁) */}
         <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs">
           {hours ? (

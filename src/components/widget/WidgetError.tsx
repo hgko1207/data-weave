@@ -13,7 +13,7 @@ export function WidgetError({ message, onRetry }: Props) {
         <span>위젯 점검 중</span>
       </div>
       {message ? (
-        <p className="font-mono text-xs text-zinc-500">{message}</p>
+        <p className="font-mono text-xs text-zinc-400">{message}</p>
       ) : null}
       {onRetry ? (
         <button

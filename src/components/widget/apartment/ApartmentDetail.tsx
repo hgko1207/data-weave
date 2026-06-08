@@ -46,7 +46,7 @@ export function ApartmentDetail({
       )}
 
       {data.source === "mock" ? (
-        <p className="font-mono text-xs uppercase tracking-wider text-zinc-500">
+        <p className="font-mono text-xs uppercase tracking-wider text-zinc-400">
           mock · API 키 등록 시 실 데이터로 전환
         </p>
       ) : null}
@@ -107,7 +107,7 @@ function EmptyState({ dealYm, query }: { dealYm: string; query: string }) {
           ? `"${query}" 일치 거래가 없어요`
           : `${formatYm(dealYm)}에 등록된 거래가 없어요`}
       </p>
-      <p className="mt-1 text-xs text-zinc-500">
+      <p className="mt-1 text-xs text-zinc-400">
         {hasQuery
           ? "단지명·동을 다르게 입력하거나 검색을 비워보세요."
           : "이전 달을 보거나 다른 시·군·구를 검색해보세요."}

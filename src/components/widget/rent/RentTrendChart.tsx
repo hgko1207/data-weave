@@ -27,7 +27,7 @@ export function RentTrendChart({ points, region }: Props) {
             <TrendingUp className="h-4 w-4" aria-hidden />
           </span>
           <div>
-            <p className="font-mono text-xs font-semibold uppercase tracking-[0.14em] text-zinc-500">
+            <p className="font-mono text-xs font-semibold uppercase tracking-[0.14em] text-zinc-400">
               월별 평균 보증금 추이
             </p>
             <p className="text-sm font-medium text-zinc-100">{region}</p>
@@ -91,7 +91,7 @@ export function RentTrendChart({ points, region }: Props) {
             <TrendingUp className="h-4 w-4" aria-hidden />
           </span>
           <div>
-            <p className="font-mono text-xs font-semibold uppercase tracking-[0.14em] text-zinc-500">
+            <p className="font-mono text-xs font-semibold uppercase tracking-[0.14em] text-zinc-400">
               월별 평균 보증금 추이
             </p>
             <p className="text-sm font-medium text-zinc-100">
