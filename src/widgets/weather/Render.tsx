@@ -51,7 +51,7 @@ export function WeatherRender({ data }: { data: WeatherData }) {
       ) : null}
 
       {data.source === "mock" ? (
-        <p className="font-mono text-xs uppercase tracking-wider text-zinc-500">
+        <p className="font-mono text-xs uppercase tracking-wider text-zinc-400">
           mock · API 키 등록 시 실 데이터로 전환
         </p>
       ) : null}

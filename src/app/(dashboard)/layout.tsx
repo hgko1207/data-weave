@@ -37,8 +37,8 @@ export default function AppLayout({
             <button
               type="button"
               onClick={() => setPaletteOpen(true)}
-              className="inline-flex h-9 min-w-[200px] items-center gap-2 rounded-lg border border-zinc-800 bg-zinc-900 px-3 text-sm text-zinc-500 transition hover:border-zinc-700 hover:bg-zinc-900/80 hover:text-zinc-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
-              aria-label="명령 팔레트 열기"
+              className="inline-flex h-9 min-w-[200px] items-center gap-2 rounded-lg border border-zinc-800 bg-zinc-900 px-3 text-sm text-zinc-400 transition hover:border-zinc-700 hover:bg-zinc-900/80 hover:text-zinc-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
+              aria-label="검색 — 명령 팔레트 열기"
             >
               <Search className="h-3.5 w-3.5" aria-hidden />
               <span className="flex-1 text-left">검색…</span>

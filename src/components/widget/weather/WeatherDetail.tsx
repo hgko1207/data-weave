@@ -33,7 +33,7 @@ export function WeatherDetail({ data }: { data: WeatherData }) {
       <DailyForecastCard daily={data.daily} currentTemp={data.temp} />
 
       {data.source === "mock" ? (
-        <p className="font-mono text-xs uppercase tracking-widest text-zinc-500">
+        <p className="font-mono text-xs uppercase tracking-widest text-zinc-400">
           mock · API 키 등록 시 실 데이터로 전환
         </p>
       ) : null}
@@ -53,7 +53,7 @@ function CurrentCard({ data }: { data: WeatherData }) {
             <CloudSun className="h-5 w-5" aria-hidden />
           </span>
           <div>
-            <p className="font-mono text-xs uppercase tracking-[0.16em] text-zinc-500">
+            <p className="font-mono text-xs uppercase tracking-[0.16em] text-zinc-400">
               현재 날씨
             </p>
             <p className="text-sm font-medium text-zinc-100">{data.region}</p>
@@ -73,14 +73,14 @@ function CurrentCard({ data }: { data: WeatherData }) {
         {data.todayHigh != null && data.todayLow != null ? (
           <div className="mb-1 ml-auto flex flex-col items-end gap-1.5">
             <span className="flex items-center gap-1.5">
-              <span className="text-xs text-zinc-500">최고</span>
+              <span className="text-xs text-zinc-400">최고</span>
               <span className="flex items-center gap-0.5 font-mono text-base font-semibold text-rose-300">
                 <ArrowUp className="h-4 w-4" aria-hidden />
                 {Math.round(data.todayHigh)}°
               </span>
             </span>
             <span className="flex items-center gap-1.5">
-              <span className="text-xs text-zinc-500">최저</span>
+              <span className="text-xs text-zinc-400">최저</span>
               <span className="flex items-center gap-0.5 font-mono text-base font-semibold text-cyan-300">
                 <ArrowDown className="h-4 w-4" aria-hidden />
                 {Math.round(data.todayLow)}°
@@ -168,14 +168,14 @@ function AirQualityCard({ data }: { data: WeatherData }) {
           <Wind className="h-5 w-5" aria-hidden />
         </span>
         <div>
-          <p className="font-mono text-xs uppercase tracking-[0.18em] text-zinc-500">
+          <p className="font-mono text-xs uppercase tracking-[0.18em] text-zinc-400">
             대기질
           </p>
           <p className="text-sm font-medium text-zinc-100">에어코리아</p>
         </div>
       </header>
 
-      <dl className="mt-5 space-y-3">
+      <div className="mt-5 space-y-3">
         <AirQualityRow
           label="미세먼지 (PM10)"
           value={data.pm10Value}
@@ -190,7 +190,7 @@ function AirQualityCard({ data }: { data: WeatherData }) {
           grade={data.pm25Grade}
           max={75}
         />
-      </dl>
+      </div>
     </article>
   );
 }
@@ -212,16 +212,16 @@ function AirQualityRow({
   return (
     <div className="rounded-lg border border-zinc-800 bg-zinc-950/60 p-3.5">
       <div className="flex items-center justify-between gap-2">
-        <dt className="text-sm text-zinc-400">{label}</dt>
-        <dd className={`rounded-md px-2 py-0.5 text-xs font-medium ${gradeBadge[grade]}`}>
+        <span className="text-sm text-zinc-400">{label}</span>
+        <span className={`rounded-md px-2 py-0.5 text-xs font-medium ${gradeBadge[grade]}`}>
           {grade}
-        </dd>
+        </span>
       </div>
       <div className="mt-2 flex items-baseline gap-1.5">
         <span className="font-mono text-2xl font-semibold tabular-nums text-zinc-100">
           {value ?? "—"}
         </span>
-        <span className="font-mono text-xs text-zinc-500">{unit}</span>
+        <span className="font-mono text-xs text-zinc-400">{unit}</span>
       </div>
       <div
         className="relative mt-2.5 h-1.5 w-full rounded-full"
@@ -254,7 +254,7 @@ function HourlyChartCard({ data }: { data: WeatherData }) {
     <article className="rounded-xl border border-zinc-800/80 bg-zinc-900 p-6">
       <header className="flex items-baseline justify-between">
         <h2 className="text-base font-semibold text-zinc-100">시간대별 예보</h2>
-        <p className="font-mono text-xs uppercase tracking-[0.16em] text-zinc-500">
+        <p className="font-mono text-xs uppercase tracking-[0.16em] text-zinc-400">
           최대 {data.hourly.length}시간
         </p>
       </header>
@@ -284,7 +284,7 @@ function DailyForecastCard({
     <article className="rounded-xl border border-zinc-800/80 bg-zinc-900 p-6">
       <header className="flex items-baseline justify-between">
         <h2 className="text-base font-semibold text-zinc-100">주간 예보</h2>
-        <p className="font-mono text-xs uppercase tracking-[0.16em] text-zinc-500">
+        <p className="font-mono text-xs uppercase tracking-[0.16em] text-zinc-400">
           {daily.length}일 · 단기 + 중기
         </p>
       </header>

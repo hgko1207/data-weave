@@ -32,10 +32,11 @@ export function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
 
   return (
     <div className="flex h-full flex-col">
+      {/* aria-label 제거 — visible text("DataWeave 한국 공공데이터")가 그대로 access name이 되어
+          voice control 사용자가 visible label로 클릭 가능. WCAG 2.5.3 (Label in Name). */}
       <Link
         href="/"
         onClick={onNavigate}
-        aria-label="DataWeave 홈"
         className="group flex items-center gap-2.5 border-b border-zinc-800/80 px-4 py-4 transition hover:bg-zinc-800/40"
       >
         <span
@@ -142,13 +143,15 @@ function DataSourceStatus() {
       <Activity className="h-3.5 w-3.5 shrink-0 text-emerald-400" aria-hidden />
       <div className="flex min-w-0 flex-1 flex-col leading-tight">
         <span className="text-xs font-medium text-zinc-300">데이터 소스</span>
-        <span className="text-xs text-zinc-500">{sources.length}/4 연결됨</span>
+        <span className="text-xs text-zinc-400">{sources.length}/4 연결됨</span>
       </div>
-      <div className="flex items-center gap-1">
+      {/* dot은 시각적 표시. status 정보는 옆 visible 텍스트가 전달 → aria-hidden + title */}
+      <div className="flex items-center gap-1" role="presentation">
         {sources.map((s) => (
           <span
             key={s.name}
-            aria-label={`${s.name} 정상`}
+            aria-hidden="true"
+            title={`${s.name} 정상`}
             className={`h-1.5 w-1.5 rounded-full ${s.color} shadow-[0_0_4px] shadow-emerald-400/60`}
           />
         ))}
