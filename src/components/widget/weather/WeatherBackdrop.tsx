@@ -1,7 +1,7 @@
 import type { WeatherData } from "@/widgets/weather/schema";
+import { CONTENT_BACKDROP_INSET } from "@/lib/layout-dims";
 
 // 날씨 페이지 content 영역 전용 하늘 배경.
-// 레이아웃 상수에 맞춤: 사이드바 w-64(좌) · 헤더 h-14(상) 안쪽(=content)만 덮는다.
 // fixed라 스크롤해도 하늘은 고정되고 카드만 그 위로 흐름. 카드는 솔리드라 가독성 유지.
 // 별은 항상 표시(우주 배경) — 밤은 밝게/짙은 인디고, 낮은 옅게/푸른 틴트.
 export function WeatherBackdrop({
@@ -16,7 +16,7 @@ export function WeatherBackdrop({
   return (
     <div
       aria-hidden
-      className={`pointer-events-none fixed bottom-0 left-64 right-0 top-14 z-0 bg-gradient-to-b ${base}`}
+      className={`${CONTENT_BACKDROP_INSET} bg-gradient-to-b ${base}`}
     >
       <Stars opacity={night ? 0.9 : 0.45} />
     </div>

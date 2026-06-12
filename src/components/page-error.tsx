@@ -25,7 +25,7 @@ export function PageError({ message, onRetry }: Props) {
         잠시 뒤 다시 시도해보세요. 사이드바 다른 위젯은 정상 동작합니다.
       </p>
       {message ? (
-        <p className="mt-3 max-w-md font-mono text-xs text-zinc-600">{message}</p>
+        <p className="mt-3 max-w-md font-mono text-xs text-zinc-500">{message}</p>
       ) : null}
       <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
         {onRetry ? (

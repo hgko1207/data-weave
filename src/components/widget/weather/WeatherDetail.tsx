@@ -419,13 +419,13 @@ function WindCompass({
         <span className="absolute left-1/2 top-1 -translate-x-1/2 font-mono text-xs text-zinc-400">
           N
         </span>
-        <span className="absolute bottom-1 left-1/2 -translate-x-1/2 font-mono text-xs text-zinc-600">
+        <span className="absolute bottom-1 left-1/2 -translate-x-1/2 font-mono text-xs text-zinc-500">
           S
         </span>
-        <span className="absolute left-1.5 top-1/2 -translate-y-1/2 font-mono text-xs text-zinc-600">
+        <span className="absolute left-1.5 top-1/2 -translate-y-1/2 font-mono text-xs text-zinc-500">
           W
         </span>
-        <span className="absolute right-1.5 top-1/2 -translate-y-1/2 font-mono text-xs text-zinc-600">
+        <span className="absolute right-1.5 top-1/2 -translate-y-1/2 font-mono text-xs text-zinc-500">
           E
         </span>
         <svg viewBox="0 0 100 100" className="absolute inset-0 h-full w-full">

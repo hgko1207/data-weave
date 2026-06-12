@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Siren, AlertTriangle, Info, Globe } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import type { DisasterData, DisasterMessage, EmergencyLevel } from "@/widgets/disaster/schema";
+import { StatCard } from "@/components/widget/StatCard";
 
 const LEVEL_META: Record<
   EmergencyLevel,
@@ -104,41 +105,6 @@ function StatsRow({ data }: { data: DisasterData }) {
   );
 }
 
-function StatCard({
-  icon,
-  label,
-  value,
-  accent,
-  valueClass,
-}: {
-  icon: React.ReactNode;
-  label: string;
-  value: string;
-  accent: string;
-  valueClass?: string;
-}) {
-  return (
-    <article className="rounded-xl border border-zinc-800/80 bg-zinc-900 p-4">
-      <div className="flex items-center gap-2.5">
-        <span
-          aria-hidden
-          className={`flex h-9 w-9 items-center justify-center rounded-md ${accent}`}
-        >
-          {icon}
-        </span>
-        <span className="text-sm font-medium text-zinc-300">{label}</span>
-      </div>
-      <p
-        className={`mt-3 font-mono text-2xl font-semibold tracking-tight ${
-          valueClass ?? "text-zinc-100"
-        }`}
-      >
-        {value}
-      </p>
-    </article>
-  );
-}
-
 function Timeline({ messages }: { messages: DisasterMessage[] }) {
   return (
     <article className="rounded-xl border border-zinc-800/80 bg-zinc-900">
@@ -172,7 +138,7 @@ function MessageRow({ message }: { message: DisasterMessage }) {
 
       <div className="min-w-0 flex-1">
         <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
-          <span className={`inline-flex items-center rounded px-1.5 py-0.5 font-mono text-[11px] font-semibold ${meta.chip}`}>
+          <span className={`inline-flex items-center rounded px-1.5 py-0.5 font-mono text-xs font-semibold ${meta.chip}`}>
             {meta.label}
           </span>
           <span className="text-sm font-medium text-zinc-100">{message.disasterType}</span>
