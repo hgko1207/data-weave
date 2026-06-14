@@ -43,3 +43,7 @@ next-env.d.ts
 
 # lighthouse reports (임시 산출물 — 시간 지나면 stale)
 /lighthouse-reports/
+
+# Claude Code 로컬 권한·설정 (API 키 등 평문이 들어갈 수 있음 — git 추적 금지)
+.claude/settings.json
+.claude/settings.local.json
