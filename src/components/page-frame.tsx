@@ -8,7 +8,7 @@ type Props = {
 
 export function PageFrame({ eyebrow, title, description, actions, children }: Props) {
   return (
-    <section className="space-y-8">
+    <section className="space-y-6 sm:space-y-8">
       <header className="flex flex-wrap items-end justify-between gap-4">
         <div className="min-w-0">
           {eyebrow ? (
@@ -16,7 +16,7 @@ export function PageFrame({ eyebrow, title, description, actions, children }: Pr
               {eyebrow}
             </p>
           ) : null}
-          <h1 className="mt-3 text-3xl font-semibold leading-tight tracking-tight text-zinc-100">
+          <h1 className="mt-3 text-2xl font-semibold leading-tight tracking-tight text-zinc-100 sm:text-3xl">
             {title}
           </h1>
           {description ? (
@@ -25,7 +25,7 @@ export function PageFrame({ eyebrow, title, description, actions, children }: Pr
             </p>
           ) : null}
         </div>
-        {actions ? <div className="flex shrink-0 items-center gap-2">{actions}</div> : null}
+        {actions ? <div className="flex shrink-0 flex-wrap items-center gap-2">{actions}</div> : null}
       </header>
       <div className="space-y-6">{children}</div>
     </section>

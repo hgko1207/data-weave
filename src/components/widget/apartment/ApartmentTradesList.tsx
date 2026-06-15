@@ -141,46 +141,54 @@ function TradeRow({
         </span>
 
         <div className="min-w-0">
-          <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
+          {/* 단지명 + 해제 표식 — 모바일은 1줄 truncate (chip은 아래로 분리) */}
+          <div className="flex min-w-0 items-center gap-2">
             <Link
               href={buildingHref}
               onClick={(e) => e.stopPropagation()}
-              className="group inline-flex items-baseline gap-1 text-base font-medium text-zinc-100 transition hover:text-emerald-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
+              className="group inline-flex min-w-0 items-baseline gap-1 text-base font-medium text-zinc-100 transition hover:text-emerald-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
             >
-              <span className="group-hover:underline">{trade.aptName}</span>
+              <span className="truncate group-hover:underline">{trade.aptName}</span>
               <ExternalLink
                 className="h-3 w-3 shrink-0 text-zinc-500 transition group-hover:text-emerald-400"
                 aria-hidden
               />
             </Link>
-            {trade.aptDong ? (
-              <span className="rounded bg-zinc-800 px-1.5 py-0.5 font-mono text-xs text-zinc-300">
-                {trade.aptDong}
-              </span>
-            ) : null}
-            {trade.floor != null ? (
-              <span className="font-mono text-xs text-zinc-400">{trade.floor}층</span>
-            ) : null}
-            {trade.buildYear != null ? (
-              <span className="font-mono text-xs text-zinc-400">{trade.buildYear}년식</span>
-            ) : null}
             {isCancelled ? (
-              <span className="inline-flex items-center gap-1 rounded bg-rose-500/15 px-1.5 py-0.5 font-mono text-xs text-rose-300">
+              <span className="inline-flex shrink-0 items-center gap-1 rounded bg-rose-500/15 px-1.5 py-0.5 font-mono text-xs text-rose-300">
                 <XCircle className="h-3 w-3" aria-hidden />
                 해제
               </span>
             ) : null}
           </div>
-          <p className="mt-0.5 truncate text-xs text-zinc-400">
+          {/* 동/층/년식 메타 (모바일: 단지명 아래 줄로 분리) */}
+          {(trade.aptDong || trade.floor != null || trade.buildYear != null) ? (
+            <div className="mt-1 flex flex-wrap items-baseline gap-x-1.5 gap-y-0.5">
+              {trade.aptDong ? (
+                <span className="rounded bg-zinc-800 px-1.5 py-0.5 font-mono text-xs text-zinc-300">
+                  {trade.aptDong}
+                </span>
+              ) : null}
+              {trade.floor != null ? (
+                <span className="font-mono text-xs text-zinc-400">{trade.floor}층</span>
+              ) : null}
+              {trade.buildYear != null ? (
+                <span className="font-mono text-xs text-zinc-400">{trade.buildYear}년식</span>
+              ) : null}
+            </div>
+          ) : null}
+          <p className="mt-1 truncate text-xs text-zinc-400">
             {trade.dong}
             {trade.jibun ? ` ${trade.jibun}` : ""}
             {trade.roadName ? ` · ${trade.roadName}` : ""}
           </p>
-          {/* mobile: 면적 + 날짜 인라인 */}
-          <p className="mt-1 flex items-baseline gap-3 font-mono text-xs tabular-nums text-zinc-400 md:hidden">
-            <span>{trade.area.toFixed(1)}㎡ ({pyeongLabel(trade.area)})</span>
-            <span>·</span>
-            <span>{formatDealDate(trade.dealDate)}</span>
+          {/* mobile: 면적 + 날짜 인라인 (whitespace-nowrap으로 mid-string wrap 방지) */}
+          <p className="mt-1 flex flex-wrap items-baseline gap-x-2 font-mono text-xs tabular-nums text-zinc-400 md:hidden">
+            <span className="whitespace-nowrap">
+              {trade.area.toFixed(1)}㎡ ({pyeongLabel(trade.area)})
+            </span>
+            <span aria-hidden>·</span>
+            <span className="whitespace-nowrap">{formatDealDate(trade.dealDate)}</span>
           </p>
         </div>
 

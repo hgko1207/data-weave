@@ -95,6 +95,7 @@ function CurrentCard({ data }: { data: WeatherData }) {
           <MetricTile
             icon={<Droplets className="h-3.5 w-3.5 text-cyan-400" aria-hidden />}
             label="강수확률"
+            labelMobile="강수"
             value={`${data.pop}%`}
           />
           <MetricTile
@@ -130,17 +131,22 @@ function CurrentCard({ data }: { data: WeatherData }) {
 function MetricTile({
   icon,
   label,
+  labelMobile,
   value,
 }: {
   icon: React.ReactNode;
   label: string;
+  labelMobile?: string;
   value: string;
 }) {
   return (
     <div className="rounded-lg border border-zinc-800 bg-zinc-950/60 px-3 py-2.5">
       <div className="flex items-center gap-1.5">
         {icon}
-        <span className="text-xs text-zinc-400">{label}</span>
+        <span className="truncate text-xs text-zinc-400">
+          <span className="sm:hidden">{labelMobile ?? label}</span>
+          <span className="hidden sm:inline">{label}</span>
+        </span>
       </div>
       <p className="mt-1.5 font-mono text-lg font-semibold tabular-nums text-zinc-100">
         {value}
@@ -332,8 +338,12 @@ function DailyRow({
         <span className="sr-only">{day.skyText}</span>
       </span>
 
-      <span className="text-right font-mono text-xs tabular-nums text-cyan-400">
-        {pop > 0 ? `${day.pop}%` : ""}
+      <span
+        className={`text-right font-mono text-xs tabular-nums ${
+          day.pop == null ? "text-zinc-500" : pop > 0 ? "text-cyan-400" : "text-zinc-500"
+        }`}
+      >
+        {day.pop != null ? `${day.pop}%` : "—"}
       </span>
 
       <span className="text-right font-mono text-sm tabular-nums text-cyan-300">
