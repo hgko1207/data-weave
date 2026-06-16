@@ -9,6 +9,8 @@ import { fetchTour } from "@/widgets/tour/fetch";
 import { LAWD_BY_SIDO } from "@/widgets/apartment/lawd-codes";
 import { tourDataSchema, type TourData, type TourCategory } from "@/widgets/tour/schema";
 import { logger } from "@/lib/logger";
+import { cookies } from "next/headers";
+import { USER_SIDO_COOKIE } from "@/lib/user-location";
 
 export const dynamic = "force-dynamic";
 
@@ -33,7 +35,10 @@ type Props = {
 
 export default async function TourDetailPage({ searchParams }: Props) {
   const params = await searchParams;
-  const sido = params.sido && LAWD_BY_SIDO[params.sido] ? params.sido : DEFAULT_SIDO;
+  const cookieStore = await cookies();
+  const userSido = cookieStore.get(USER_SIDO_COOKIE)?.value;
+  const fallbackSido = userSido && LAWD_BY_SIDO[userSido] ? userSido : DEFAULT_SIDO;
+  const sido = params.sido && LAWD_BY_SIDO[params.sido] ? params.sido : fallbackSido;
   const sigunguMap = LAWD_BY_SIDO[sido];
   const requestedSigungu = params.sigungu ?? "";
   // 빈 값 = '전체'(시·도 전체). 유효한 시·군·구면 그것, 아니면 '전체'.

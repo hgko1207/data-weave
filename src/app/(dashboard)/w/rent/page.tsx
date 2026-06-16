@@ -19,6 +19,8 @@ import { currentKstYmExport, formatYm } from "@/widgets/apartment/fetch";
 import { findLawdCode, LAWD_BY_SIDO } from "@/widgets/apartment/lawd-codes";
 import { rentDataSchema, type RentData } from "@/widgets/rent/schema";
 import { logger } from "@/lib/logger";
+import { cookies } from "next/headers";
+import { USER_SIDO_COOKIE } from "@/lib/user-location";
 
 export const dynamic = "force-dynamic";
 
@@ -47,7 +49,10 @@ type Props = {
 
 export default async function RentDetailPage({ searchParams }: Props) {
   const params = await searchParams;
-  const sido = params.sido && LAWD_BY_SIDO[params.sido] ? params.sido : DEFAULT_SIDO;
+  const cookieStore = await cookies();
+  const userSido = cookieStore.get(USER_SIDO_COOKIE)?.value;
+  const fallbackSido = userSido && LAWD_BY_SIDO[userSido] ? userSido : DEFAULT_SIDO;
+  const sido = params.sido && LAWD_BY_SIDO[params.sido] ? params.sido : fallbackSido;
   const sigunguMap = LAWD_BY_SIDO[sido];
   const requestedSigungu = params.sigungu ?? "";
   const sigungu = sigunguMap[requestedSigungu]

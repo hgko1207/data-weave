@@ -12,6 +12,8 @@ import { fetchPharmacy } from "@/widgets/pharmacy/fetch";
 import { getSidoCenter } from "@/widgets/pharmacy/sido-centers";
 import { sosDataSchema, type SosData } from "@/widgets/pharmacy/schema";
 import { logger } from "@/lib/logger";
+import { cookies } from "next/headers";
+import { USER_SIDO_COOKIE } from "@/lib/user-location";
 
 export const dynamic = "force-dynamic";
 
@@ -29,7 +31,9 @@ type Props = {
 
 export default async function PharmacyDetailPage({ searchParams }: Props) {
   const params = await searchParams;
-  const sido = params.sido?.trim() || "대전광역시";
+  const cookieStore = await cookies();
+  const userSido = cookieStore.get(USER_SIDO_COOKIE)?.value;
+  const sido = params.sido?.trim() || userSido || "대전광역시";
   const sigungu = (params.sigungu ?? "").trim(); // 빈 문자열이면 '전체'
   const radiusNum = Number(params.radius);
   const radius = ALLOWED_RADIUS.has(radiusNum) ? radiusNum : 5;

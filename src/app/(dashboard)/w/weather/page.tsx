@@ -10,6 +10,8 @@ import { fetchWeather } from "@/widgets/weather/fetch";
 import { findWeatherRegion } from "@/widgets/weather/regions";
 import { weatherDataSchema, type WeatherData } from "@/widgets/weather/schema";
 import { logger } from "@/lib/logger";
+import { cookies } from "next/headers";
+import { USER_SIDO_COOKIE, toWeatherRegion } from "@/lib/user-location";
 
 export const dynamic = "force-dynamic";
 
@@ -19,7 +21,11 @@ type Props = {
 
 export default async function WeatherDetailPage({ searchParams }: Props) {
   const { region: regionParam } = await searchParams;
-  const region = findWeatherRegion(regionParam);
+  // searchParams 우선 → 없으면 user-location cookie → 그래도 없으면 widget default
+  const cookieStore = await cookies();
+  const userSido = cookieStore.get(USER_SIDO_COOKIE)?.value;
+  const defaultRegion = userSido ? toWeatherRegion(userSido) : undefined;
+  const region = findWeatherRegion(regionParam ?? defaultRegion);
 
   let data: WeatherData;
   let errorMessage: string | undefined;

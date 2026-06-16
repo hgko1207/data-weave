@@ -8,6 +8,7 @@ import { PwaInstallPrompt } from "@/components/pwa-install-prompt";
 import { Sidebar } from "@/components/sidebar/Sidebar";
 import { MobileSidebar } from "@/components/sidebar/MobileSidebar";
 import { ContentBackdrop } from "@/components/content-backdrop";
+import { LocationDefaulter } from "@/components/location-defaulter";
 import { WidgetErrorBoundary } from "@/components/error-boundary";
 import { PageError } from "@/components/page-error";
 import { getPageTitle } from "@/lib/page-titles";
@@ -70,6 +71,7 @@ export default function AppLayout({
 
       <CommandPalette open={paletteOpen} onOpenChange={setPaletteOpen} />
       <PwaInstallPrompt activeWidgetCount={1} />
+      <LocationDefaulter />
     </div>
   );
 }
