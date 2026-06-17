@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { Search } from "lucide-react";
 import { CommandPalette } from "@/components/command-palette";
@@ -9,6 +9,10 @@ import { Sidebar } from "@/components/sidebar/Sidebar";
 import { MobileSidebar } from "@/components/sidebar/MobileSidebar";
 import { ContentBackdrop } from "@/components/content-backdrop";
 import { LocationDefaulter } from "@/components/location-defaulter";
+import {
+  AlertCountsProvider,
+  useAlertCounts,
+} from "@/components/alert-counts-provider";
 import { WidgetErrorBoundary } from "@/components/error-boundary";
 import { PageError } from "@/components/page-error";
 import { getPageTitle } from "@/lib/page-titles";
@@ -19,6 +23,15 @@ export default function AppLayout({
 }: {
   children: React.ReactNode;
 }) {
+  return (
+    <AlertCountsProvider>
+      <AppLayoutBody>{children}</AppLayoutBody>
+      <MarkSeenOnNav />
+    </AlertCountsProvider>
+  );
+}
+
+function AppLayoutBody({ children }: { children: React.ReactNode }) {
   const [paletteOpen, setPaletteOpen] = useState(false);
   const pathname = usePathname();
   const { eyebrow, title } = getPageTitle(pathname);
@@ -90,4 +103,15 @@ function Breadcrumb({ eyebrow, title }: { eyebrow?: string; title: string }) {
       <p className="truncate text-base font-semibold text-zinc-100">{title}</p>
     </nav>
   );
+}
+
+// 위젯 페이지 진입 시 해당 위젯의 "마지막 본 시각" 갱신 → 뱃지 즉시 제거.
+function MarkSeenOnNav() {
+  const pathname = usePathname();
+  const { markSeen } = useAlertCounts();
+  useEffect(() => {
+    if (pathname.startsWith("/w/disaster")) markSeen("disaster");
+    else if (pathname.startsWith("/w/food-recall")) markSeen("food-recall");
+  }, [pathname, markSeen]);
+  return null;
 }

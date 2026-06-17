@@ -7,8 +7,10 @@ import type { LucideIcon } from "lucide-react";
 import { LayoutDashboard, Settings, Activity } from "lucide-react";
 import { WIDGET_META, GROUP_ORDER, GROUP_LABEL } from "@/widgets/_metadata";
 import { SidebarBookmarks } from "./SidebarBookmarks";
+import { useAlertCounts } from "@/components/alert-counts-provider";
+import { AlertDot } from "@/components/alert-dot";
 
-type NavItem = { href: string; icon: LucideIcon; label: string };
+type NavItem = { href: string; icon: LucideIcon; label: string; widgetId?: string };
 
 const PRIMARY: NavItem[] = [
   { href: "/", icon: LayoutDashboard, label: "대시보드" },
@@ -27,6 +29,7 @@ export function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
       href: `/w/${w.id}`,
       icon: w.icon,
       label: w.title,
+      widgetId: w.id,
     })),
   })).filter((g) => g.items.length > 0);
 
@@ -85,11 +88,13 @@ function NavSection({
   onNavigate?: () => void;
 }) {
   const pathname = usePathname();
+  const { counts } = useAlertCounts();
   return (
     <ul className="space-y-px">
       {items.map((it) => {
         const active = pathname === it.href;
         const Icon = it.icon;
+        const alertCount = it.widgetId ? counts[it.widgetId] : undefined;
         return (
           <li key={it.href}>
             <Link
@@ -113,6 +118,7 @@ function NavSection({
                 <Icon className="h-4 w-4" />
               </span>
               <span className="truncate font-medium">{it.label}</span>
+              <AlertDot count={alertCount} />
             </Link>
           </li>
         );

@@ -5,6 +5,8 @@ import Link from "next/link";
 import { ArrowRight, Settings, Star } from "lucide-react";
 import { WIDGET_META, GROUP_ORDER, GROUP_LABEL, type WidgetMeta } from "@/widgets/_metadata";
 import { readPinned } from "@/lib/pinned-widgets";
+import { useAlertCounts } from "@/components/alert-counts-provider";
+import { AlertDot } from "@/components/alert-dot";
 
 export function DashboardHome() {
   const [pinned, setPinned] = useState<string[] | null>(null);
@@ -90,6 +92,8 @@ function SectionHeader({ title, children }: { title: string; children?: React.Re
 
 function WidgetCard({ widget, pinned }: { widget: WidgetMeta; pinned: boolean }) {
   const Icon = widget.icon;
+  const { counts } = useAlertCounts();
+  const alertCount = counts[widget.id];
   return (
     <Link
       href={`/w/${widget.id}`}
@@ -110,6 +114,7 @@ function WidgetCard({ widget, pinned }: { widget: WidgetMeta; pinned: boolean })
               <span className="sr-only">즐겨찾기됨</span>
             </>
           ) : null}
+          <AlertDot count={alertCount} />
         </span>
         <span className="mt-0.5 line-clamp-2 block text-xs leading-relaxed text-zinc-400">
           {widget.description}
