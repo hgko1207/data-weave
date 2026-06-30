@@ -1,12 +1,12 @@
 # DataWeave — Claude 작업 가이드
 
-한국 공공데이터 조회형 위젯 대시보드. **Phase 1 (위젯 3개) 완성 → Phase 1.5 (사이드바 네비 + 위젯별 상세 페이지)** 진행 중. 로컬-only 운영, Vercel 배포는 [docs/TODOS.md](docs/TODOS.md) TODO 10으로 deferred.
+한국 공공데이터 조회형 위젯 대시보드. **Phase 1 + 1.5 완성** — 위젯 **10종**(weather / pharmacy / food-recall / disaster / price / apartment / rent / library / tour / lotto), 사이드바 네비, 위젯별 상세 페이지(URL `searchParams`), 즐겨찾기, geo 자동 기본값, 인앱 알림 배지, 모바일 드로어, 카카오맵 SDK 임베드까지. **Vercel(icn1 리전) 배포 완료 — live 운영 중.** Phase 2(알림 인프라)는 [docs/TODOS.md](docs/TODOS.md) TODO 8로 deferred.
 
 ## SSOT 문서
 
 - [docs/PLAN.md](docs/PLAN.md) — 차터·위젯 인터페이스·공통 골격(사이드바·즐겨찾기·라우트 규약)
-- [docs/widgets/](docs/widgets/) — **위젯별 화면 문서** (apartment / rent / weather / pharmacy / food-recall + 신규 위젯). 페이지 구조, 데이터 소스, 진화 이력, TODO를 위젯 단위로 분리.
-- [docs/plans/](docs/plans/) — **진행 트래킹용 로드맵** (예: `new-widgets.md` 신규 위젯 4종 우선순위 + spec)
+- [docs/widgets/](docs/widgets/) — **위젯별 화면 문서** (10종 모두 — 페이지 구조, 데이터 소스, 진화 이력, TODO를 위젯 단위로 분리). 위젯 단위 변경은 여기가 SSOT.
+- [docs/plans/](docs/plans/) — **진행 트래킹용 로드맵.** `new-widgets.md`(신규 4+1종 — 완료), `welfare-widget.md`(11번째 위젯 — 미착수), `local-dashboard-map.md`(지도 뷰 — 미착수), `separate/law-clear.md`(별도 신규 프로젝트 구상).
 - [docs/DESIGN.md](docs/DESIGN.md) — 컬러/타이포/스페이싱 토큰, 디자인 원칙
 - [docs/TODOS.md](docs/TODOS.md) — Phase 2+ 의식적으로 deferred한 항목
 

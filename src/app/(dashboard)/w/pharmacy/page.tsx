@@ -8,6 +8,7 @@ import {
   type PharmacyFilterValues,
 } from "@/components/widget/pharmacy/PharmacyFilters";
 import { PharmacyDetail } from "@/components/widget/pharmacy/PharmacyDetail";
+import { PharmacyMap } from "@/components/widget/pharmacy/PharmacyMap";
 import { fetchPharmacy } from "@/widgets/pharmacy/fetch";
 import { getSidoCenter } from "@/widgets/pharmacy/sido-centers";
 import { sosDataSchema, type SosData } from "@/widgets/pharmacy/schema";
@@ -103,6 +104,8 @@ export default async function PharmacyDetailPage({ searchParams }: Props) {
       />
 
       <DataSourceNotice errorMessage={errorMessage} source={data.source} />
+
+      <PharmacyMap data={displayData} kindFilter={kind} openNowFilter={openNow} />
 
       <PharmacyDetail data={displayData} kindFilter={kind} openNowFilter={openNow} />
     </PageFrame>
