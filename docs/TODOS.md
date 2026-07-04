@@ -200,9 +200,11 @@
 
 ---
 
-## TODO 10 — Vercel 배포 (로컬-only → 다중 디바이스)
+## TODO 10 — Vercel 배포 ✅ 완료 (2026-06)
 
-**What.** Phase 1 완성 시점의 사이드 프로젝트는 의식적으로 *로컬-only*로 운영 중. 폰/태블릿에서도 보고 싶거나 가족·친구에게 공유하고 싶어지면 Vercel에 배포하여 HTTPS 도메인 + 자동 배포 파이프라인 활성화.
+> **DONE.** Vercel에 live 배포 완료 — `vercel.json`으로 SSR 리전 icn1(서울) 고정, `git push origin main` 시 자동 재배포. 모바일에서도 HTTPS PWA 접속 확인. 아래는 당시 셋업 기록(참고용). 남은 선택 항목: 커스텀 도메인(5번), Supabase 프로덕션(6번 — 다중 사용자 TODO 2 시점에).
+
+**What.** 폰/태블릿에서도 보거나 가족·친구에게 공유하기 위해 Vercel에 배포하여 HTTPS 도메인 + 자동 배포 파이프라인 활성화. (완료됨)
 
 **Why.** 로컬-only는 본인 PC 켜져 있을 때만 동작 = 모바일에서 못 봄, 외부 공유 불가, PWA install이 작동은 하지만 불완전 (Service Worker는 HTTPS 필수, localhost 예외만 활용). 다중 디바이스·공유 욕구가 생기면 그때 30분 투자.
 
@@ -274,7 +276,47 @@
 
 **Priority.** P2 — 아파트 실거래가 위젯 안정화 후 진행
 
-**Depends on / blocks.** 없음. 사용자 OPINET 가입 + 키 발급 필요.
+**Depends on / blocks.** 없음. 사용자 OPINET 가입 + 키 발급 필요. (아직 미구현 — `price` 위젯은 KAMIS 농수산물로 별개)
+
+---
+
+## TODO 12 — 복지·지원금 매칭 위젯 (`welfare`)
+
+**What.** 지역 + 카테고리(청년/육아/노인/장애 등) → 받을 수 있는 정부·지자체 지원금 목록. 11번째 위젯으로 합류 예정.
+
+**Context.** 상세 spec은 [`docs/plans/welfare-widget.md`](plans/welfare-widget.md). Phase 1은 정적 큐레이션 JSON(30~50건), Phase 2에 청년정책통합 API 라이브.
+
+**Effort.** 사람 M (Phase 1 3~5일) → CC ~2시간 + 큐레이션 시간
+
+**Priority.** P2 — 다음 위젯 후보 1순위.
+
+**Depends on / blocks.** 없음 (기존 위젯 인프라 재사용).
+
+---
+
+## TODO 13 — 우리 동네 지도 대시보드 (`/map`)
+
+**What.** 한국 SVG 지도에서 시·도 클릭 → 그 지역 위젯 데이터를 한눈에. 위젯 카드 그리드 위에 얹는 새 진입 경로 (기존 위젯 페이지는 유지).
+
+**Context.** 상세 spec·Phase 분할은 [`docs/plans/local-dashboard-map.md`](plans/local-dashboard-map.md). Phase 1은 자체 SVG, Phase 2+에 카카오맵 SDK + ISR 멀티 fetch.
+
+**Effort.** 사람 L (Phase 1 1주) → CC ~3시간
+
+**Priority.** P3 — 위젯 충분히 쌓인 뒤. 시작 전 사용자 결정 사항 있음(plan 문서 말미).
+
+**Depends on / blocks.** 없음.
+
+---
+
+## TODO 14 — LawClear (별도 신규 프로젝트, DataWeave 위젯 아님)
+
+**What.** 조례·법안 AI 풀이 — 별도 Next.js 프로젝트. DataWeave의 디자인 시스템·스택을 이식하되 "텍스트+AI" 제품이라 분리.
+
+**Context.** 상세 구상은 [`docs/plans/separate/law-clear.md`](plans/separate/law-clear.md). Claude Haiku 4.5 + prompt caching + 국가법령정보센터 API.
+
+**Priority.** P3 — **DataWeave 안정화 + welfare 위젯 완료 후** 시작 권장 (양다리 금지).
+
+**Depends on / blocks.** DataWeave 안정화 선행.
 
 ---
 
@@ -286,3 +328,4 @@
 | 2026-05-04 | TODO 8 (Watcher Platform 인프라), TODO 9 (Phase 2 trigger 점검) 추가 — `/plan-eng-review` Phase 1 축소 결정 + Outside Voice 반영 |
 | 2026-05-10 | TODO 10 (Vercel 배포) 추가 — Phase 1 완성, 사용자 결정으로 로컬-only 운영. 다중 디바이스/공유 욕구 발생 시 활성화. |
 | 2026-05-13 | TODO 11 (유가 정보 위젯) 추가 — 사용자가 아파트 실거래가 다음 차순으로 요청. |
+| 2026-06-30 | **TODO 10 (Vercel 배포) 완료 마킹** — icn1 리전 live 배포. TODO 12(복지 위젯) / 13(지도 대시보드) / 14(LawClear 별도 프로젝트) 추가 — `docs/plans/` 로드맵 문서 연결. |

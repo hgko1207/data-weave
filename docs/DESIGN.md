@@ -128,7 +128,7 @@ Tailwind 기본 스케일 (4px 그리드) 따름.
 - 카드 내부 패딩: `p-5` (20px) 또는 `p-6` (24px)
 - 카드 간격: `gap-6` (24px)
 - 페이지 패딩: `px-6 lg:px-8`
-- 헤더 높이: `h-16` (64px)
+- 헤더 높이: `h-14` (56px) — `lib/layout-dims.ts` 기준
 
 ### Touch target
 - 버튼 최소: `h-10 w-10` (40px) — shadcn 디폴트, A11y 권장 44 근접
@@ -158,40 +158,11 @@ Tailwind 기본 스케일 (4px 그리드) 따름.
 
 ---
 
-## 7. ~~Aurora Background~~ (Deprecated, Phase 1.5)
+## 7. ~~Aurora Background~~ (제거됨, Phase 1.5)
 
-> ⚠️ **사용 안 함.** Phase 1.5에서 솔리드 surface(§2)로 교체. 사용자 피드백 "사이드바/메인 구분 안 됨" → opaque chrome으로 해결. 컴포넌트 파일은 `src/components/aurora-bg.tsx`에 남아있으나 root layout에서 제거됨. 새 작업에서 사용 X.
+> ⚠️ **완전 삭제.** Phase 1.5에서 솔리드 surface(§2)로 교체하고 `src/components/aurora-bg.tsx`도 **삭제**함. 사용자 피드백 "사이드바/메인 구분 안 됨" → opaque chrome(zinc-900 + zinc-800 border)으로 해결. 새 작업에서 gradient 배경·decorative blur blob 사용 X.
 
-옛 안 (참고용):
-
-```tsx
-// src/components/aurora-bg.tsx (deprecated)
-export function AuroraBg() {
-  return (
-    <div className="fixed inset-0 -z-10 overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-br from-slate-950 via-zinc-950 to-black" />
-      <div
-        aria-hidden
-        className="absolute -top-40 -right-40 h-[40rem] w-[40rem] rounded-full
-                   bg-emerald-500/10 blur-3xl"
-      />
-      <div
-        aria-hidden
-        className="absolute -bottom-40 -left-40 h-[40rem] w-[40rem] rounded-full
-                   bg-cyan-500/10 blur-3xl"
-      />
-      {/* 미세한 노이즈 텍스처 (선택) */}
-      <div
-        aria-hidden
-        className="absolute inset-0 opacity-[0.015]"
-        style={{ backgroundImage: 'url(/noise.png)' }}
-      />
-    </div>
-  );
-}
-```
-
-루트 레이아웃에서 `<AuroraBg />`를 한 번 렌더하고 메인 콘텐츠는 그 위에. 모바일에서도 가벼움 (CSS만, 60fps).
+대신 현재 배경 레이어는 **`<ContentBackdrop>`** (`src/components/content-backdrop.tsx`) — 위젯 그룹별로 아주 옅은 단색 틴트만 깐다 (living=emerald-950/30, realestate=amber-950/20, culture=…). 카드는 솔리드라 그 위에서 가독성 유지. weather 위젯은 자체 배경을 써서 틴트 제외. §14.9 참조.
 
 ---
 
@@ -247,19 +218,21 @@ export function WidgetHealthDot({ status }: { status: Health }) {
 
 ## 10. 위젯 카드 비주얼 샘플
 
+> 토큰은 §2 솔리드 모델 + §14 기준. (옛 `bg-zinc-900/60 backdrop-blur` + `border border-white/5`는 deprecated — 아래는 현재 톤)
+
 ```tsx
-<Card className="rounded-xl border border-white/5 bg-zinc-900/60
-                 p-6 shadow-md shadow-black/30 backdrop-blur
+<Card className="rounded-xl border border-zinc-800/80 bg-zinc-900
+                 p-6 shadow-md shadow-black/30
                  transition-shadow hover:shadow-xl hover:shadow-black/40">
   <header className="flex items-center justify-between">
     <div className="flex items-center gap-2">
       <CloudSun className="h-5 w-5 text-emerald-400" />
-      <h3 className="text-lg font-semibold text-zinc-100">날씨</h3>
+      <h3 className="text-base font-semibold text-zinc-100">날씨</h3>
     </div>
     <div className="flex items-center gap-2">
       <WidgetHealthDot status="healthy" />
-      <button className="rounded-lg p-1.5 text-zinc-500 hover:text-zinc-300
-                         hover:bg-white/5 focus-visible:ring-2
+      <button className="rounded-lg p-1.5 text-zinc-400 hover:text-zinc-100
+                         hover:bg-zinc-800 focus-visible:ring-2
                          focus-visible:ring-emerald-500/50">
         <RefreshCw className="h-4 w-4" />
       </button>
@@ -316,8 +289,8 @@ export function WidgetHealthDot({ status }: { status: Health }) {
 
 | State | Tailwind |
 |-------|----------|
-| idle | `text-zinc-500` |
-| hover | `text-zinc-300 bg-white/5` |
+| idle | `text-zinc-400` |
+| hover | `text-zinc-100 bg-zinc-800` |
 | active (pressed) | `scale-95 transition` |
 | spinning (fetch 중) | `animate-spin text-emerald-400` |
 | disabled (debounce) | `text-zinc-700 cursor-not-allowed` |
@@ -327,7 +300,7 @@ export function WidgetHealthDot({ status }: { status: Health }) {
 | 상황 | UI 표현 |
 |------|--------|
 | SOS 위치 권한 거부 | 기본 좌표(서울 시청) 사용 + 카드 상단 amber `<Banner>` "위치 켜면 더 정확" + amber HealthDot |
-| 위젯 0개 첫 진입 | `<EmptyDashboard>` Hero — Aurora 위 큰 카피 "어떤 데이터를 받아볼까요?" + "+ 첫 위젯 추가" emerald CTA |
+| 핀 위젯 0개 | `DashboardHome`이 빈 핀 영역 대신 그룹별 둘러보기 카드를 바로 노출 (별도 Hero 없이 전체 위젯 그리드로 안내) |
 | 새로고침 빠른 연타 | debounce 500ms, 두 번째 클릭부터 disabled |
 
 ### 12.3 User Journey & Time-Horizon Design (Pass 3)
@@ -336,8 +309,8 @@ export function WidgetHealthDot({ status }: { status: Health }) {
 
 | Horizon | 사용자 인지 | 디자인이 지지 |
 |---------|------------|------------|
-| 5초 (visceral) | "이거 좀 다르네, 진짜 같다" | Aurora gradient + Mono 큰 숫자 + Cmd+K 힌트 |
-| 5분 (behavioral) | "어 빠르네 + 변화 보이네" | First Run Magic 1초 + Diff 색표시 + health dot |
+| 5초 (visceral) | "이거 좀 다르네, 진짜 같다" | 솔리드 다크 surface + Mono 큰 숫자 + Cmd+K 힌트 |
+| 5분 (behavioral) | "어 빠르네 + 변화 보이네" | 빠른 RSC fetch + Diff 색표시 + health dot + 새 알림 배지 |
 | 5년 (reflective) | "내 일상에 박힘" | 일관된 디자인, 변화 없는 안정감, 6개월 후도 동일 톤 |
 
 **6단계 User Journey:**
@@ -345,10 +318,10 @@ export function WidgetHealthDot({ status }: { status: Health }) {
 ```
 STEP | USER DOES                        | FEELS    | DESIGN SUPPORTS
 ─────|──────────────────────────────────|──────────|────────────────────────────
-  1  | 첫 진입 (빈 dashboard)            | 호기심    | Aurora + Hero 빈 상태 + 큰 CTA
-  2  | 카탈로그 둘러봄                   | 기대     | 카드 hover에 데이터 미리보기
-  3  | 첫 위젯 추가                      | 만족     | First Run Magic 1초 → Mono 큰 숫자 fade-in
-  4  | 매일 새로고침 1회                  | 안심     | health dot 녹색, refresh 가벼운 spin
+  1  | 첫 진입 (대시보드)                | 호기심    | 솔리드 다크 + 그룹별 둘러보기 그리드
+  2  | 위젯 상세 둘러봄                  | 기대     | 그룹 배경 틴트 + StatCard 큰 mono 값
+  3  | 위젯 핀 / 즐겨찾기                | 만족     | 핀 토글 즉시 반영, 사이드바 ★ 복귀
+  4  | 매일 조회 1회                     | 안심     | health dot 녹색, refresh 가벼운 spin, 새 알림 배지
   5  | PWA 설치 (3번째 방문 trigger)      | 깊은 관계 | iOS install 가이드 또는 Chrome A2HS
   6  | 6개월 후                          | 일상      | 일관된 디자인, "왜 안 봤지" 후회 없음
 ```
@@ -357,14 +330,14 @@ STEP | USER DOES                        | FEELS    | DESIGN SUPPORTS
 
 **위젯 그리드는 일반 SaaS dashboard와 다음 4가지가 다름:**
 
-1. **Aurora bg** — 카드 *사이의 공기*가 다름. 일반 SaaS는 white/gray flat.
+1. **솔리드 다크 surface + 그룹별 배경 틴트** — 카드 *사이의 공기*가 다름. zinc-900 카드 + 그룹별 옅은 단색 틴트(`ContentBackdrop`). 일반 SaaS는 white/gray flat. (Phase 1 초기 Aurora gradient는 §7로 제거 — gradient/blur blob은 오히려 slop tell)
 2. **Mono 데이터** — 큰 숫자가 카드의 anchor. 일반 SaaS는 본문체 + 작은 그래프.
-3. **Live HealthDot** — 카드가 "살아있다"는 신호. 일반 SaaS는 정적.
+3. **Live HealthDot + 새 알림 배지** — 카드가 "살아있다"는 신호. 일반 SaaS는 정적.
 4. **Diff 색표시** — 새로고침 시 변화가 보임. 일반 SaaS는 silent refresh.
 
-이 4가지 중 어느 하나라도 빠지면 위젯 그리드는 generic SaaS로 회귀. Phase 1 구현 시 **모두 포함 필수.**
+이 4가지 중 어느 하나라도 빠지면 위젯 그리드는 generic SaaS로 회귀. **모두 포함 필수.**
 
-**Aurora 가드레일:** §7의 Aurora bg는 emerald-500/10 + cyan-500/10 blur-3xl, 반드시 *2개만, 10% opacity 이하*. 더 추가하면 "decorative blob slop"으로 추락.
+**Surface 가드레일:** 배경은 §2 솔리드 zinc + §14.9 그룹 틴트만. gradient 배경·decorative blur blob·backdrop-blur 남용 금지 — 다크 톤에서 "AI 슬롭 텔". 경계는 색이 아니라 `border-zinc-800/80`로.
 
 **Emoji 가드레일:** ✨/✅ 등 emoji는 *빈 상태에서만, 카드당 1회 한정*. 헤더·버튼·본문에 emoji 금지.
 
@@ -372,12 +345,12 @@ STEP | USER DOES                        | FEELS    | DESIGN SUPPORTS
 
 | 요소 | DESIGN.md 토큰 |
 |------|--------------|
-| 위젯 카드 bg | `bg-zinc-900/60 backdrop-blur` |
-| 카드 border | `border border-white/5` |
+| 위젯 카드 bg | `bg-zinc-900` (솔리드 — §2/§14.1) |
+| 카드 border | `border border-zinc-800/80` |
 | 카드 shadow | `shadow-md shadow-black/30 hover:shadow-xl hover:shadow-black/40` |
 | 카드 radius | `rounded-xl` |
 | 핵심 데이터 (값) | `text-3xl font-mono font-bold text-zinc-100` |
-| 위젯 제목 | `text-lg font-semibold text-zinc-100` |
+| 위젯 제목 | `text-base font-semibold text-zinc-100` |
 | 보조 데이터 | `text-xs font-mono text-zinc-400` |
 | HealthDot 정상 | `bg-emerald-400 shadow-[0_0_8px] shadow-emerald-400/50 motion-safe:animate-pulse` |
 | HealthDot 경고 | `bg-amber-400 shadow-[0_0_8px] shadow-amber-400/50` |
@@ -480,8 +453,12 @@ Aurora gradient + 반투명 카드 → **솔리드 zinc surface + 명확한 경�
 |----------|------|------|
 | `<PageFrame>` | `src/components/page-frame.tsx` | 모든 페이지 헤더 (eyebrow + h1 + description + actions). 새 페이지 직접 헤더 만들지 X |
 | `<BaseWidget>` / `<DashboardWidget>` | `src/components/widget/` | 위젯 카드. 새 위젯에서 절대 직접 카드 스타일 X |
-| `<DashboardStats>` | `src/components/dashboard-stats.tsx` | 대시보드 상단 4-up 통계 strip |
-| `<Sidebar>` / `<SidebarContent>` / `<SidebarBookmarks>` | `src/components/sidebar/` | 좌측 영구 네비 (w-64) |
+| `<StatCard>` | `src/components/widget/StatCard.tsx` | 상세 페이지 상단 통계 카드 (아이콘 + 라벨 + mono 값) — 위젯별 상세에서 공유 |
+| `<DashboardHome>` | `src/components/dashboard-home.tsx` | 메인 대시보드 client island — 핀 런처 + 그룹별 둘러보기 + 알림 배지 |
+| `<Sidebar>` / `<MobileSidebar>` / `<SidebarContent>` / `<SidebarBookmarks>` | `src/components/sidebar/` | 데스크톱 고정(w-64) + 모바일 드로어 네비 + 즐겨찾기 |
+| `<ContentBackdrop>` | `src/components/content-backdrop.tsx` | 위젯 그룹별 배경 틴트 (§14.9) |
+| `<AlertDot>` / `<AlertCountsProvider>` | `src/components/alert-*.tsx` | 인앱 새 알림 배지 + 카운트 context (§14.10) |
+| `<KakaoMap>` | `src/components/kakao-map.tsx` | 카카오맵 JS SDK mini 지도 로더 (§14.11) |
 | `<BookmarkButton>` | `src/components/bookmark/` | 페이지 헤더 ★ 즐겨찾기 토글 |
 | `<CommandPalette>` | `src/components/command-palette.tsx` | ⌘K (cmdk) |
 | `getSkyVisual(skyText)` | `src/components/widget/weather/sky-icon.ts` | 날씨 텍스트 → Lucide 아이콘 + 색상 |
@@ -507,16 +484,22 @@ Aurora gradient + 반투명 카드 → **솔리드 zinc surface + 명확한 경�
 ├── ★ 즐겨찾기 (mounted 후 표시, 빈 리스트면 숨김)
 │   - 라벨 + 별표 + hover 시 X 제거 버튼
 │
-├── 공공데이터 (섹션 라벨, registry-driven)
-│   - 날씨 / SOS 병원·약국 / 식품 리콜 / 아파트 실거래가 / ...
+├── 생활·안전 (섹션 라벨, registry-driven)
+│   - 날씨 / SOS 병원·약국 / 식품 리콜 / 재난문자 / 농수산물 시세
+├── 부동산
+│   - 아파트 실거래가 / 전월세 실거래가
+├── 문화·여가
+│   - 공공도서관 / 관광·전시 / 로또
 │
 └── 설정 (footer)
-    + 데이터 소스 상태 pill (4/4 연결됨)
 ```
 
-- 너비 고정 `w-64` (반응형 collapse 시도 → 사용자 피드백으로 폐기, 항상 표시)
+- 섹션 그룹은 `_metadata.ts`의 `GROUP_ORDER` / `GROUP_LABEL` 구동 (living / realestate / culture). 위젯 추가 시 자동 반영.
+- **데스크톱(md+)**: `w-64` 고정 표시 (반응형 collapse는 폐기).
+- **모바일(<md)**: `<MobileSidebar>` 햄버거 드로어 — 헤더 좌측 메뉴 버튼 → 오버레이 드로어. 항목 동일.
 - Active 메뉴: `bg-emerald-500/10 text-emerald-200` + 아이콘 chip emerald-500/15
 - 호버: `hover:bg-zinc-800/60 hover:text-zinc-100`
+- disaster·food-recall 항목에는 새 알림 시 rose `<AlertDot>` 표시 (§14.10).
 
 ### 14.7 검색 상태 = URL searchParams
 
@@ -537,12 +520,50 @@ Aurora gradient + 반투명 카드 → **솔리드 zinc surface + 명확한 경�
 
 위젯 데이터의 의미(위험도)가 chip 색에도 반영되어 한눈에 분류 가능.
 
+### 14.9 그룹별 배경 틴트 (ContentBackdrop)
+
+Aurora bg(§7 제거) 대신, content 영역에만 **위젯 그룹별로 아주 옅은 단색 그라데이션 틴트**를 깐다. `src/components/content-backdrop.tsx`.
+
+| 그룹 | 틴트 (from) |
+|------|-------------|
+| living (생활·안전) | `from-emerald-950/30` |
+| realestate (부동산) | `from-amber-950/20` |
+| culture (문화·여가) | (그룹별 톤) |
+
+- 카드는 솔리드 zinc-900이라 틴트 위에서 가독성 유지. 틴트는 "분위기"만.
+- 영역 치수는 `lib/layout-dims.ts`의 `CONTENT_BACKDROP_INSET` (모바일 `left-0`, md+ `left-64`, top `h-14` 헤더 아래).
+- **weather 위젯은 자체 배경**(하늘/우주 톤)을 써서 그룹 틴트 제외.
+
+### 14.10 인앱 새 알림 배지 (AlertDot)
+
+알림 인프라(Web Push) 없이도 "새로운 게 있다"를 표시하는 경량 패턴. `alert-dot.tsx` + `alert-counts-provider.tsx`.
+
+- **건수 표시 X** — rose dot만(`bg-rose-500` + `motion-safe:animate-pulse`). 정확한 건수는 위젯 페이지에서.
+- 위젯 페이지 진입 시 `markSeen`으로 dot 사라짐 (localStorage 기준 last-seen).
+- 현재 대상: **disaster · food-recall** (시간 민감 위젯). 사이드바 항목 + 대시보드 카드에 표시.
+- A11y: `aria-label="새 알림 N건"`.
+
+### 14.11 카카오맵 mini 지도 (KakaoMap)
+
+위젯 상세에서 위치를 가진 결과는 외부 링크가 아니라 **임베드 mini 지도**로 표시. `src/components/kakao-map.tsx` (카카오맵 JS SDK 로더).
+
+- 사용 위젯: pharmacy(약국·응급실) / apartment·rent(단지) / library / tour / lotto(판매점).
+- 키: `NEXT_PUBLIC_KAKAO_MAP_KEY` (클라이언트 노출되지만 도메인 제한). **없으면 지도 카드만 숨고 위젯은 정상**.
+- 지도 톤은 다크 surface와 충돌하지 않게 컨테이너를 `border-zinc-800/80 rounded-xl`로 감싼다.
+
+### 14.12 모바일 레이아웃 (<md)
+
+- 사이드바 → 햄버거 드로어(`MobileSidebar`). 헤더 좌측 메뉴 버튼으로 토글, 오버레이 + 좌측 슬라이드.
+- content는 풀폭(`left-0`), 데스크톱은 `left-64`. 치수 상수는 `lib/layout-dims.ts`.
+- 위젯별 모바일 변환은 §12.6. 좁은 뷰포트 레이아웃 보정은 커밋 8057793(Stage 1) 참조.
+
 ---
 
-## 13. 디자인 변경 이력
+## 15. 디자인 변경 이력
 
 | 날짜 | 변경 |
 |------|------|
 | 2026-05-04 | 최초 작성. Emerald + Cyan 액센트 + Aurora bg + JetBrains Mono 데이터 |
 | 2026-05-05 | §12 Phase 1 Design Patches 추가 — `/plan-design-review` 7-pass: 카드 IA, 인터랙션 상태, User Journey 5초/5분/5년, Slop 차별화 4가지, 위젯-토큰 매핑, 모바일 변환, 로고 wordmark, PWA install prompt 트리거 |
 | 2026-05-16 | **§14 Phase 1.5 Design Evolution 추가**. Aurora bg + 반투명 surface 폐기 → Supabase/shadcn 톤 솔리드 surface로 교체. 옛 표면 토큰 deprecated 표시. 버튼 시스템 (Primary/Ghost-zinc/Chip with semantic tones) 정리. 타이포 하한 `text-xs`, `text-[10px]` 금지. PageFrame/사이드바/즐겨찾기/SVG 차트 패턴 정리. 검색 상태 = URL searchParams 컨벤션 명문화. |
+| 2026-06-30 | **코드 정합성 정리.** Aurora 컴포넌트 완전 삭제 반영(§7), §10·§12.4·§12.5의 deprecated 반투명 토큰 → 솔리드로 교체, §12.2·§12.3 Aurora 의존 문구 갱신. 신규 패턴 추가: §14.9 그룹 배경 틴트(ContentBackdrop), §14.10 인앱 알림 배지(AlertDot), §14.11 카카오맵 mini 지도, §14.12 모바일 드로어. §14.6 사이드바 3그룹 + 모바일 드로어 반영. `<DashboardStats>` → `<DashboardHome>`/`<StatCard>`로 교체. 변경 이력 섹션 §13 → §15 재배치. |

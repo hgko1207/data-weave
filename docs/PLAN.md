@@ -19,6 +19,7 @@
 | 2026-05-18 | v3.3 | **매매↔전월세 cross-link + 단지별 가격 추이 + 전월세 시·군·구 추이.** 단지 페이지 사이를 한 클릭으로 이동. 단지 페이지에 시간순 거래가 산점도(매매) / 전세·월세 sub-chart(전월세). 전월세 메인 페이지에 시·군·구 평균 보증금 추이 차트 (매매 차트 미러). **PLAN.md §14의 위젯별 디테일을 `docs/widgets/*.md`로 분리** — PLAN.md는 차터·공통 골격만, 위젯별은 화면 단위 문서로. | 사용자 요청 |
 | 2026-05-19 | v3.4 | **신규 위젯 4종 로드맵 확정** — 도서관 / 관광·전시 / 로또 / 농수산물 시세 순. 진행 트래킹은 [`docs/plans/new-widgets.md`](plans/new-widgets.md). | 사용자 결정 |
 | 2026-05-20~21 | v3.5 | **신규 4종 실 API 연동 완료** (로또 동행복권 / KAMIS / 정보나루 / TourAPI). 로또 통계·생성기·내번호, 도서명 검색(목록 선택 + bookExist 대출가능). **메인 대시보드를 핀 위젯 런처로 재구성** (demo 미리보기 → DashboardHome client island, 핀 실제 연동 + 9개 그룹별 둘러보기). 사이드바 3그룹화. 위젯별 진화는 `docs/widgets/*.md`. | 사용자 요청 |
+| 2026-06-30 | v3.6 | **코드 정합성 정리 + 운영 상태 반영.** 위젯 **10종** 확정(재난문자 disaster 합류 → §3 전면 갱신). 공통 강화: geo 자동 기본값(가장 가까운 시·도), 인앱 알림 배지(disaster·food-recall, Web Push 없이 last-seen 기반), 카카오맵 SDK mini 지도(외부 링크 → 임베드), 모바일 햄버거 드로어(`MobileSidebar`), 그룹별 배경 틴트. **Vercel(icn1 리전) live 배포 완료** ([TODOS.md](TODOS.md) TODO 10 done). §5 폴더 구조는 초기 설계 스냅샷으로 명시(현재 트리는 CLAUDE.md). | 코드 진화 반영, 사용자 요청 |
 
 ---
 
@@ -37,7 +38,7 @@
 
 ## 2. 기술 스택
 
-- **Framework:** Next.js 15+ (App Router, RSC strict)
+- **Framework:** Next.js 16 (App Router, RSC strict) + Turbopack
 - **Language:** TypeScript (strict)
 - **Styling:** Tailwind CSS + shadcn/ui (cherry-pick) + Lucide React + cmdk
 - **Backend:** Supabase Free Tier (Postgres, Auth-ready). **cron / push / queue 모두 X.**
@@ -49,16 +50,26 @@
 
 ---
 
-## 3. 위젯 목록 (모두 조회형, v3 = 4개)
+## 3. 위젯 목록 (모두 조회형, v3.5+ = 10개)
 
-| ID | 데이터 소스 | API 시스템 | 상세 페이지 강화 |
-|----|------------|------------|------------------|
-| `weather` | 기상청 단기예보 + 에어코리아 + 기상청 중기예보 | data.go.kr 통합 키 | 지역 chip 셀렉터 + 시간대별 24h + 주간 예보 8일 + 습도/풍속/풍향/오늘 high·low |
-| `pharmacy` | 국립중앙의료원 응급의료 (응급실 + 약국) | data.go.kr 통합 키 | 시·도/시·군·구 cascade + 반경 + 종류 chip + **지금 영업중 토글** |
-| `food-recall` | 식품안전나라 I0490 (별도 시스템) | foodsafetykorea.go.kr **별도 키** | 키워드 chip + 기간 chip + **등급 필터 (1/2/3등급)** |
-| `apartment` | 국토교통부 RTMS 매매 실거래가 (15126469) | data.go.kr 통합 키 | 시·도/시·군·구 cascade + 월 stepper + **정렬 chip** + **6개월 평균가 추이 차트** |
+사이드바 그룹(`_metadata.ts`의 living / realestate / culture)별. 위젯별 화면·강화 상세는 [docs/widgets/](widgets/) 단위 문서가 SSOT — 아래는 요약.
 
-**모든 위젯은 사용자 능동 조회.** 새로고침 버튼으로 강제 fetch. Phase 2에 cron 폴링 추가 예정 ([TODOS.md](TODOS.md) TODO 8).
+| 그룹 | ID | 데이터 소스 | API 시스템 |
+|------|----|------------|------------|
+| 생활·안전 | `weather` | 기상청 단기 + 에어코리아 + 기상청 중기 | data.go.kr 통합 키 |
+| 생활·안전 | `pharmacy` | 국립중앙의료원 응급의료 (응급실 + 약국) | data.go.kr 통합 키 |
+| 생활·안전 | `food-recall` | 식품안전나라 I0490 | foodsafetykorea.go.kr **별도 키** |
+| 생활·안전 | `disaster` | 행정안전부 긴급재난문자 | safetydata.go.kr **별도 키** |
+| 생활·안전 | `price` | KAMIS 농산물유통정보 | kamis.or.kr **별도 키(+id)** |
+| 부동산 | `apartment` | 국토교통부 RTMS 매매 실거래가 (15126469) | data.go.kr 통합 키 |
+| 부동산 | `rent` | 국토교통부 RTMS 전월세 실거래가 | data.go.kr 통합 키 |
+| 문화·여가 | `library` | 정보나루 도서관·도서 검색 | data4library.kr **(통합 키 폴백)** |
+| 문화·여가 | `tour` | 한국관광공사 TourAPI 4.0 | data.go.kr 통합/별도 키 |
+| 문화·여가 | `lotto` | 동행복권 회차별 당첨번호 + 1등 배출점 | **키 불필요 (공개)** |
+
+**위젯별 강화 예 (상세는 widgets/*.md):** weather 시간대별 24h + 주간 8일 / pharmacy 영업중 토글 + 카카오맵 / food-recall 등급 필터 / apartment·rent 단지 상세(`/building`) + 추이 차트 / price 추이 차트 / disaster 긴급단계 타임라인 + 알림 배지.
+
+**모든 위젯은 사용자 능동 조회.** 새로고침 버튼으로 강제 fetch. Phase 2에 cron 폴링 추가 예정 ([TODOS.md](TODOS.md) TODO 8). 인앱 알림 배지(disaster·food-recall)는 Web Push 없이 last-seen 기반 경량 표시.
 
 **공통 강화 (Phase 1.5, v3):**
 - **즐겨찾기**: 모든 상세 페이지 헤더에 ★ 버튼 — 현재 검색 URL을 `localStorage["dataweave.bookmarks"]`에 저장 → 사이드바 즐겨찾기 섹션에서 1클릭 복귀.
@@ -123,6 +134,8 @@ export type WidgetConfig = {
 ---
 
 ## 5. 폴더 구조
+
+> ℹ️ 아래는 **초기 설계 스냅샷** (위젯 3개 시절). 실제 현재 트리(위젯 10종 + 신규 컴포넌트)는 [CLAUDE.md](../CLAUDE.md) "폴더 구조"가 SSOT. 어긋나면 CLAUDE.md/코드 기준.
 
 ```
 data-weave/
@@ -311,12 +324,12 @@ AIRKOREA_API_KEY=                      # 미세먼지 (날씨 위젯)
 3. 최근 24시간 vs 전체 토글
 4. **확인 체크포인트**
 
-### Step 6 — PWA + 배포 (PWA만 ✅, Vercel/Supabase는 deferred)
+### Step 6 — PWA + 배포 (PWA ✅, Vercel ✅, Supabase는 deferred)
 1. ✅ manifest.ts + 아이콘 + install prompt
 2. ✅ Service Worker (정적 캐시만, dev 모드 자동 unregister)
-3. ⏳ Vercel 배포 → [TODOS.md](TODOS.md) TODO 10 (사용자 결정으로 로컬-only 운영)
-4. ⏳ Supabase 프로덕션 마이그레이션 → 데모 인스턴스 하드코딩 + localStorage로 충분, Vercel 시점에 함께
-5. ⏳ Smoke test → Vercel 배포 시점에
+3. ✅ Vercel(icn1 리전) live 배포 — `git push origin main` 자동 재배포 ([TODOS.md](TODOS.md) TODO 10 done)
+4. ⏳ Supabase 프로덕션 마이그레이션 → 데모 인스턴스 하드코딩 + localStorage로 충분, 다중 사용자(TODO 2) 시점에
+5. ✅ Smoke test → live 배포 + 모바일 접속 확인
 
 **총 Step 6단계 (PWA까지 완료), CC ~4시간. Phase 1 완성.**
 
@@ -419,10 +432,13 @@ Phase 2 추가 예정 (점선): cron worker + push dispatcher + push_subs/snapsh
 - [x] 위젯 강화: 등급 필터(리콜), 영업중 토글(약국), 정렬+추이 차트(아파트)
 - [x] 즐겨찾기 시스템 — 검색 URL을 localStorage에 핀
 
+**완료 (v3.6):**
+- [x] Vercel(icn1 리전) live 배포 — `git push origin main` 자동 재배포 (TODO 10 done)
+
 **아직 안 한 것 (의식적 defer):**
-- ⏳ Vercel 배포 → TODO 10
-- ⏳ Supabase 인스턴스 영구 저장 → Vercel 시점에
+- ⏳ Supabase 인스턴스 영구 저장 → 데모 하드코딩 + localStorage로 충분, 다중 사용자(TODO 2) 시점에
 - ⏳ tests: Vitest unit + schema drift 테스트 → 안정화되면
+- ⏳ 알림 인프라 (Web Push + cron) → TODO 8
 
 ---
 
@@ -480,13 +496,18 @@ type Bookmark = {
 
 ### 14.5 위젯별 화면 문서
 
-위젯별 상세 페이지 구조, 데이터 소스, 강화 이력, TODO는 [`docs/widgets/`](widgets/)로 분리:
+위젯별 상세 페이지 구조, 데이터 소스, 강화 이력, TODO는 [`docs/widgets/`](widgets/)로 분리 (10종):
 
-- [매매 실거래가 (apartment)](widgets/apartment.md) — `/w/apartment` + `/w/apartment/building`
-- [전월세 실거래가 (rent)](widgets/rent.md) — `/w/rent` + `/w/rent/building`
 - [날씨 (weather)](widgets/weather.md) — `/w/weather`
 - [SOS 약국·응급실 (pharmacy)](widgets/pharmacy.md) — `/w/pharmacy`
 - [식품 리콜 (food-recall)](widgets/food-recall.md) — `/w/food-recall`
+- [재난문자 (disaster)](widgets/disaster.md) — `/w/disaster`
+- [농수산물 시세 (price)](widgets/price.md) — `/w/price`
+- [매매 실거래가 (apartment)](widgets/apartment.md) — `/w/apartment` + `/w/apartment/building`
+- [전월세 실거래가 (rent)](widgets/rent.md) — `/w/rent` + `/w/rent/building`
+- [공공도서관 (library)](widgets/library.md) — `/w/library`
+- [관광·전시 (tour)](widgets/tour.md) — `/w/tour`
+- [로또 (lotto)](widgets/lotto.md) — `/w/lotto`
 
 새 위젯 추가는 [src/widgets/README.md](../src/widgets/README.md) 참조 (코드 가이드).
 
