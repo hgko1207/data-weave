@@ -100,7 +100,7 @@ export default async function PharmacyDetailPage({ searchParams }: Props) {
       }
     >
       <PharmacyFilters
-        current={{ sido, sigungu, radius, kind, openNow }}
+        current={{ sido, sigungu, radius: effectiveRadius, kind, openNow }}
       />
 
       <DataSourceNotice errorMessage={errorMessage} source={data.source} />
