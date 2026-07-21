@@ -26,7 +26,7 @@ export function DataSourceNotice({ errorMessage, source }: Props) {
     return (
       <div className="inline-flex items-center gap-1.5 rounded-md border border-amber-500/20 bg-amber-500/[0.06] px-2.5 py-1 text-xs text-amber-200">
         <FlaskConical className="h-3 w-3" aria-hidden />
-        샘플 데이터로 표시 중 · API 키 미설정
+        샘플 데이터로 표시 중
       </div>
     );
   }
