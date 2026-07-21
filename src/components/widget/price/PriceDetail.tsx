@@ -35,8 +35,8 @@ export function PriceDetail({ data }: { data: PriceData }) {
               <span>품목·품종</span>
               <span className="text-right">단위</span>
               <span className="text-right">당일가</span>
-              <span className="text-right">전일比</span>
-              <span className="text-right">1주前比</span>
+              <span className="text-right">전일비</span>
+              <span className="text-right">전주비</span>
             </div>
             <ul className="divide-y divide-zinc-800/60">
               {data.items.map((it) => (
