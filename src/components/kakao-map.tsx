@@ -133,9 +133,9 @@ export function KakaoMap({
         className={`flex flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-zinc-800 bg-zinc-900/40 p-6 text-center ${height} ${className}`}
       >
         <MapPin className="h-5 w-5 text-zinc-500" aria-hidden />
-        <p className="text-sm text-zinc-300">지도 표시 안 됨</p>
-        <p className="text-xs text-zinc-500">
-          NEXT_PUBLIC_KAKAO_MAP_KEY 환경변수 등록 시 자동 표시
+        <p className="text-sm text-zinc-300">지도를 표시할 수 없어요</p>
+        <p className="text-xs text-zinc-400">
+          목록에서 위치를 확인할 수 있어요
         </p>
       </div>
     );
