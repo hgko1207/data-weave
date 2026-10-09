@@ -2,6 +2,10 @@
 
 한국 공공데이터 조회형 위젯 대시보드. 날씨 · SOS 병원·약국 · 식품 리콜 · 재난문자 · 농수산물 시세 · 아파트 매매/전월세 · 공공도서관 · 관광·전시 · 로또 — **10종 위젯**을 한 곳에서.
 
+**🔗 Live:** <https://data-weave-psi.vercel.app>
+
+![DataWeave 대시보드 화면](docs/screenshots/home.png)
+
 > Phase 1 + 1.5 완성 — 위젯 10종, 위젯별 상세 페이지, 즐겨찾기, 카카오맵 mini 지도, 인앱 알림 배지. Vercel(icn1)에 live 배포 중. 알림 인프라(Web Push)는 Phase 2. 자세한 설계는 [docs/PLAN.md](docs/PLAN.md), [docs/DESIGN.md](docs/DESIGN.md), [docs/TODOS.md](docs/TODOS.md), 위젯별 [docs/widgets/](docs/widgets/) 참고.
 
 ## 로컬 개발
