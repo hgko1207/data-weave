@@ -17,6 +17,8 @@ export const metadata: Metadata = {
   title: "DataWeave — 한국 공공데이터 위젯 대시보드",
   description: "날씨·SOS 병원·식품 리콜을 한 화면에서. 한국 공공데이터로 만든 조회형 위젯.",
   manifest: "/manifest.webmanifest",
+  // 개인용 — 색인·링크 추적 금지 (robots.ts와 이중 방어)
+  robots: { index: false, follow: false },
   appleWebApp: {
     capable: true,
     title: "DataWeave",

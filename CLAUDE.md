@@ -229,6 +229,7 @@ node scripts/generate-icons.mjs   # PWA 아이콘 재생성 (sharp)
 - **Server-first** — 위젯 데이터 fetch는 RSC에서. 클라이언트는 Render/ConfigForm/refresh 트리거만.
 - **위젯 격리** — `WidgetErrorBoundary`로 위젯 단위 오류 캡슐화. 하나 깨져도 다른 위젯 영향 X.
 - **다크 일관** — `<html class="dark">` 강제. 라이트 모드 지원 안 함.
+- **크롤러 차단** — `robots.ts`(전체 disallow) + 메타 `noindex,nofollow` + `src/proxy.ts`(봇 UA 403). 상세 페이지가 force-dynamic SSR + 무한 URL이라 크롤러 유입 시 Vercel Hobby Fast Origin Transfer(10GB) 초과로 팀 전체가 정지됨(2026-10-30). 공개 노출 기능을 넣을 때 이 방어를 풀지 말 것.
 
 ## 사용자 협업 노트
 
